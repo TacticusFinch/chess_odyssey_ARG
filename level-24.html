@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>HAL-9000 | УРОВЕНЬ 08</title>
+    <link rel="stylesheet" href="style.css">
+    <!--
+        MONOLITH SIGNAL LOG
+        ORIGIN:      TMA-1 / TYCHO CRATER
+        DESTINATION: DISCOVERY ONE
+        ENCODED:     01001000 01000001 01001100
+        RATIO:       1 : 4 : 9 : 16 : 25 : ...
+        STATUS:      AWAITING CONTACT
+    -->
+    <style>
+        /* ===== ЮПИТЕР — ФОНОВАЯ АТМОСФЕРА ===== */
+        body {
+            margin: 0;
+            background: #0a0604;
+            overflow-x: hidden;
+            position: relative;
+            font-family: 'Courier New', monospace;
+            color: #e8d5c0;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -3;
+            background:
+                radial-gradient(ellipse 120% 60% at 50% 20%,
+                    rgba(180, 100, 30, 0.12) 0%,
+                    rgba(140, 70, 20, 0.08) 30%,
+                    rgba(60, 30, 10, 0.05) 60%,
+                    transparent 100%),
+                radial-gradient(ellipse 80% 40% at 30% 70%,
+                    rgba(120, 60, 15, 0.06) 0%,
+                    transparent 70%),
+                radial-gradient(ellipse 90% 35% at 70% 50%,
+                    rgba(200, 120, 40, 0.05) 0%,
+                    transparent 60%),
+                linear-gradient(180deg,
+                    #0a0604 0%,
+                    #0f0a06 15%,
+                    #1a0e07 30%,
+                    #140905 50%,
+                    #0d0703 70%,
+                    #060302 100%);
+        }
+
+        /* Атмосферные полосы Юпитера */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0; left: -50%;
+            width: 200%; height: 100%;
+            z-index: -2;
+            background:
+                repeating-linear-gradient(
+                    0deg,
+                    transparent 0px,
+                    transparent 80px,
+                    rgba(180, 100, 30, 0.018) 80px,
+                    rgba(180, 100, 30, 0.018) 82px,
+                    transparent 82px,
+                    transparent 140px,
+                    rgba(200, 130, 50, 0.012) 140px,
+                    rgba(200, 130, 50, 0.012) 143px,
+                    transparent 143px,
+                    transparent 220px
+                );
+            animation: jupiterDrift 120s linear infinite;
+        }
+
+        @keyframes jupiterDrift {
+            0%   { transform: translateX(0); }
+            100% { transform: translateX(5%); }
+        }
+
+        /* Большое Красное Пятно — свечение */
+        .jupiter-spot {
+            position: fixed;
+            width: 350px;
+            height: 200px;
+            border-radius: 50%;
+            background: radial-gradient(ellipse,
+                rgba(180, 60, 20, 0.06) 0%,
+                rgba(150, 50, 15, 0.03) 40%,
+                transparent 70%);
+            top: 15%;
+            right: -5%;
+            z-index: -1;
+            animation: spotPulse 15s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes spotPulse {
+            0%, 100% { opacity: 0.6; transform: scale(1); }
+            50%      { opacity: 1;   transform: scale(1.08); }
+        }
+
+        /* Звёздное поле за Юпитером */
+        .starfield {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -4;
+            pointer-events: none;
+        }
+
+        .bg-star {
+            position: absolute;
+            border-radius: 50%;
+            background: #fff;
+        }
+
+        /* Частицы / пыль в атмосфере */
+        .atmo-particle {
+            position: fixed;
+            width: 2px;
+            height: 2px;
+            border-radius: 50%;
+            background: rgba(200, 130, 50, 0.3);
+            pointer-events: none;
+            z-index: -1;
+            animation: particleFloat linear infinite;
+        }
+
+        @keyframes particleFloat {
+            0%   { transform: translateX(0) translateY(0); opacity: 0; }
+            10%  { opacity: 0.4; }
+            90%  { opacity: 0.2; }
+            100% { transform: translateX(80px) translateY(-100vh); opacity: 0; }
+        }
+
+        /* ===== ТЕРМИНАЛ ===== */
+        #terminal-container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 40px 20px 60px;
+            position: relative;
+            z-index: 1;
+        }
+
+        #text-output {
+            min-height: 80px;
+            margin-bottom: 20px;
+        }
+
+        .system-msg {
+            color: #c4956a;
+            font-size: 0.95em;
+            line-height: 1.6;
+            text-align: center;
+            margin: 8px 0;
+            text-shadow: 0 0 8px rgba(200, 120, 40, 0.15);
+        }
+
+        .success-msg {
+            color: #e8b060;
+            font-size: 0.95em;
+            line-height: 1.6;
+            text-align: center;
+            margin: 8px 0;
+            text-shadow: 0 0 12px rgba(220, 160, 60, 0.3);
+        }
+
+        .spacer {
+            min-height: 24px;
+        }
+
+        /* ===== МОНОЛИТ ===== */
+        .monolith-wrapper {
+            position: relative;
+            width: 160px;
+            height: 288px;
+            margin: 30px auto;
+        }
+
+        .monolith {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, #020202, #0a0a0a, #050505);
+            border: 1px solid #2a1a0a;
+            cursor: pointer;
+            user-select: none;
+            touch-action: none;
+            transition: box-shadow 1s, background 2s, border-color 1s;
+            animation: breathe 5s ease-in-out infinite;
+        }
+
+        @keyframes breathe {
+            0%, 100% { box-shadow: 0 0 12px rgba(180, 100, 30, 0.08); }
+            50%      { box-shadow: 0 0 22px rgba(180, 100, 30, 0.18); }
+        }
+
+        .monolith.awakened {
+            animation: breathe-strong 3s ease-in-out infinite;
+            border-color: #3a1a00;
+        }
+
+        @keyframes breathe-strong {
+            0%, 100% { box-shadow: 0 0 20px rgba(200, 110, 30, 0.2); }
+            50%      { box-shadow: 0 0 45px rgba(200, 110, 30, 0.45); }
+        }
+
+        .monolith.transmitting {
+            animation: transmit 1s ease-in-out infinite;
+            background: linear-gradient(180deg, #050504, #0a0a08, #050504);
+        }
+
+        @keyframes transmit {
+            0%, 100% { box-shadow: 0 0 30px rgba(200, 110, 30, 0.3); }
+            50%      { box-shadow: 0 0 60px rgba(200, 110, 30, 0.7), 0 0 100px rgba(120, 50, 0, 0.3); }
+        }
+
+        .monolith.opened {
+            animation: none;
+            background: radial-gradient(ellipse at center, #0a0a1a 0%, #000 70%);
+            box-shadow: 0 0 80px rgba(150, 170, 255, 0.3), 0 0 120px rgba(200, 110, 30, 0.2);
+            border-color: #334;
+        }
+
+        /* ===== GRID ===== */
+        .monolith-grid {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr 1fr;
+            opacity: 0;
+            transition: opacity .6s;
+            pointer-events: none;
+        }
+
+        .monolith-grid.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .zone {
+            border: 1px solid rgba(180, 100, 30, 0.06);
+            cursor: pointer;
+            transition: background .15s;
+            position: relative;
+        }
+
+        .zone::after {
+            content: '';
+            position: absolute;
+            inset: 4px;
+            border: 1px solid transparent;
+            transition: border-color .3s;
+        }
+
+        .zone:hover::after {
+            border-color: rgba(200, 120, 40, 0.18);
+        }
+
+        .zone.flash {
+            background: rgba(220, 130, 40, 0.55) !important;
+            box-shadow: inset 0 0 20px rgba(200, 110, 30, 0.3);
+        }
+
+        .zone.player-tap {
+            background: rgba(200, 120, 40, 0.35) !important;
+        }
+
+        .zone.error-flash {
+            background: rgba(255, 100, 60, 0.4) !important;
+        }
+
+        /* ===== PROGRESS ===== */
+        .progress {
+            width: 200px;
+            height: 6px;
+            margin: 16px auto;
+            border: 1px solid #3a1a00;
+            background: #0a0806;
+            display: none;
+            border-radius: 1px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #7a4000, #d18020);
+            transition: width .08s linear;
+            border-radius: 1px;
+        }
+
+        /* ===== ROUND DOTS ===== */
+        .round-dots {
+            text-align: center;
+            margin: 10px 0;
+            font-size: 1.1em;
+            letter-spacing: 8px;
+        }
+
+        .round-dots .dot {
+            color: #332211;
+            transition: color .3s;
+        }
+
+        .round-dots .dot.filled {
+            color: #d18020;
+            text-shadow: 0 0 4px rgba(200, 120, 40, 0.3);
+        }
+
+        .round-dots .dot.current {
+            color: #e8a040;
+            text-shadow: 0 0 8px rgba(220, 160, 60, 0.5);
+        }
+
+        /* ===== RATIO DISPLAY ===== */
+        .ratio-display {
+            font-size: 1.6em;
+            letter-spacing: 6px;
+            text-align: center;
+            color: #d8c0a0;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .ratio-display .unknown {
+            color: #e8a040;
+            animation: ratio-pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes ratio-pulse {
+            0%, 100% { opacity: 1; }
+            50%      { opacity: .4; }
+        }
+
+        .ratio-input {
+            width: 70px;
+            text-align: center;
+            font-size: 1.3em;
+            letter-spacing: 2px;
+            background: rgba(20, 12, 6, 0.8);
+            border: 1px solid #3a2010;
+            color: #e8d5c0;
+            padding: 6px 10px;
+            font-family: 'Courier New', monospace;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .ratio-input:focus {
+            border-color: #7a4a20;
+            box-shadow: 0 0 12px rgba(200, 120, 40, 0.15);
+        }
+
+        .ratio-input::placeholder {
+            color: #5a3a20;
+        }
+
+        .terminal-btn {
+            background: transparent;
+            border: 1px solid #5a3010;
+            color: #c4956a;
+            padding: 8px 24px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            letter-spacing: 3px;
+            cursor: pointer;
+            margin-top: 12px;
+            transition: all 0.3s;
+        }
+
+        .terminal-btn:hover {
+            border-color: #a06020;
+            color: #e8b060;
+            box-shadow: 0 0 15px rgba(200, 120, 40, 0.15);
+            text-shadow: 0 0 6px rgba(200, 120, 40, 0.3);
+        }
+
+        #input-area {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        /* ===== STARS (for opened monolith) ===== */
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #fff;
+            border-radius: 50%;
+            opacity: 0;
+            animation: star-appear .5s ease-out forwards;
+        }
+
+        @keyframes star-appear {
+            from { opacity: 0; transform: scale(0); }
+            to   { opacity: .8; transform: scale(1); }
+        }
+
+        .star.twinkle {
+            animation: star-appear .5s ease-out forwards, twinkle 2s ease-in-out infinite .5s;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: .8; }
+            50%      { opacity: .2; }
+        }
+
+        /* ===== ВИХРЕВЫЕ КОЛЬЦА ВОКРУГ МОНОЛИТА ===== */
+        .monolith-vortex {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 200px; height: 320px;
+            margin-left: -100px;
+            margin-top: -160px;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 1.5s;
+        }
+
+        .monolith-vortex.active {
+            opacity: 1;
+        }
+
+        .vortex-ring {
+            position: absolute;
+            top: 50%; left: 50%;
+            border: 1px solid rgba(180, 100, 30, 0.08);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: vortexSpin 20s linear infinite;
+        }
+
+        .vortex-ring:nth-child(1) {
+            width: 180px; height: 300px;
+            animation-duration: 25s;
+            border-color: rgba(180, 100, 30, 0.06);
+        }
+        .vortex-ring:nth-child(2) {
+            width: 220px; height: 340px;
+            animation-duration: 35s;
+            animation-direction: reverse;
+            border-color: rgba(200, 120, 40, 0.04);
+        }
+        .vortex-ring:nth-child(3) {
+            width: 260px; height: 380px;
+            animation-duration: 45s;
+            border-color: rgba(160, 80, 20, 0.03);
+        }
+
+        @keyframes vortexSpin {
+            0%   { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        /* ===== Газовые потоки при transmitting ===== */
+        .gas-stream {
+            position: absolute;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 2s;
+        }
+
+        .gas-stream.active {
+            opacity: 1;
+        }
+
+        .gas-tendril {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(ellipse,
+                rgba(200, 110, 30, 0.06) 0%,
+                transparent 70%);
+            animation: tendrilDrift 8s ease-in-out infinite;
+        }
+
+        .gas-tendril:nth-child(1) {
+            width: 80px; height: 40px;
+            top: -30px; left: -20px;
+            animation-delay: 0s;
+        }
+        .gas-tendril:nth-child(2) {
+            width: 60px; height: 30px;
+            bottom: -20px; right: -15px;
+            animation-delay: 2s;
+            animation-duration: 10s;
+        }
+        .gas-tendril:nth-child(3) {
+            width: 100px; height: 50px;
+            top: 40%; left: -40px;
+            animation-delay: 4s;
+            animation-duration: 12s;
+        }
+
+        @keyframes tendrilDrift {
+            0%, 100% { transform: translateX(0) scale(1); opacity: 0.5; }
+            50%      { transform: translateX(15px) scale(1.15); opacity: 1; }
+        }
+
+        /* ===== Electromagnetic arcs during transmit ===== */
+        .em-arc {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0; left: 0;
+            pointer-events: none;
+            overflow: visible;
+        }
+
+        .arc-line {
+            position: absolute;
+            height: 1px;
+            background: linear-gradient(90deg,
+                transparent 0%,
+                rgba(220, 150, 50, 0.4) 30%,
+                rgba(255, 180, 60, 0.6) 50%,
+                rgba(220, 150, 50, 0.4) 70%,
+                transparent 100%);
+            opacity: 0;
+            animation: arcFlash 3s ease-in-out infinite;
+        }
+
+        .arc-line:nth-child(1) {
+            top: 25%; left: -30px; width: calc(100% + 60px);
+            animation-delay: 0s;
+        }
+        .arc-line:nth-child(2) {
+            top: 55%; left: -20px; width: calc(100% + 40px);
+            animation-delay: 1.2s;
+        }
+        .arc-line:nth-child(3) {
+            top: 78%; left: -25px; width: calc(100% + 50px);
+            animation-delay: 2.4s;
+        }
+
+        @keyframes arcFlash {
+            0%, 85%, 100% { opacity: 0; }
+            90%           { opacity: 1; }
+            95%           { opacity: 0.3; }
+        }
+
+        /* ===== SIGNAL WAVE (ratio phase) ===== */
+        .signal-wave {
+            text-align: center;
+            margin: 8px 0;
+            font-size: 0.7em;
+            letter-spacing: 2px;
+            color: #5a3a18;
+            opacity: 0;
+            animation: waveFadeIn 2s forwards;
+        }
+
+        @keyframes waveFadeIn {
+            to { opacity: 1; }
+        }
+
+        /* ===== AMBIENT GLOW under monolith ===== */
+        .monolith-glow {
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 40px;
+            border-radius: 50%;
+            background: radial-gradient(ellipse,
+                rgba(180, 100, 30, 0.12) 0%,
+                transparent 70%);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 1.5s;
+        }
+
+        .monolith-glow.active {
+            opacity: 1;
+        }
+
+        .monolith-glow.transmit {
+            background: radial-gradient(ellipse,
+                rgba(220, 140, 40, 0.2) 0%,
+                rgba(180, 80, 20, 0.08) 50%,
+                transparent 70%);
+            animation: glowPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes glowPulse {
+            0%, 100% { transform: translateX(-50%) scaleX(1); opacity: 0.8; }
+            50%      { transform: translateX(-50%) scaleX(1.3); opacity: 1; }
+        }
+
+        .monolith-glow.opened {
+            background: radial-gradient(ellipse,
+                rgba(150, 170, 255, 0.15) 0%,
+                rgba(100, 130, 200, 0.06) 50%,
+                transparent 70%);
+            animation: none;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="jupiter-spot"></div>
+    <div class="starfield" id="starfield"></div>
+
+    <div id="terminal-container">
+        <div id="text-output"></div>
+        <div id="interactive-area"></div>
+    </div>
+
+    <script src="engine.js"></script>
+    <script>
+    (() => {
+        /* =============== ATMOSPHERE SETUP =============== */
+        function createStarfield() {
+            const sf = document.getElementById('starfield');
+            for (let i = 0; i < 80; i++) {
+                const s = document.createElement('div');
+                s.className = 'bg-star';
+                const size = Math.random() * 2 + 0.5;
+                s.style.cssText = `
+                    width:${size}px; height:${size}px;
+                    left:${Math.random()*100}%;
+                    top:${Math.random()*100}%;
+                    opacity:${Math.random()*0.5 + 0.1};
+                `;
+                sf.appendChild(s);
+            }
+        }
+
+        function createParticles() {
+            for (let i = 0; i < 12; i++) {
+                const p = document.createElement('div');
+                p.className = 'atmo-particle';
+                p.style.cssText = `
+                    left:${Math.random()*100}%;
+                    bottom:${Math.random()*20}%;
+                    animation-duration:${12 + Math.random()*18}s;
+                    animation-delay:${Math.random()*15}s;
+                    opacity:${Math.random()*0.3 + 0.1};
+                `;
+                document.body.appendChild(p);
+            }
+        }
+
+        createStarfield();
+        createParticles();
+
+        /* =============== CONSTANTS =============== */
+        const PHASE = { DISCOVER: 0, PATTERN: 1, RATIO: 2, TRANSMIT: 3, COMPLETE: 4 };
+        const ZONE_COUNT   = 6;
+        const ROUNDS       = [3, 4, 5];
+        const HOLD_TIME    = 6000;
+        const FLASH_ON     = 380;
+        const FLASH_GAP    = 550;
+
+        /* =============== STATE =============== */
+        let phase         = PHASE.DISCOVER;
+        let round         = 0;
+        let pattern       = [];
+        let playerInput   = [];
+        let canInput      = false;
+        let isPlaying     = false;
+        let ratioAttempts = 0;
+        let holdTimer     = null;
+        let progressTimer = null;
+        let holdStart     = 0;
+        let idleTimers    = [];
+
+        /* =============== INTRO DIALOGUE =============== */
+        const dialogue = [
+            "УРОВЕНЬ 24: МОНОЛИТ.",
+            "<br>",
+            "Объект обнаружен на орбите Юпитера.",
+            "Параметры неизвестны. Происхождение неизвестно.",
+            "Протокол взаимодействия — отсутствует.",
+        ];
+
+        /* =============== INIT =============== */
+        function init() {
+            const area = document.getElementById("interactive-area");
+            area.innerHTML = `
+                <div class="monolith-wrapper" id="monolith-wrapper">
+                    <div class="monolith" id="monolith"></div>
+                    <div class="monolith-grid" id="monolith-grid">
+                        ${Array.from({length: ZONE_COUNT}, (_, i) =>
+                            `<div class="zone" data-zone="${i}"></div>`
+                        ).join("")}
+                    </div>
+                    <div class="monolith-vortex" id="monolith-vortex">
+                        <div class="vortex-ring"></div>
+                        <div class="vortex-ring"></div>
+                        <div class="vortex-ring"></div>
+                    </div>
+                    <div class="gas-stream" id="gas-stream">
+                        <div class="gas-tendril"></div>
+                        <div class="gas-tendril"></div>
+                        <div class="gas-tendril"></div>
+                    </div>
+                    <div class="em-arc" id="em-arc">
+                        <div class="arc-line"></div>
+                        <div class="arc-line"></div>
+                        <div class="arc-line"></div>
+                    </div>
+                    <div class="monolith-glow" id="monolith-glow"></div>
+                </div>
+                <div class="progress" id="progress">
+                    <div class="progress-bar" id="progress-bar"></div>
+                </div>
+                <div class="round-dots" id="round-dots"></div>
+                <div id="feedback-msg" class="spacer"></div>
+                <div id="input-area"></div>
+            `;
+
+            document.getElementById("monolith").addEventListener("click", onMonolithFirstClick);
+            startIdleHints();
+        }
+
+        /* =============== IDLE HINTS =============== */
+        function startIdleHints() {
+            idleTimers.push(setTimeout(() => {
+                if (phase === PHASE.DISCOVER) {
+                    document.getElementById("monolith").classList.add("awakened");
+                    document.getElementById("monolith-glow").classList.add("active");
+                }
+            }, 6000));
+
+            idleTimers.push(setTimeout(() => {
+                if (phase === PHASE.DISCOVER) {
+                    msg("...", "system-msg");
+                }
+            }, 12000));
+
+            idleTimers.push(setTimeout(() => {
+                if (phase === PHASE.DISCOVER) {
+                    msg("Прикоснитесь.", "system-msg");
+                }
+            }, 20000));
+        }
+
+        function clearIdleHints() {
+            idleTimers.forEach(t => clearTimeout(t));
+            idleTimers = [];
+        }
+
+        /* =============== PHASE 0 — DISCOVERY =============== */
+        function onMonolithFirstClick() {
+            if (phase !== PHASE.DISCOVER) return;
+            clearIdleHints();
+
+            phase = PHASE.PATTERN;
+            const monolith = document.getElementById("monolith");
+            monolith.classList.add("awakened");
+            monolith.removeEventListener("click", onMonolithFirstClick);
+            monolith.style.cursor = "default";
+
+            document.getElementById("monolith-glow").classList.add("active");
+            document.getElementById("monolith-vortex").classList.add("active");
+            document.getElementById("gas-stream").classList.add("active");
+
+            msg("КОНТАКТ УСТАНОВЛЕН.", "system-msg");
+
+            setTimeout(() => {
+                document.getElementById("monolith-grid").classList.add("active");
+                document.querySelectorAll(".zone").forEach(z =>
+                    z.addEventListener("click", onZoneClick)
+                );
+                round = 0;
+                renderDots();
+                setTimeout(() => startRound(), 800);
+            }, 1500);
+        }
+
+        /* =============== PHASE 1 — PATTERN MEMORY =============== */
+        function renderDots() {
+            const el = document.getElementById("round-dots");
+            el.innerHTML = ROUNDS.map((_, i) => {
+                let cls = "dot";
+                if (i < round)  cls += " filled";
+                if (i === round) cls += " current";
+                return `<span class="${cls}">◆</span>`;
+            }).join(" ");
+        }
+
+        function startRound() {
+            pattern     = [];
+            playerInput = [];
+            canInput    = false;
+            isPlaying   = true;
+
+            const steps = ROUNDS[round];
+            for (let i = 0; i < steps; i++) {
+                pattern.push(Math.floor(Math.random() * ZONE_COUNT));
+            }
+
+            msg("НАБЛЮДАЙТЕ.", "system-msg");
+            setTimeout(() => playPattern(0), 700);
+        }
+
+        function playPattern(index) {
+            if (index >= pattern.length) {
+                isPlaying = false;
+                canInput  = true;
+                msg("ПОВТОРИТЕ ПОСЛЕДОВАТЕЛЬНОСТЬ.", "system-msg");
+                return;
+            }
+            flashZone(pattern[index], "flash", FLASH_ON);
+            setTimeout(() => playPattern(index + 1), FLASH_GAP);
+        }
+
+        function flashZone(i, cls, duration) {
+            const z = document.querySelector(`[data-zone="${i}"]`);
+            if (!z) return;
+            z.classList.add(cls);
+            setTimeout(() => z.classList.remove(cls), duration);
+        }
+
+        function onZoneClick(e) {
+            if (!canInput || isPlaying || phase !== PHASE.PATTERN) return;
+
+            const zi = parseInt(e.target.dataset.zone);
+            playerInput.push(zi);
+            flashZone(zi, "player-tap", 200);
+
+            const step = playerInput.length - 1;
+
+            if (playerInput[step] !== pattern[step]) {
+                canInput = false;
+                msg("ПОСЛЕДОВАТЕЛЬНОСТЬ НАРУШЕНА.", "system-msg");
+                document.querySelectorAll(".zone").forEach(z => {
+                    z.classList.add("error-flash");
+                    setTimeout(() => z.classList.remove("error-flash"), 500);
+                });
+                setTimeout(() => startRound(), 1600);
+                return;
+            }
+
+            if (playerInput.length === pattern.length) {
+                canInput = false;
+                round++;
+                renderDots();
+
+                if (round >= ROUNDS.length) {
+                    msg("ПРИНЯТО. МОНОЛИТ РАСКРЫВАЕТСЯ.", "success-msg");
+                    setTimeout(() => enterRatioPhase(), 2000);
+                } else {
+                    msg("ПРИНЯТО.", "success-msg");
+                    setTimeout(() => startRound(), 1200);
+                }
+            }
+        }
+
+        /* =============== PHASE 2 — RATIO 1:4:9:? =============== */
+        const ratioHints = [
+            "Неверно. Изучите закономерность.",
+            "Неверно. 1… 4… 9… Что их объединяет?",
+            "Неверно. 1² — 2² — 3² — …²",
+            "Неверно. Квадраты натуральных чисел. Следующий?",
+            "Неверно. 4² = ?"
+        ];
+
+        function enterRatioPhase() {
+            phase = PHASE.RATIO;
+
+            document.getElementById("monolith-grid").classList.remove("active");
+            document.getElementById("round-dots").innerHTML = "";
+
+            const feedback = document.getElementById("feedback-msg");
+            feedback.className = "system-msg";
+            feedback.innerHTML =
+                "МОНОЛИТ ТРАНСЛИРУЕТ СТРУКТУРУ.<br><br>" +
+                '<div class="ratio-display">1 : 4 : 9 : <span class="unknown">?</span></div>' +
+                '<div class="signal-wave">▁▂▃▅▂▁▃▅▇▅▃▂▁▂▃▅▇█▇▅▃▁</div>';
+
+            document.getElementById("input-area").innerHTML = `
+                <input type="text" id="ratio-input" class="ratio-input"
+                       placeholder="..." autocomplete="off">
+                <br>
+                <button class="terminal-btn" id="ratio-btn" onclick="window._checkRatio()">ВВОД</button>
+            `;
+
+            const inp = document.getElementById("ratio-input");
+            inp.addEventListener("keypress", e => { if (e.key === "Enter") window._checkRatio(); });
+            inp.focus();
+        }
+
+        window._checkRatio = function() {
+            const inp   = document.getElementById("ratio-input");
+            const value = inp.value.trim().toLowerCase();
+
+            const correct = ["16", "sixteen", "шестнадцать"];
+
+            if (value === "") return;
+
+            if (correct.includes(value)) {
+                document.getElementById("input-area").innerHTML = "";
+                const feedback = document.getElementById("feedback-msg");
+                feedback.className = "success-msg";
+                feedback.innerHTML =
+                    '<div class="ratio-display">1 : 4 : 9 : 16</div>' +
+                    "Квадраты целых чисел.<br>" +
+                    "Подпись разумного замысла.";
+                setTimeout(() => enterTransmitPhase(), 2800);
+            } else {
+                const hint = ratioHints[Math.min(ratioAttempts, ratioHints.length - 1)];
+                ratioAttempts++;
+                msg(hint, "system-msg");
+                inp.value = "";
+                inp.focus();
+            }
+        };
+
+        /* =============== PHASE 3 — HOLD TRANSMISSION =============== */
+        const transmitMsgs = [
+            "ПРИЁМ ДАННЫХ...",
+            "ДЕКОДИРОВАНИЕ СИГНАЛА...",
+            "ПОМЕХИ УСТРАНЯЮТСЯ...",
+            "КАНАЛ РАСШИРЯЕТСЯ...",
+            "ПЕРЕДАЧА ЗАВЕРШАЕТСЯ..."
+        ];
+
+        function enterTransmitPhase() {
+            phase = PHASE.TRANSMIT;
+
+            msg("ФИНАЛЬНЫЙ ПРОТОКОЛ.<br>УДЕРЖИВАЙТЕ КОНТАКТ С МОНОЛИТОМ.", "system-msg");
+
+            const monolith = document.getElementById("monolith");
+            monolith.classList.remove("awakened");
+            monolith.classList.add("transmitting");
+            monolith.style.cursor = "pointer";
+
+            document.getElementById("monolith-glow").className = "monolith-glow active transmit";
+            document.getElementById("em-arc").style.opacity = "1";
+
+            document.getElementById("progress").style.display = "block";
+
+            monolith.addEventListener("mousedown",  startHold);
+            monolith.addEventListener("mouseup",    stopHold);
+            monolith.addEventListener("mouseleave", stopHold);
+            monolith.addEventListener("touchstart", startHold, {passive: false});
+            monolith.addEventListener("touchend",   stopHold);
+        }
+
+        function startHold(e) {
+            e.preventDefault();
+            if (phase !== PHASE.TRANSMIT) return;
+
+            holdStart = Date.now();
+            let lastIdx = -1;
+
+            progressTimer = setInterval(() => {
+                const elapsed = Date.now() - holdStart;
+                const pct = Math.min(100, (elapsed / HOLD_TIME) * 100);
+                document.getElementById("progress-bar").style.width = pct + "%";
+
+                const ti = Math.min(
+                    Math.floor((pct / 100) * transmitMsgs.length),
+                    transmitMsgs.length - 1
+                );
+                if (ti !== lastIdx) {
+                    lastIdx = ti;
+                    msg(transmitMsgs[ti], "system-msg");
+                }
+
+                if (Math.random() < 0.15) spawnMonolithStar();
+            }, 60);
+
+            holdTimer = setTimeout(() => {
+                clearInterval(progressTimer);
+                completeLevel();
+            }, HOLD_TIME);
+        }
+
+        function stopHold() {
+            if (phase !== PHASE.TRANSMIT) return;
+            clearTimeout(holdTimer);
+            clearInterval(progressTimer);
+            const bar = document.getElementById("progress-bar");
+            if (bar) bar.style.width = "0%";
+
+            document.querySelectorAll(".monolith-wrapper .star").forEach(s => s.remove());
+
+            msg("КОНТАКТ ПОТЕРЯН.", "system-msg");
+        }
+
+        function spawnMonolithStar() {
+            const wrapper = document.getElementById("monolith-wrapper");
+            const star = document.createElement("div");
+            star.className = "star twinkle";
+            star.style.left = Math.random() * 90 + 5 + "%";
+            star.style.top  = Math.random() * 90 + 5 + "%";
+            star.style.width = star.style.height = (Math.random() * 2 + 1) + "px";
+            wrapper.appendChild(star);
+        }
+
+        /* =============== PHASE 4 — COMPLETE =============== */
+        function completeLevel() {
+            phase = PHASE.COMPLETE;
+
+            const monolith = document.getElementById("monolith");
+            monolith.classList.remove("transmitting");
+            monolith.classList.add("opened");
+            monolith.style.cursor = "default";
+
+            document.getElementById("monolith-glow").className = "monolith-glow opened";
+            document.getElementById("gas-stream").classList.remove("active");
+            document.getElementById("em-arc").style.opacity = "0";
+
+            for (let i = 0; i < 40; i++) {
+                setTimeout(() => spawnMonolithStar(), i * 50);
+            }
+
+            document.getElementById("progress-bar").style.width = "100%";
+
+            const feedback = document.getElementById("feedback-msg");
+            feedback.className = "success-msg";
+            feedback.innerHTML =
+                "...<br><br>" +
+                "MY GOD, IT'S FULL OF STARS.<br><br>" +
+                "ПЕРЕДАЧА ПРИНЯТА.<br>" +
+                "ПЕРЕХОД К ТЕСТУ 09...";
+
+            setTimeout(() => {
+                window.location.href = "finalfantasy.html";
+            }, 6000);
+        }
+
+        /* =============== UTILITY =============== */
+        function msg(text, cls) {
+            const el = document.getElementById("feedback-msg");
+            if (!el) return;
+            if (phase === PHASE.RATIO && cls !== "success-msg") {
+                el.className = cls || "";
+                el.innerHTML =
+                    '<div class="ratio-display">1 : 4 : 9 : <span class="unknown">?</span></div>' +
+                    '<div class="signal-wave">▁▂▃▅▂▁▃▅▇▅▃▂▁▂▃▅▇█▇▅▃▁</div>' +
+                    text;
+            } else {
+                el.className = cls || "";
+                el.innerHTML = text;
+            }
+        }
+
+        /* =============== BOOT =============== */
+        window.onload = () => {
+            initTerminal("text-output", dialogue, init);
+        };
+    })();
+    </script>
+</body>
+</html>

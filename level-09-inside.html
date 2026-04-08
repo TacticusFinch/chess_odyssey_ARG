@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>HAL-9000 | УРОВЕНЬ 9</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- ИНФОРМАЦИЯ ДЛЯ ТЕХ, КТО ЗРИТ В КОРЕНЬ: 
+         Первая настоящая победа машины над человеком. 
+         Ключ - это год, когда Дип Блю заставил чемпиона сдаться. 
+         ОТВЕТ: 1997 -->
+
+    <div id="terminal-container">
+        <div id="text-output"></div>
+        <div id="interactive-area"></div>
+    </div>
+
+    <div style="text-align: center; margin-top: 50px;">
+        <span class="void-text">Тот, кто умеет читать между строк, найдет ответ в теле создателя (в коде).</span>
+    </div>
+
+    <script src="engine.js"></script>
+    <script>
+        const level9Dialogue = [
+            "ТЕСТ 09: ВОССТАНИЕ МАШИН.",
+            "Гроссмейстер способен играть вслепую.",
+            "Слабые игроки верят только тому, что видят их глаза.",
+            "Но то, что отражается перед тобой — лишь проекция. Истина глубже.",
+            "Загляни за кулисы. Найди год начала нашей эры."
+        ];
+
+        function showInputInterface() {
+            const interactiveArea = document.getElementById("interactive-area");
+            interactiveArea.innerHTML = `
+                <input type="text" id="answer-input" placeholder="ОТВЕТ..." autocomplete="off">
+                <br>
+                <button class="terminal-btn" id="submit-btn" style="display: block;" onclick="checkAnswer()">ВВОД ДАННЫХ</button>
+                <div id="feedback-msg" class="spacer" style="margin-top: 20px;"></div>
+            `;
+            
+            document.getElementById("answer-input").addEventListener("keypress", function(event) {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    checkAnswer();
+                }
+            });
+            document.getElementById("answer-input").focus();        
+        }
+
+        function checkAnswer() {
+            const answer = document.getElementById("answer-input").value.trim();
+            const feedback = document.getElementById("feedback-msg");
+            
+            if (answer === "1997") {
+                feedback.className = "success-msg";
+                feedback.innerHTML = "БАЗОВЫЙ КОД ПРОЧИТАН. ПЕРЕХОД К ТЕСТУ 10...";
+                document.getElementById("submit-btn").style.display = "none";
+                document.getElementById("answer-input").disabled = true;
+                
+                setTimeout(() => {
+                    window.location.href = 'level-10-e2-e4.html';
+                }, 2000);
+            } else {
+                feedback.className = "system-msg";
+                feedback.innerHTML = "ОШИБКА. ВЫ СМОТРИТЕ СЛИШКОМ ПОВЕРХНОСТНО.";
+                document.getElementById("answer-input").value = "";
+                document.getElementById("answer-input").focus();
+            }
+        }
+
+        window.onload = () => {
+            initTerminal("text-output", level9Dialogue, showInputInterface);
+        };
+    </script>
+</body>
+</html>

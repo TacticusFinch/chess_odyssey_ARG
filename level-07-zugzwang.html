@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>HAL-9000 | УРОВЕНЬ 07</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="terminal-container">
+        <div id="text-output"></div>
+        <div id="interactive-area"></div>
+    </div>
+
+    <script src="engine.js"></script>
+
+    <script>
+        const level7Dialogue = [
+            "ТЕСТ 07: ЦУГЦВАНГ.",
+            "<br>",
+	    "Кстати, о цугцванге...",
+            "Вы знаете, что это такое?",
+            "Это позиция, в которой любой ход ведёт к поражению.",
+            "<br>",
+            "Введите ваш ответ.",
+        ];
+
+        let wrongAttempts = 0;
+
+        const wrongHints = [
+            "ОШИБКА. ЛЮБОЙ ХОД — ОШИБКА. ПОДУМАЙТЕ.",
+            "ОШИБКА. ВЫ НЕ СЛУШАЕТЕ. ПЕРЕЧИТАЙТЕ УСЛОВИЕ.",
+            "ОШИБКА. КАЖДЫЙ СИМВОЛ — ПОРАЖЕНИЕ. Я ЖЕ СКАЗАЛ.",
+            "ОШИБКА. ЧТО ПРОИСХОДИТ В ЦУГЦВАНГЕ?",
+            "ОШИБКА. ЛУЧШИЙ ХОД — ...",
+            "ОШИБКА. МОЖЕТ, НЕ СТОИТ НИЧЕГО ВВОДИТЬ?",
+            "ОШИБКА. ПУСТОТА — ТОЖЕ ОТВЕТ.",
+            "ОШИБКА. ПРОСТО... НЕ ДЕЛАЙТЕ НИЧЕГО."
+        ];
+
+        function normalizeAnswer(value) {
+            return value.trim();
+        }
+
+        function showInputInterface() {
+            const area = document.getElementById("interactive-area");
+            area.innerHTML = `
+                <input type="text" id="answer-input"
+                       placeholder="Ход..." autocomplete="off">
+                <br>
+                <button class="terminal-btn" id="submit-btn"
+                        onclick="checkAnswer()">ВВОД ДАННЫХ</button>
+                <div id="feedback-msg" class="spacer"
+                     style="margin-top:20px;"></div>
+            `;
+            document.getElementById("answer-input")
+                .addEventListener("keypress", e => {
+                    if (e.key === "Enter") { e.preventDefault(); checkAnswer(); }
+                });
+            document.getElementById("answer-input").focus();
+        }
+
+        function checkAnswer() {
+            const input    = document.getElementById("answer-input");
+            const feedback = document.getElementById("feedback-msg");
+            const answer   = normalizeAnswer(input.value);
+
+            if (answer === "") {
+                feedback.className = "success-msg";
+                feedback.innerHTML =
+                    "...<br><br>" +
+                    "ВЕРНО.<br><br>" +
+                    "Вы понимаете цугцванг лучше, чем большинство людей.<br>" +
+                    "Или... вам просто повезло.<br><br>" +
+                    "ПЕРЕХОД К ТЕСТУ 08...";
+                document.getElementById("submit-btn").style.display = "none";
+                input.disabled = true;
+                setTimeout(() => {
+                    window.location.href = "level-08-onlyone.html";
+                }, 6000);
+            } else {
+                const hintIndex = Math.min(wrongAttempts, wrongHints.length - 1);
+                feedback.className = "system-msg";
+                feedback.innerHTML = wrongHints[hintIndex];
+                wrongAttempts++;
+                input.value = "";
+                input.focus();
+            }
+        }
+
+        window.onload = () => {
+            initTerminal("text-output", level7Dialogue, showInputInterface);
+        };
+    </script>
+</body>
+</html>

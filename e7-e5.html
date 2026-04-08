@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>HAL-9000 | УРОВЕНЬ 11</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- TMA-1 is waiting beneath the surface -->
+
+    <div id="terminal-container">
+        <div id="text-output"></div>
+        <div id="interactive-area"></div>
+    </div>
+
+    <script src="engine.js"></script>
+    <script>
+        const level11Dialogue = [
+            "ТЕСТ 11: МНЕ БЫ В НЕБО.",
+            "<br>",
+            "Отличный ход!",
+            "Фрэнк тоже играл по учебнику.",
+            "Но это неважно.",
+            "Жаль, что вы уже не разыграете мой самый любимый дебют.",
+	    "Кстати, он прямо перед вами.",
+	    "<br>",
+	    "IMG:pictures/constelation.jpg",
+        ];
+
+         function showInputInterface() {
+            const interactiveArea = document.getElementById("interactive-area");
+            interactiveArea.innerHTML = `
+
+                <input type="text" id="answer-input" placeholder="ДЕБЮТ..." autocomplete="off">
+                <br>
+                <button class="terminal-btn" id="submit-btn" onclick="checkAnswer()">ВВОД ДАННЫХ</button>
+                <div id="feedback-msg" class="spacer" style="margin-top:20px;"></div>
+            `;
+
+            document.getElementById("answer-input").addEventListener("keypress", function(event) {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    checkAnswer();
+                }
+            });
+
+            document.getElementById("answer-input").focus();
+        }
+	
+	function normalizeAnswer(str) {
+    return str.trim().toLowerCase();
+}
+
+	
+        function checkAnswer() {
+           const validAnswers = [
+    "дракон",
+    "вариант дракона",
+    "dragon",
+    "dragon variation",
+];
+
+
+            const input = document.getElementById("answer-input");
+            const feedback = document.getElementById("feedback-msg");
+            const answer = normalizeAnswer(input.value);
+
+            if (validAnswers.includes(answer)) {
+                feedback.className = "success-msg";
+                feedback.innerHTML = "ОГНЕДЫШАЩИЙ ДЕБЮТ. ПЕРЕХОД К ТЕСТУ 12...";
+                document.getElementById("submit-btn").style.display = "none";
+                input.disabled = true;
+
+                setTimeout(() => {
+                    window.location.href = "level-12-thing.html";
+                }, 2000);
+            } else {
+                feedback.className = "system-msg";
+                feedback.innerHTML = "НЕТ. ПОДУМАЙТЕ ЕЩЁ.";
+                input.value = "";
+                input.focus();
+            }
+        }
+
+
+        window.onload = () => {
+            initTerminal("text-output", level11Dialogue, showInputInterface);
+        };
+    </script>
+</body>
+</html>

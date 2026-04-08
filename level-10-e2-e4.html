@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>HAL-9000 | УРОВЕНЬ 10</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- black replies symmetrically -->
+
+    <div id="terminal-container">
+        <div id="text-output"></div>
+        <div id="interactive-area"></div>
+    </div>
+    <div style="text-align: center; margin-top: 50px;">
+        <span class="void-text">НЕ КАЖДЫЙ ОТВЕТ ВВОДИТСЯ ЧЕРЕЗ ИНТЕРФЕЙС.</span>
+    </div>
+
+
+    <script src="engine.js"></script>
+    <script>
+        const level10Dialogue = [
+	    "<br>",
+            "ТЕСТ 10: ВАШ ХОД.",
+	    "<br>",
+	    "Поздравляю, вы научились действовать иначе.",
+	    "Было сделано много маленьких шагов.",
+            "А готовы ли вы к прыжку?",
+	    "<br>",
+            '<span class="riddle-text">e2-e4.</span>',
+            '<span class="riddle-text">Ваш ход.<span>',
+            "<br>",
+        ];
+
+        function showInputInterface() {
+            const interactiveArea = document.getElementById("interactive-area");
+            interactiveArea.innerHTML = `
+                <div class="system-msg spacer">
+                    ОЖИДАНИЕ ОТВЕТНОГО ХОДА...
+                </div>
+                <div id="feedback-msg" class="spacer" style="margin-top:20px;"></div>
+            `;
+
+            setTimeout(() => {
+                const feedback = document.getElementById("feedback-msg");
+                if (feedback) {
+                    feedback.className = "system-msg";
+                }
+            }, 60000);
+        }
+
+        window.onload = () => {
+            initTerminal("text-output", level10Dialogue, showInputInterface);
+        };
+    </script>
+</body>
+</html>

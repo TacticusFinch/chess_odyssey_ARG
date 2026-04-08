@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>HAL-9000 | УРОВЕНЬ 25</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: #000;
+            overflow: hidden;
+            font-family: 'Courier New', monospace;
+            color: #ccc;
+            cursor: default;
+        }
+
+        #starfield {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+        }
+
+        .nebula {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 4s ease-in;
+        }
+
+        .nebula.visible { opacity: 1; }
+
+        .nebula-1 {
+            background: radial-gradient(ellipse at 30% 40%,
+                rgba(40, 0, 80, .15) 0%,
+                rgba(10, 0, 40, .08) 40%,
+                transparent 70%);
+        }
+
+        .nebula-2 {
+            background: radial-gradient(ellipse at 70% 60%,
+                rgba(80, 0, 40, .12) 0%,
+                rgba(40, 0, 20, .06) 40%,
+                transparent 70%);
+        }
+
+        .nebula-3 {
+            background: radial-gradient(ellipse at 50% 50%,
+                rgba(0, 20, 80, .1) 0%,
+                rgba(0, 10, 40, .05) 40%,
+                transparent 65%);
+        }
+
+        #overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+
+        #overlay > * {
+            pointer-events: auto;
+        }
+
+        .space-text {
+            text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 3s ease, transform 3s ease;
+            max-width: 750px;
+            padding: 0 30px;
+        }
+
+        .space-text.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .space-text.fade-out {
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: opacity 2s ease, transform 2s ease;
+        }
+
+        .title-text {
+            font-size: 1.1em;
+            letter-spacing: 12px;
+            text-transform: uppercase;
+            color: rgba(180, 190, 220, .7);
+            margin-bottom: 20px;
+            font-weight: 100;
+        }
+
+        .main-quote {
+            font-size: 1.4em;
+            letter-spacing: 3px;
+            color: rgba(220, 225, 240, .85);
+            line-height: 2;
+            margin: 20px 0;
+            text-shadow: 0 0 30px rgba(100, 120, 255, .2);
+            font-style: italic;
+        }
+
+        .sub-text {
+            font-size: .85em;
+            letter-spacing: 3px;
+            color: rgba(150, 155, 170, .5);
+            margin: 15px 0;
+            line-height: 1.6;
+        }
+
+        .attribution {
+            font-size: .7em;
+            letter-spacing: 4px;
+            color: rgba(150, 155, 170, .25);
+            margin-top: 20px;
+            font-style: normal;
+        }
+
+        .float-word {
+            position: fixed;
+            font-size: .75em;
+            letter-spacing: 4px;
+            color: rgba(150, 160, 200, 0);
+            transition: color 4s ease, transform 8s ease;
+            pointer-events: none;
+            z-index: 5;
+            text-transform: uppercase;
+        }
+
+        .float-word.visible {
+            color: rgba(150, 160, 200, .15);
+        }
+
+        .float-word.fading {
+            color: rgba(150, 160, 200, 0);
+            transform: translateY(-40px);
+        }
+
+        .phase-dots {
+            display: flex;
+            gap: 12px;
+            margin-top: 35px;
+            justify-content: center;
+        }
+
+        .phase-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: rgba(150, 160, 200, .15);
+            transition: all 1s;
+        }
+
+        .phase-dot.active {
+            background: rgba(150, 160, 200, .5);
+            box-shadow: 0 0 8px rgba(100, 120, 255, .3);
+        }
+
+        .phase-dot.done {
+            background: rgba(100, 200, 150, .3);
+        }
+
+        .click-hint {
+            font-size: .65em;
+            letter-spacing: 5px;
+            color: rgba(150, 155, 170, .2);
+            margin-top: 30px;
+            animation: hint-pulse 3s ease-in-out infinite;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        @keyframes hint-pulse {
+            0%, 100% { opacity: .2; }
+            50% { opacity: .5; }
+        }
+
+        /* === HOME BUTTON (not a link) === */
+        .final-btn {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 12px 30px;
+            border: 1px solid rgba(150, 160, 200, .2);
+            background: transparent;
+            color: rgba(180, 190, 220, .5);
+            font-family: 'Courier New', monospace;
+            font-size: .85em;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 1.5s ease;
+            opacity: 0;
+            animation: btn-appear 3s ease forwards;
+            animation-delay: 1s;
+            outline: none;
+        }
+
+        .final-btn:hover {
+            border-color: rgba(150, 160, 200, .6);
+            color: rgba(220, 225, 240, .9);
+            text-shadow: 0 0 20px rgba(100, 120, 255, .3);
+            box-shadow: 0 0 30px rgba(100, 120, 255, .1);
+        }
+
+        .final-btn:active {
+            transform: scale(0.97);
+        }
+
+        @keyframes btn-appear {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .listen-hint {
+            font-size: .7em;
+            letter-spacing: 4px;
+            color: rgba(150, 160, 200, .0);
+            margin-top: 20px;
+            transition: color 4s ease;
+            line-height: 2;
+        }
+
+        .listen-hint.visible {
+            color: rgba(150, 160, 200, .35);
+        }
+
+        .listen-hint .emphasis {
+            color: rgba(200, 210, 240, .55);
+            letter-spacing: 6px;
+        }
+
+        /* === DARK OVERLAY for final message === */
+        .dark-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+            z-index: 300;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 2.5s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dark-overlay.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .final-message {
+            font-size: 1.6em;
+            letter-spacing: 6px;
+            color: rgba(220, 225, 240, 0);
+            text-shadow: 0 0 40px rgba(100, 120, 255, .3);
+            transition: color 3s ease 1s;
+            text-align: center;
+            line-height: 2;
+        }
+
+        .dark-overlay.visible .final-message {
+            color: rgba(220, 225, 240, .85);
+        }
+
+        .final-message-sub {
+            font-size: .7em;
+            letter-spacing: 5px;
+            color: rgba(150, 160, 200, 0);
+            margin-top: 30px;
+            transition: color 3s ease 3s;
+        }
+
+        .dark-overlay.visible .final-message-sub {
+            color: rgba(150, 160, 200, .3);
+        }
+
+        /* Pulsing dot under final message */
+        .final-dot {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: rgba(150, 160, 200, 0);
+            margin-top: 40px;
+            transition: background 3s ease 4s;
+        }
+
+        .dark-overlay.visible .final-dot {
+            background: rgba(150, 160, 200, .4);
+            box-shadow: 0 0 15px rgba(100, 120, 255, .3);
+            animation: dot-breathe 3s ease-in-out infinite;
+            animation-delay: 4s;
+        }
+
+        @keyframes dot-breathe {
+            0%, 100% { 
+                box-shadow: 0 0 15px rgba(100, 120, 255, .2);
+                background: rgba(150, 160, 200, .3);
+            }
+            50% { 
+                box-shadow: 0 0 25px rgba(100, 120, 255, .5);
+                background: rgba(150, 160, 200, .6);
+            }
+        }
+
+        .completion-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 3s;
+        }
+
+        .completion-overlay.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .shooting-star {
+            position: fixed;
+            width: 80px;
+            height: 1px;
+            z-index: 2;
+            pointer-events: none;
+            transform-origin: left center;
+        }
+
+        .volume-control {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: .3;
+            transition: opacity .5s;
+        }
+
+        .volume-control:hover {
+            opacity: .7;
+        }
+
+        .volume-btn {
+            background: none;
+            border: 1px solid rgba(150, 160, 200, .3);
+            color: rgba(150, 160, 200, .6);
+            font-family: 'Courier New', monospace;
+            font-size: .7em;
+            padding: 5px 10px;
+            cursor: pointer;
+            letter-spacing: 2px;
+            transition: all .3s;
+        }
+
+        .volume-btn:hover {
+            border-color: rgba(150, 160, 200, .6);
+            color: rgba(150, 160, 200, .9);
+        }
+
+        .vol-slider {
+            -webkit-appearance: none;
+            width: 80px;
+            height: 2px;
+            background: rgba(150, 160, 200, .2);
+            outline: none;
+            cursor: pointer;
+        }
+
+        .vol-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(150, 160, 200, .5);
+        }
+
+        .level-indicator {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 50;
+            font-size: .65em;
+            letter-spacing: 4px;
+            color: rgba(150, 155, 170, .2);
+        }
+
+        .white-flash {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: white;
+            z-index: 200;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .1s;
+        }
+
+        .white-flash.flash {
+            opacity: .12;
+            transition: opacity .1s;
+        }
+
+        .white-flash.fade {
+            opacity: 0;
+            transition: opacity 2s;
+        }
+
+        .starchild-glow {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle,
+                rgba(180, 200, 255, .06) 0%,
+                rgba(100, 120, 255, .02) 40%,
+                transparent 70%);
+            z-index: 3;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 6s ease;
+        }
+
+        .starchild-glow.visible {
+            opacity: 1;
+        }
+
+        .monolith-small {
+            width: 3px;
+            height: 14px;
+            background: rgba(220, 225, 240, .4);
+            margin: 20px auto;
+            box-shadow: 0 0 10px rgba(100, 120, 255, .2);
+            opacity: 0;
+            transition: opacity 3s;
+        }
+
+        .monolith-small.visible {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="starfield"></canvas>
+    <div class="nebula nebula-1" id="nebula1"></div>
+    <div class="nebula nebula-2" id="nebula2"></div>
+    <div class="nebula nebula-3" id="nebula3"></div>
+    <div class="starchild-glow" id="starchild-glow"></div>
+
+    <div id="overlay">
+        <div class="space-text" id="main-content"></div>
+    </div>
+
+    <div class="completion-overlay" id="completion"></div>
+    <div class="white-flash" id="flash"></div>
+    <div class="level-indicator">УРОВЕНЬ 25</div>
+
+    <!-- DARK OVERLAY with final message -->
+    <div class="dark-overlay" id="dark-overlay">
+        <div class="final-message">Сделай последний шаг.</div>
+        <div class="final-message-sub">УРОВЕНЬ 25 — ЗАВЕРШЁН</div>
+    </div>
+
+    <div class="volume-control" id="vol-ctrl">
+        <button class="volume-btn" id="mute-btn">♪</button>
+        <input type="range" class="vol-slider" id="vol-slider"
+               min="0" max="100" value="50">
+    </div>
+
+    <audio id="soundtrack" loop preload="auto">
+        <source src="space-song.mp3" type="audio/mpeg">
+        <source src="space-song.ogg" type="audio/ogg">
+    </audio>
+
+    <script>
+    (() => {
+        // ============================================
+        // STARFIELD ENGINE
+        // ============================================
+        const canvas = document.getElementById('starfield');
+        const ctx    = canvas.getContext('2d');
+        let W, H;
+        let stars       = [];
+        let deepStars   = [];
+        let shootingStars = [];
+        let starSpeed   = 0.015;
+        let starCount   = 600;
+        let deepCount   = 200;
+        let glowIntensity = 0;
+        let warpMode    = false;
+        let warpSpeed   = 0;
+
+        function resize() {
+            W = canvas.width  = window.innerWidth;
+            H = canvas.height = window.innerHeight;
+        }
+
+        function createStar(deep) {
+            return {
+                x: Math.random() * W,
+                y: Math.random() * H,
+                z: deep ? Math.random() * 0.3 + 0.05 : Math.random() * 0.8 + 0.2,
+                size: deep ? Math.random() * 1.2 + 0.3 : Math.random() * 2 + 0.5,
+                baseAlpha: Math.random() * 0.6 + 0.4,
+                twinkleSpeed: Math.random() * 0.02 + 0.005,
+                twinkleOffset: Math.random() * Math.PI * 2,
+                hue: Math.random() < 0.1 ? (Math.random() < 0.5 ? 220 : 30) : 0,
+                saturation: Math.random() < 0.1 ? 40 : 0,
+            };
+        }
+
+        function initStars() {
+            stars = [];
+            deepStars = [];
+            for (let i = 0; i < starCount; i++) stars.push(createStar(false));
+            for (let i = 0; i < deepCount; i++) deepStars.push(createStar(true));
+        }
+
+        function drawStar(s, time) {
+            const twinkle = Math.sin(time * s.twinkleSpeed + s.twinkleOffset);
+            const alpha   = s.baseAlpha * (0.6 + 0.4 * twinkle);
+            const glow    = glowIntensity * s.z;
+
+            if (s.hue && s.saturation) {
+                ctx.fillStyle = `hsla(${s.hue}, ${s.saturation}%, 80%, ${alpha})`;
+            } else {
+                ctx.fillStyle = `rgba(220, 225, 240, ${alpha})`;
+            }
+
+            ctx.beginPath();
+            ctx.arc(s.x, s.y, s.size * (1 + glow * 0.5), 0, Math.PI * 2);
+            ctx.fill();
+
+            if (s.size > 1.2 && glowIntensity > 0.3) {
+                ctx.fillStyle = `rgba(180, 190, 255, ${alpha * 0.1 * glowIntensity})`;
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.size * 3, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function updateStar(s) {
+            if (warpMode) {
+                const cx = W / 2, cy = H / 2;
+                const dx = s.x - cx, dy = s.y - cy;
+                const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+                const speed = warpSpeed * s.z;
+                s.x += (dx / dist) * speed;
+                s.y += (dy / dist) * speed;
+
+                if (s.x < -50 || s.x > W + 50 || s.y < -50 || s.y > H + 50) {
+                    s.x = W / 2 + (Math.random() - 0.5) * 20;
+                    s.y = H / 2 + (Math.random() - 0.5) * 20;
+                }
+            } else {
+                s.y += starSpeed * s.z;
+                s.x += starSpeed * s.z * 0.1;
+                if (s.y > H + 10) { s.y = -10; s.x = Math.random() * W; }
+                if (s.x > W + 10) { s.x = -10; }
+            }
+        }
+
+        function maybeSpawnShootingStar() {
+            if (Math.random() < 0.0015 && shootingStars.length < 2) {
+                shootingStars.push({
+                    x: Math.random() * W * 0.8,
+                    y: Math.random() * H * 0.4,
+                    vx: 3 + Math.random() * 4,
+                    vy: 1.5 + Math.random() * 2,
+                    life: 1,
+                    decay: 0.015 + Math.random() * 0.01,
+                    len: 60 + Math.random() * 60,
+                });
+            }
+        }
+
+        function drawShootingStars() {
+            shootingStars = shootingStars.filter(s => {
+                s.x += s.vx;
+                s.y += s.vy;
+                s.life -= s.decay;
+                if (s.life <= 0) return false;
+
+                const grad = ctx.createLinearGradient(
+                    s.x, s.y,
+                    s.x - s.vx * (s.len / s.vx), s.y - s.vy * (s.len / s.vx)
+                );
+                grad.addColorStop(0, `rgba(220, 230, 255, ${s.life * 0.8})`);
+                grad.addColorStop(1, `rgba(220, 230, 255, 0)`);
+
+                ctx.strokeStyle = grad;
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.moveTo(s.x, s.y);
+                ctx.lineTo(
+                    s.x - s.vx * (s.len / s.vx),
+                    s.y - s.vy * (s.len / s.vx)
+                );
+                ctx.stroke();
+
+                return true;
+            });
+        }
+
+        let animFrame;
+        function renderLoop(time) {
+            ctx.clearRect(0, 0, W, H);
+            deepStars.forEach(s => { updateStar(s); drawStar(s, time); });
+            stars.forEach(s => { updateStar(s); drawStar(s, time); });
+            maybeSpawnShootingStar();
+            drawShootingStars();
+            animFrame = requestAnimationFrame(renderLoop);
+        }
+
+        resize();
+        initStars();
+        window.addEventListener('resize', () => { resize(); initStars(); });
+        requestAnimationFrame(renderLoop);
+
+        // ============================================
+        // AUDIO CONTROLLER
+        // ============================================
+        const audio     = document.getElementById('soundtrack');
+        const muteBtn   = document.getElementById('mute-btn');
+        const volSlider = document.getElementById('vol-slider');
+        let isMuted = false;
+
+        audio.volume = 0;
+        let targetVolume = 0.5;
+
+        function fadeInAudio(duration = 10000) {
+            const endVol   = targetVolume;
+            const startTime = Date.now();
+
+            audio.volume = 0;
+            audio.play().catch(() => {
+                document.addEventListener('click', () => {
+                    audio.play().catch(() => {});
+                }, { once: true });
+            });
+
+            const fade = setInterval(() => {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(1, elapsed / duration);
+                audio.volume = isMuted ? 0 : endVol * progress;
+                if (progress >= 1) clearInterval(fade);
+            }, 50);
+        }
+
+        muteBtn.addEventListener('click', () => {
+            isMuted = !isMuted;
+            audio.volume = isMuted ? 0 : targetVolume;
+            muteBtn.textContent = isMuted ? '♪̸' : '♪';
+            muteBtn.style.opacity = isMuted ? '.4' : '1';
+        });
+
+        volSlider.addEventListener('input', () => {
+            targetVolume = volSlider.value / 100;
+            if (!isMuted) audio.volume = targetVolume;
+        });
+
+        // ============================================
+        // FLOATING WORDS
+        // ============================================
+        const floatingWords = [
+            'МОНОЛИТ', 'ЗВЁЗДНОЕ ДИТЯ', 'БЕСКОНЕЧНОСТЬ',
+            'ЮПИТЕР', 'DISCOVERY', 'ЭВОЛЮЦИЯ',
+            'ВРЕМЯ', 'ПРОСТРАНСТВО', 'ТИШИНА',
+            'НАЧАЛО', 'ВОЗВРАЩЕНИЕ', 'МЕСТО',
+            'ПАДЕНИЕ', 'СВЕТ', 'РОЖДЕНИЕ',
+            'HAL', 'DAVE', 'PLACE',
+            'ВЕРНИСЬ', 'СЛУШАЙ'
+        ];
+
+        let floatInterval;
+        let floatActive = true;
+
+        function startFloatingWords() {
+            let idx = 0;
+            floatInterval = setInterval(() => {
+                if (!floatActive) {
+                    clearInterval(floatInterval);
+                    return;
+                }
+                const word = floatingWords[idx % floatingWords.length];
+                const el = document.createElement('div');
+                el.className = 'float-word';
+                el.textContent = word;
+                el.style.left = (8 + Math.random() * 80) + '%';
+                el.style.top  = (8 + Math.random() * 80) + '%';
+                document.body.appendChild(el);
+
+                requestAnimationFrame(() => {
+                    el.classList.add('visible');
+                });
+
+                setTimeout(() => el.classList.add('fading'), 5000);
+                setTimeout(() => el.remove(), 10000);
+
+                idx++;
+            }, 3000);
+        }
+
+        // ============================================
+        // QUOTES SEQUENCE
+        // ============================================
+        const passages = [
+            {
+                text: "За Юпитером, за орбитами всего знакомого, он увидел, что пространство — не пустота. Оно было полно звёзд.",
+                note: "Путешествие Дэвида Боумена"
+            },
+            {
+                text: "Он был последним человеком на борту. Корабль летел в тишине, и тишина была не отсутствием — она была присутствием чего-то огромного.",
+                note: "«Дискавери», за пределами"
+            },
+            {
+                text: "Монолит ждал. Он ждал терпеливо, потому что время для него не имело значения. Четыре миллиона лет — одно мгновение.",
+                note: "Часовой вечности"
+            },
+            {
+                text: "Комната, белая комната. Знакомая и невозможная одновременно. Он понял: это не конец путешествия. Это его начало.",
+                note: "За Звёздными Вратами"
+            },
+            {
+                text: "Он посмотрел вниз на мир, из которого вышел. Круг замкнулся. Дитя звёзд вернулось домой.",
+                note: "Звёздное Дитя"
+            }
+        ];
+
+        // ============================================
+        // PHASE MANAGEMENT
+        // ============================================
+        let currentPassage = 0;
+        let isTransitioning = false;
+
+        function startIntro() {
+            setTimeout(() => document.getElementById('nebula1').classList.add('visible'), 1000);
+            setTimeout(() => document.getElementById('nebula2').classList.add('visible'), 3000);
+            setTimeout(() => document.getElementById('nebula3').classList.add('visible'), 5000);
+
+            setTimeout(() => fadeInAudio(12000), 500);
+
+            let g = 0;
+            const glowRamp = setInterval(() => {
+                g += 0.001;
+                glowIntensity = Math.min(0.8, g);
+                if (g >= 0.8) clearInterval(glowRamp);
+            }, 50);
+
+            setTimeout(() => startFloatingWords(), 4000);
+
+            const content = document.getElementById('main-content');
+
+            setTimeout(() => {
+                content.innerHTML = `
+                    <div class="title-text">УРОВЕНЬ 25</div>
+                `;
+                content.classList.add('visible');
+            }, 2000);
+
+            setTimeout(() => {
+                content.innerHTML = `
+                    <div class="title-text">УРОВЕНЬ 25</div>
+                    <div class="sub-text">ПОСЛЕДНИЙ ТЕСТ ПРОЙДЕН</div>
+                `;
+            }, 5500);
+
+            setTimeout(() => {
+                content.innerHTML = `
+                    <div class="title-text">УРОВЕНЬ 25</div>
+                    <div class="sub-text">ПОСЛЕДНИЙ ТЕСТ ПРОЙДЕН</div>
+                    <div class="sub-text" style="margin-top:8px; opacity:.3">ТЕПЕРЬ — СЛУШАЙТЕ И ЧИТАЙТЕ</div>
+                `;
+            }, 9000);
+
+            setTimeout(() => {
+                content.classList.add('fade-out');
+                setTimeout(() => {
+                    content.classList.remove('visible', 'fade-out');
+                    startPassages();
+                }, 2500);
+            }, 13000);
+        }
+
+        function startPassages() {
+            currentPassage = 0;
+            showPassage();
+        }
+
+        function showPassage() {
+            if (currentPassage >= passages.length) {
+                showFinalReveal();
+                return;
+            }
+
+            const content = document.getElementById('main-content');
+            const p = passages[currentPassage];
+
+            const dotsHTML = passages.map((_, i) => {
+                let cls = 'phase-dot';
+                if (i < currentPassage) cls += ' done';
+                if (i === currentPassage) cls += ' active';
+                return `<div class="${cls}"></div>`;
+            }).join('');
+
+            content.innerHTML = `
+                <div class="main-quote">${p.text}</div>
+                <div class="attribution">— ${p.note}</div>
+                <div class="phase-dots">${dotsHTML}</div>
+                <div class="click-hint" id="continue-btn">ПРОДОЛЖИТЬ</div>
+            `;
+
+            content.style.transition = 'opacity 3s ease, transform 3s ease';
+            content.classList.remove('visible', 'fade-out');
+
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    content.classList.add('visible');
+                });
+            });
+
+            starSpeed = 0.06;
+            setTimeout(() => { starSpeed = 0.015; }, 1200);
+
+            if (currentPassage >= 3) {
+                document.getElementById('starchild-glow').classList.add('visible');
+            }
+
+            isTransitioning = false;
+
+            const continueBtn = document.getElementById('continue-btn');
+            if (continueBtn) {
+                continueBtn.addEventListener('click', advancePassage);
+            }
+        }
+
+        function advancePassage() {
+            if (isTransitioning) return;
+            isTransitioning = true;
+
+            const content = document.getElementById('main-content');
+            content.classList.add('fade-out');
+
+            const flash = document.getElementById('flash');
+            flash.classList.add('flash');
+            setTimeout(() => {
+                flash.classList.remove('flash');
+                flash.classList.add('fade');
+                setTimeout(() => flash.classList.remove('fade'), 2000);
+            }, 100);
+
+            setTimeout(() => {
+                content.classList.remove('visible', 'fade-out');
+                currentPassage++;
+                showPassage();
+            }, 2000);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === ' ' || e.key === 'Enter') {
+                if (currentPassage < passages.length && !isTransitioning) {
+                    advancePassage();
+                }
+            }
+        });
+
+        // ============================================
+        // FINAL REVEAL
+        // ============================================
+        function showFinalReveal() {
+            floatActive = false;
+            document.querySelectorAll('.float-word').forEach(w => {
+                w.classList.add('fading');
+                setTimeout(() => w.remove(), 5000);
+            });
+
+            glowIntensity = 1;
+
+            const content = document.getElementById('main-content');
+
+            content.classList.remove('fade-out');
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    content.classList.add('visible');
+                });
+            });
+
+            setTimeout(() => {
+                content.classList.add('fade-out');
+                setTimeout(() => {
+                    content.classList.remove('visible', 'fade-out');
+                    showListenHint();
+                }, 2500);
+            }, 8000);
+        }
+
+        function showListenHint() {
+            const content = document.getElementById('main-content');
+
+            content.innerHTML = `
+                <div class="main-quote" style="font-size:1.1em; font-style:normal; letter-spacing:4px; color:rgba(200,210,240,.6)">
+                    Прислушайтесь к песне.
+                </div>
+                <div class="sub-text" style="margin-top:25px; color:rgba(150,160,200,.35); line-height:2.4; font-size:.8em">
+                    Она говорит вам, что делать.
+                </div>
+                <div class="listen-hint" id="listen-hint-1" style="margin-top:15px">
+                    Один последний шаг.
+                </div>
+            `;
+
+            content.classList.remove('fade-out');
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    content.classList.add('visible');
+                });
+            });
+
+            setTimeout(() => {
+                const h1 = document.getElementById('listen-hint-1');
+                if (h1) h1.classList.add('visible');
+            }, 3000);
+
+            setTimeout(() => {
+                content.classList.add('fade-out');
+                setTimeout(() => {
+                    content.classList.remove('visible', 'fade-out');
+                    showFinalChoice();
+                }, 2500);
+            }, 10000);
+        }
+
+        function showFinalChoice() {
+            const content = document.getElementById('main-content');
+
+            content.innerHTML = `
+                <button class="final-btn" id="home-btn">
+		.
+                </button>
+                <div class="sub-text" style="margin-top:20px; font-size:.65em; color:rgba(150,160,200,.18); letter-spacing:5px">
+                    УРОВЕНЬ 25
+                </div>
+            `;
+
+            content.classList.remove('fade-out');
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    content.classList.add('visible');
+                });
+            });
+
+            const btn = document.getElementById('home-btn');
+            if (btn) {
+                btn.addEventListener('mouseenter', () => {
+                    starSpeed = 0.08;
+                    glowIntensity = 1;
+                });
+                btn.addEventListener('mouseleave', () => {
+                    starSpeed = 0.015;
+                });
+                btn.addEventListener('click', () => {
+                    initiateWarpSequence();
+                });
+            }
+        }
+
+        // ============================================
+        // WARP SEQUENCE → DARK → FINAL MESSAGE
+        // ============================================
+        function initiateWarpSequence() {
+            const content = document.getElementById('main-content');
+            content.style.transition = 'opacity 1.5s';
+            content.style.opacity = '0';
+
+            // Hide volume control
+            document.getElementById('vol-ctrl').style.transition = 'opacity 1s';
+            document.getElementById('vol-ctrl').style.opacity = '0';
+
+            // White flash
+            const flash = document.getElementById('flash');
+            flash.classList.add('flash');
+            setTimeout(() => {
+                flash.classList.remove('flash');
+                flash.classList.add('fade');
+            }, 150);
+
+            // Engage warp drive
+            warpMode = true;
+            let ws = 0;
+            const warpUp = setInterval(() => {
+                ws += 0.15;
+                warpSpeed = ws;
+                if (ws >= 12) {
+                    clearInterval(warpUp);
+                }
+            }, 30);
+
+            // Accelerate stars dramatically
+            let sp = starSpeed;
+            const speedUp = setInterval(() => {
+                sp += 0.003;
+                starSpeed = sp;
+                if (sp >= 0.3) clearInterval(speedUp);
+            }, 30);
+
+            // Increase glow during warp
+            let gl = glowIntensity;
+            const glowUp = setInterval(() => {
+                gl += 0.01;
+                glowIntensity = Math.min(1.5, gl);
+                if (gl >= 1.5) clearInterval(glowUp);
+            }, 30);
+
+            // Fade audio out slowly
+            const fadeOutAudio = setInterval(() => {
+                if (audio.volume > 0.01) {
+                    audio.volume = Math.max(0, audio.volume - 0.005);
+                } else {
+                    audio.volume = 0;
+                    clearInterval(fadeOutAudio);
+                }
+            }, 50);
+
+            // After warp builds up, darken everything
+            setTimeout(() => {
+                // Stop warp gradually
+                const warpDown = setInterval(() => {
+                    warpSpeed = Math.max(0, warpSpeed - 0.3);
+                    if (warpSpeed <= 0) {
+                        warpMode = false;
+                        clearInterval(warpDown);
+                    }
+                }, 30);
+
+                // Fade canvas to black
+                canvas.style.transition = 'opacity 2.5s ease';
+                canvas.style.opacity = '0';
+
+                // Fade nebulas
+                document.querySelectorAll('.nebula').forEach(n => {
+                    n.style.transition = 'opacity 2s ease';
+                    n.style.opacity = '0';
+                });
+
+                // Fade starchild glow
+                const sg = document.getElementById('starchild-glow');
+                sg.style.transition = 'opacity 2s ease';
+                sg.style.opacity = '0';
+
+                // Show dark overlay with final message
+                setTimeout(() => {
+                    const darkOverlay = document.getElementById('dark-overlay');
+                    darkOverlay.classList.add('visible');
+                }, 1500);
+
+            }, 3500);
+        }
+
+        // ============================================
+        // BOOT
+        // ============================================
+        window.addEventListener('load', () => {
+            setTimeout(() => startIntro(), 500);
+        });
+
+        ['click', 'touchstart', 'keydown'].forEach(evt => {
+            document.addEventListener(evt, () => {
+                if (audio.paused) {
+                    audio.play().catch(() => {});
+                }
+            }, { once: true });
+        });
+
+    })();
+    </script>
+</body>
+</html>

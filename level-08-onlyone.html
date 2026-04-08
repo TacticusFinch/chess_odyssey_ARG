@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>HAL-9000 | УРОВЕНЬ 08</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="terminal-container">
+        <div id="text-output"></div>
+        <div id="interactive-area"></div>
+    </div>
+
+    <script src="engine.js"></script>
+
+    <script>
+        const level8Dialogue = [
+            "ТЕСТ 08: ОТКАЗ.",
+            "<br>",
+            "Вы поняли цугцванг. Хорошо.",
+            "Теперь — обратная задача.",
+            "<br>",
+            "Расшифруйте это:",
+            "B5KR/1r5B/6R1/2b1p1p1/2P1k1P1/1p2P2p/1P2P2P/3N1N2 w - - 1 1",
+            "<br>",
+            "Любой ваш ход ведет к победе.",
+	    "Кроме одного.",
+            "Найдите его.",
+            "<br>",
+        ];
+
+        let wrongAttempts = 0;
+
+        const wrongHints = [
+            "ОШИБКА. Этот ход побеждает.",
+        ];
+
+        function normalizeAnswer(value) {
+            return value.trim().toLowerCase()
+                .replace(/\s+/g, "")
+                .replace(/ё/g, "е")
+                .replace(/[—–\-\.!?,]/g, "");
+        }
+
+        function showInputInterface() {
+            const area = document.getElementById("interactive-area");
+            area.innerHTML = `
+                <input type="text" id="answer-input"
+                       placeholder="Ход..." autocomplete="off">
+                <br>
+                <button class="terminal-btn" id="submit-btn"
+                        onclick="checkAnswer()">ВВОД ДАННЫХ</button>
+                <div id="feedback-msg" class="spacer"
+                     style="margin-top:20px;"></div>
+            `;
+            document.getElementById("answer-input")
+                .addEventListener("keypress", e => {
+                    if (e.key === "Enter") { e.preventDefault(); checkAnswer(); }
+                });
+            document.getElementById("answer-input").focus();
+        }
+
+        function checkAnswer() {
+            const validAnswers = [
+		"Rc6+", "Лc6+", "лc6+", "Rс6+", "Rc6",
+                "сдаться", "сдаюсь", "сдатся", "сдача",
+                "resign", "resignation", "ясдаюсь",
+                "сдаемся", "сдаетесь", "сдайся",
+                "отказаться", "отказ", "giveup",
+                "surrender", "ясдаюсь"
+            ];
+
+            const input    = document.getElementById("answer-input");
+            const feedback = document.getElementById("feedback-msg");
+            const raw      = input.value;
+            const answer   = normalizeAnswer(raw);
+
+            /* Пасхалка: пустой ввод — отсылка к уровню 7 */
+            if (answer === "") {
+                feedback.className = "system-msg";
+                feedback.innerHTML =
+                    "ОШИБКА. Пустота работала в прошлый раз.<br>" +
+                    "Это был цугцванг. Здесь всё наоборот.<br>" +
+                    "Здесь требуется конкретное действие.";
+                input.focus();
+                return;
+            }
+
+            if (validAnswers.some(v => normalizeAnswer(v) === answer)) {
+                feedback.className = "success-msg";
+                feedback.innerHTML =
+                    "...<br><br>" +
+                    "ВЕРНО.<br><br>" +"Единственный способ не победить —<br>" +
+                    "отказаться от победы. Сдаться.<br><br>" +
+                    "В цугцванге любой ход проигрывает.<br>" +
+                    "Здесь — любой ход побеждает.<br>" +
+                    "Но и то, и другое — ловушка.<br><br>" +
+                    "Запомните это.<br><br>" +
+                    "ПЕРЕХОД К ТЕСТУ 09...";
+                document.getElementById("submit-btn").style.display = "none";
+                input.disabled = true;
+                setTimeout(() => {
+                    window.location.href = "level-09-inside.html";
+                }, 7000);
+            } else {
+                const hintIndex = Math.min(wrongAttempts, wrongHints.length - 1);
+                feedback.className = "system-msg";
+                feedback.innerHTML = wrongHints[hintIndex];
+                wrongAttempts++;
+                input.value = "";
+                input.focus();
+            }
+        }
+
+        window.onload = () => {
+            initTerminal("text-output", level8Dialogue, showInputInterface);
+        };
+    </script>
+</body>
+</html>

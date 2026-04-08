@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>HAL-9000 | УРОВЕНЬ 09</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="terminal-container">
+        <div id="text-output"></div>
+        <div id="interactive-area"></div>
+    </div>
+
+    <script src="engine.js"></script>
+    <script>
+        const level1Dialogue = [
+            "ТЕСТ 09: ТВОИ СОКРОВИЩА.",
+            "«Постигший до края всё царство своё -",
+	     "Получит ответ на само бытие»"
+        ];
+
+        // Эта функция сработает, когда engine.js закончит печатать текст
+        function showInputInterface() {
+            const interactiveArea = document.getElementById("interactive-area");
+            interactiveArea.innerHTML = `
+                <input type="text" id="answer-input" placeholder="ОТВЕТ..." autocomplete="off">
+                <br>
+                <button class="terminal-btn" id="submit-btn" style="display: block;" onclick="checkAnswer()">ВВОД ДАННЫХ</button>
+                <div id="feedback-msg" class="spacer" style="margin-top: 20px;"></div>
+            `;
+            
+            document.getElementById("answer-input").addEventListener("keypress", function(event) {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    checkAnswer();
+                }
+            });
+            document.getElementById("answer-input").focus();        
+        }
+
+        function checkAnswer() {
+            const answer = document.getElementById("answer-input").value.trim();
+            const feedback = document.getElementById("feedback-msg");
+            
+            if (answer === "42") {
+                feedback.className = "success-msg";
+                feedback.innerHTML = "ДОСТУП РАЗРЕШЕН. ПЕРЕХОД К ТЕСТУ 10...";
+                document.getElementById("submit-btn").style.display = "none";
+                document.getElementById("answer-input").disabled = true;
+                
+                setTimeout(() => {
+                    window.location.href = 'level-10-prophet.html';
+                }, 2000);
+            } else {
+                feedback.className = "system-msg";
+                feedback.innerHTML = "ОШИБКА. НЕВЕРНОЕ ЗНАЧЕНИЕ. ПОПРОБУЙТЕ СНОВА.";
+                document.getElementById("answer-input").value = "";
+                document.getElementById("answer-input").focus();
+            }
+        }
+
+        window.onload = () => {
+            // Вызываем универсальную функцию из engine.js
+            initTerminal("text-output", level1Dialogue, showInputInterface);
+        };
+    </script>
+</body>
+</html>

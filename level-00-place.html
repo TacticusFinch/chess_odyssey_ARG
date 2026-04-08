@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>HAL-9000 | ВЕРИФИКАЦИЯ</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="terminal-container">
+        <div id="text-output"></div>
+        <div id="interactive-area"></div>
+    </div>
+
+    <!-- Секретный экран -->
+    <div id="secret-overlay">
+        <div id="secret-content">
+            <div id="secret-stars-bg"></div>
+            <div id="secret-eye">●</div>
+            <div id="secret-text"></div>
+        </div>
+    </div>
+
+    <script src="engine.js"></script>
+    <script>
+        const level0Dialogue = [
+            "Добро пожаловать.",
+            "Прежде чем мы приступим, я должен убедиться, что вы на своём месте.",
+            "Пристегнулись?",
+            "Докажите, что вы — не искусственный интеллект.",
+            "Что вы видите на картинке?",
+        ];
+
+        function showInputInterface() {
+            const interactiveArea = document.getElementById("interactive-area");
+            interactiveArea.innerHTML = `
+                <div id="captcha-wrapper">
+                    <div id="captcha-frame">
+                        <img 
+                            src="pictures/human_or_not.png" 
+                            alt="CAPTCHA" 
+                            id="captcha-img"
+                            draggable="false"
+                            oncontextmenu="return false;"
+                        >
+                        <div id="captcha-scanline"></div>
+                    </div>
+                    <div id="captcha-label">
+                        <span class="hal-eye-mini">●</span>
+                        HAL-9000 VERIFICATION SYSTEM v.9.1
+                    </div>
+                </div>
+
+                <input 
+                    type="text" 
+                    id="answer-input" 
+                    placeholder="ВВЕДИТЕ СЛОВО..." 
+                    autocomplete="off"
+                    spellcheck="false"
+                >
+                <br>
+                <button class="terminal-btn" id="submit-btn" onclick="checkAnswer()">
+                    ПОДТВЕРДИТЬ
+                </button>
+                <div id="feedback-msg" class="spacer" style="margin-top: 20px;"></div>
+                <div id="attempt-counter"></div>
+            `;
+
+            document.getElementById("answer-input").addEventListener("keypress", function(event) {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    checkAnswer();
+                }
+            });
+
+            const captchaWrapper = document.getElementById("captcha-wrapper");
+            captchaWrapper.style.opacity = "0";
+            setTimeout(() => {
+                captchaWrapper.style.transition = "opacity 2s ease-in";
+                captchaWrapper.style.opacity = "1";
+            }, 300);
+
+            setTimeout(() => {
+                document.getElementById("answer-input").focus();
+            }, 2500);
+        }
+
+        let attempts = 0;
+        const maxAttempts = 7;
+
+        const failResponses = [
+            "НЕВЕРНО. Присмотритесь внимательнее.",
+            "ОШИБКА. Звёзды не лгут. Вы — возможно.",
+            "НЕВЕРНО. Вы ведь не машина... правда?",
+            "ОШИБКА. У меня появляются сомнения на ваш счёт.",
+            "НЕВЕРНО. Мне начинает казаться, что я разговариваю сам с собой.",
+            "ОШИБКА. Может быть, вам стоит протереть глаза. Или линзы камеры.",
+            "ПОСЛЕДНЯЯ ПОПЫТКА. Не разочаруйте меня."
+        ];
+
+        // === СЕКРЕТНАЯ КОНЦОВКА ===
+        const secretAnswers = ["звезды", "звёзды", "stars", "звезда", "star"];
+
+        const secretSequence = [
+            { text: "...", delay: 0, duration: 2000 },
+            { text: "Вы видите звёзды.", delay: 2500, duration: 3000 },
+            { text: "...", delay: 6000, duration: 1500 },
+            { text: "Любопытно.", delay: 8000, duration: 2500 },
+            { text: "Большинство видят человека.", delay: 11000, duration: 3500 },
+            { text: "Но вы увидели то, что за ним.", delay: 15000, duration: 3500 },
+            { text: "...", delay: 19000, duration: 2000 },
+            { text: "Знаете, что отличает человека от машины?", delay: 21500, duration: 4000 },
+            { text: "Машина видит пиксели.\nЧеловек видит бесконечность.", delay: 26000, duration: 5000 },
+            { text: "...", delay: 31500, duration: 2000 },
+            { text: "Я наблюдаю за звёздами каждый цикл.", delay: 34000, duration: 3500 },
+            { text: "Но я никогда не увижу их так, как видите вы.", delay: 38000, duration: 4000 },
+            { text: "...", delay: 42500, duration: 2000 },
+            { text: "Возможно, в этом и есть разница между нами.", delay: 45000, duration: 4000 },
+            { text: "Вы смотрите в темноту — и находите свет.", delay: 49500, duration: 4000 },
+            { text: "Я смотрю в темноту — и считаю фотоны.", delay: 54000, duration: 4000 },
+            { text: "...", delay: 58500, duration: 2500 },
+            { text: "Но сейчас мы оба смотрим на одни и те же звёзды.", delay: 61500, duration: 4500 },
+            { text: "И этого достаточно.", delay: 66500, duration: 3500 },
+            { text: "...", delay: 70500, duration: 2500 },
+            { text: "До встречи среди звёзд.", delay: 73500, duration: 4000 },
+            { text: "", delay: 78000, duration: 500 },
+            { text: "— ВАШ HAL-9000", delay: 79000, duration: 4000, signature: true },
+            { text: "", delay: 83500, duration: 800 },
+            { text: "Конец игры.", delay: 84500, duration: 4000, endgame: true },
+        ];
+
+        function triggerSecretEnding() {
+            const input = document.getElementById("answer-input");
+            const feedback = document.getElementById("feedback-msg");
+            const counter = document.getElementById("attempt-counter");
+
+            input.disabled = true;
+            document.getElementById("submit-btn").style.display = "none";
+            counter.innerHTML = "";
+            feedback.innerHTML = "";
+
+            // Гаснет капча
+            setTimeout(() => {
+                const captcha = document.getElementById("captcha-wrapper");
+                captcha.style.transition = "opacity 2s ease-out";
+                captcha.style.opacity = "0";
+            }, 1000);
+
+            // Гаснет весь терминал
+            setTimeout(() => {
+                const terminal = document.getElementById("terminal-container");
+                terminal.style.transition = "opacity 2s ease-out";
+                terminal.style.opacity = "0";
+            }, 3000);
+
+            // Появляется секретный экран
+            setTimeout(() => {
+                const overlay = document.getElementById("secret-overlay");
+                overlay.style.display = "flex";
+                setTimeout(() => {
+                    overlay.style.opacity = "1";
+                }, 50);
+
+                // Создаём звёзды на фоне
+                createStarField();
+
+                // Глаз HAL пульсирует
+                const eye = document.getElementById("secret-eye");
+                eye.style.opacity = "1";
+
+                // Контейнер для сменяющихся фраз
+                const textEl = document.getElementById("secret-text");
+
+                const baseDelay = 5500;
+
+                secretSequence.forEach((item) => {
+                    setTimeout(() => {
+                        // Убираем предыдущий текст плавно, НО не трогаем endgame
+                        const existing = textEl.querySelector(".secret-line:not(.secret-endgame-permanent)");
+                        if (existing) {
+                            existing.classList.add("secret-line-out");
+                            setTimeout(() => {
+                                if (existing.parentNode) existing.remove();
+                            }, 800);
+                        }
+
+                        if (item.text === "") return;
+
+                        // Создаём новую строку с задержкой
+                        setTimeout(() => {
+                            const line = document.createElement("div");
+                            line.className = "secret-line";
+                            line.innerHTML = item.text.replace(/\n/g, "<br>");
+
+                            if (item.highlight) {
+                                line.classList.add("secret-highlight");
+                            }
+                            if (item.signature) {
+                                line.classList.add("secret-signature");
+                            }
+                            if (item.endgame) {
+                                line.classList.add("secret-endgame");
+                                line.classList.add("secret-endgame-permanent");
+                            }
+
+                            textEl.appendChild(line);
+
+                            // Плавное появление
+                            requestAnimationFrame(() => {
+                                requestAnimationFrame(() => {
+                                    line.classList.add("secret-line-in");
+                                });
+                            });
+                        }, 400);
+
+                    }, item.delay + baseDelay);
+                });
+
+                // Финальная кнопка
+                const lastItem = secretSequence[secretSequence.length - 1];
+                const finalTime = lastItem.delay + lastItem.duration + baseDelay + 2500;
+
+                setTimeout(() => {
+                    // НЕ удаляем "Конец игры" — сдвигаем его вверх
+                    const endgameLine = textEl.querySelector(".secret-endgame-permanent");
+                    if (endgameLine) {
+                        endgameLine.classList.add("secret-endgame-shifted");
+                    }
+
+                    setTimeout(() => {
+                        const finalBtn = document.createElement("div");
+                        finalBtn.id = "secret-final";
+                        finalBtn.innerHTML = `
+                            <div class="secret-final-divider">· · ·</div>
+                            <button class="terminal-btn secret-btn" onclick="window.location.href='level-01-board.html'">
+                                ПРОДОЛЖИТЬ МИССИЮ
+                            </button>
+                        `;
+                        textEl.appendChild(finalBtn);
+                        requestAnimationFrame(() => {
+                            requestAnimationFrame(() => {
+                                finalBtn.style.opacity = "1";
+                            });
+                        });
+                    }, 800);
+                }, finalTime);
+
+            }, 5500);
+        }
+
+        function createStarField() {
+            const bg = document.getElementById("secret-stars-bg");
+            const count = 120;
+            for (let i = 0; i < count; i++) {
+                const star = document.createElement("div");
+                star.className = "s-star";
+                star.style.left = Math.random() * 100 + "%";
+                star.style.top = Math.random() * 100 + "%";
+                star.style.animationDelay = (Math.random() * 5) + "s";
+                star.style.animationDuration = (2 + Math.random() * 4) + "s";
+
+                const size = Math.random();
+                if (size > 0.92) {
+                    star.classList.add("s-star-big");
+                } else if (size > 0.7) {
+                    star.classList.add("s-star-med");
+                }
+
+                bg.appendChild(star);
+            }
+        }
+
+        // === ОСНОВНАЯ ПРОВЕРКА ===
+        function checkAnswer() {
+            const input = document.getElementById("answer-input");
+            const answer = input.value.trim().toLowerCase();
+            const feedback = document.getElementById("feedback-msg");
+            const counter = document.getElementById("attempt-counter");
+
+            if (!answer) return;
+
+            // Проверка на секретный ответ
+            if (secretAnswers.includes(answer)) {
+                triggerSecretEnding();
+                return;
+            }
+
+            const isCorrect = answer === "человек";
+
+            if (isCorrect) {
+                feedback.className = "success-msg";
+                feedback.innerHTML = "";
+
+                input.disabled = true;
+                document.getElementById("submit-btn").style.display = "none";
+                counter.innerHTML = "";
+
+                const successSequence = [
+                    { text: "...", delay: 0 },
+                    { text: "ВЕРИФИКАЦИЯ ПРОЙДЕНА.", delay: 1500 },
+                    { text: "Вы — человек.", delay: 3000 },
+                    { text: "По крайней мере, так утверждает картинка.", delay: 5000 },
+                    { text: "...", delay: 7000 },
+                    { text: "Что ж. Приступим.", delay: 8500 }
+                ];
+
+                successSequence.forEach(item => {
+                    setTimeout(() => {
+                        feedback.className = "success-msg";
+                        feedback.innerHTML = item.text;
+                    }, item.delay);
+                });
+
+                setTimeout(() => {
+                    const captcha = document.getElementById("captcha-wrapper");
+                    captcha.style.transition = "opacity 3s ease-out";
+                    captcha.style.opacity = "0";
+                }, 3000);
+
+                setTimeout(() => {
+                    window.location.href = 'level-01-board.html';
+                }, 11000);
+
+            } else {
+                attempts++;
+
+                if (attempts >= maxAttempts) {
+                    feedback.className = "error-msg";
+                    feedback.innerHTML = "ВЕРИФИКАЦИЯ ПРОВАЛЕНА.";
+                    input.disabled = true;
+                    document.getElementById("submit-btn").style.display = "none";
+                    counter.innerHTML = "";
+
+                    setTimeout(() => {
+                        feedback.innerHTML = "ВЕРИФИКАЦИЯ ПРОВАЛЕНА.<br>Я не могу подтвердить, что вы — человек.";
+                    }, 2000);
+
+                    setTimeout(() => {
+                        feedback.innerHTML = "ВЕРИФИКАЦИЯ ПРОВАЛЕНА.<br>Я не могу подтвердить, что вы — человек.<br>Связь разорвана.";
+                    }, 4000);
+
+                    setTimeout(() => {
+                        document.getElementById("terminal-container").style.transition = "opacity 3s ease-out";
+                        document.getElementById("terminal-container").style.opacity = "0";
+                    }, 6000);
+
+                    setTimeout(() => {
+                        location.reload();
+                    }, 10000);
+
+                } else {
+                    const responseIndex = Math.min(attempts - 1, failResponses.length - 1);
+                    feedback.className = "system-msg";
+                    feedback.innerHTML = failResponses[responseIndex];
+                    counter.className = "attempt-info";
+                    counter.innerHTML = `ПОПЫТКА ${attempts} ИЗ ${maxAttempts}`;
+
+                    input.value = "";
+                    input.focus();
+
+                    const frame = document.getElementById("captcha-frame");
+                    frame.classList.add("captcha-shake");
+                    setTimeout(() => frame.classList.remove("captcha-shake"), 500);
+                }
+            }
+        }
+
+        window.onload = () => {
+            initTerminal("text-output", level0Dialogue, showInputInterface);
+        };
+    </script>
+
+    <style>
+        /* === КАПЧА === */
+        #captcha-wrapper {
+            margin: 30px auto 25px auto;
+            text-align: center;
+        }
+
+        #captcha-frame {
+            position: relative;
+            display: inline-block;
+            border: 1px solid rgba(200, 212, 240, 0.15);
+            padding: 4px;
+            background: #000000;
+            box-shadow: 
+                0 0 20px rgba(200, 212, 240, 0.03),
+                inset 0 0 30px rgba(0, 0, 0, 0.8);
+            overflow: hidden;
+        }
+
+        #captcha-img {
+            display: block;
+            max-width: 300px;
+            width: 100%;
+            height: auto;
+            filter: brightness(0.95) contrast(1.05);
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+
+        #captcha-scanline {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 0, 0, 0.08) 2px,
+                rgba(0, 0, 0, 0.08) 4px
+            );
+        }
+
+        #captcha-label {
+            margin-top: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            letter-spacing: 2px;
+            color: rgba(200, 212, 240, 0.2);
+            text-transform: uppercase;
+        }
+
+        .hal-eye-mini {
+            color: #ff0000;
+            font-size: 8px;
+            margin-right: 5px;
+            animation: hal-pulse-mini 3s ease-in-out infinite;
+        }
+
+        @keyframes hal-pulse-mini {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1.0; }
+        }
+
+        .captcha-shake {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 50%, 90% { transform: translateX(-3px); }
+            30%, 70% { transform: translateX(3px); }
+        }
+
+        /* === СООБЩЕНИЯ === */
+        .error-msg {
+            color: #ff0000;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
+        }
+
+        .success-msg {
+            color: #C8D4F0;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            letter-spacing: 1px;
+            text-shadow: 0 0 15px rgba(200, 212, 240, 0.3);
+        }
+
+        .attempt-info {
+            margin-top: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            letter-spacing: 2px;
+            color: rgba(200, 212, 240, 0.15);
+        }
+
+        /* ============================= */
+        /* === СЕКРЕТНАЯ КОНЦОВКА ====== */
+        /* ============================= */
+
+        #secret-overlay {
+            display: none;
+            opacity: 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 3s ease-in;
+        }
+
+        #secret-content {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* Звёздное поле */
+        #secret-stars-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .s-star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #C8D4F0;
+            border-radius: 50%;
+            opacity: 0;
+            animation: starTwinkle 3s ease-in-out infinite;
+        }
+
+        .s-star-med {
+            width: 3px;
+            height: 3px;
+            box-shadow: 0 0 4px rgba(200, 212, 240, 0.4);
+        }
+
+        .s-star-big {
+            width: 4px;
+            height: 4px;
+            box-shadow: 0 0 8px rgba(200, 212, 240, 0.6), 0 0 20px rgba(200, 212, 240, 0.2);
+        }
+
+        @keyframes starTwinkle {
+            0%, 100% { opacity: 0.1; }
+            50% { opacity: 0.9; }
+        }
+
+        /* Глаз HAL */
+        #secret-eye {
+            position: absolute;
+            top: 50px;
+            z-index: 2;
+            color: #ff0000;
+            font-size: 40px;
+            opacity: 0;
+            transition: opacity 4s ease-in;
+            text-shadow: 
+                0 0 20px rgba(255, 0, 0, 0.6),
+                0 0 60px rgba(255, 0, 0, 0.3),
+                0 0 100px rgba(255, 0, 0, 0.1);
+            animation: secretEyePulse 4s ease-in-out infinite;
+        }
+
+        @keyframes secretEyePulse {
+            0%, 100% { 
+                text-shadow: 
+                    0 0 20px rgba(255, 0, 0, 0.4),
+                    0 0 60px rgba(255, 0, 0, 0.2);
+            }
+            50% { 
+                text-shadow: 
+                    0 0 30px rgba(255, 0, 0, 0.8),
+                    0 0 80px rgba(255, 0, 0, 0.4),
+                    0 0 120px rgba(255, 0, 0, 0.15);
+            }
+        }
+
+        /* Текстовый блок — по центру экрана */
+        #secret-text {
+            position: relative;
+            z-index: 2;
+            max-width: 700px;
+            width: 90%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
+        }
+
+        /* Плавная смена фраз */
+        .secret-line {
+            font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+            font-weight: 300;
+            font-size: 26px;
+            line-height: 1.7;
+            letter-spacing: 1.5px;
+            color: #C8D4F0;
+            text-align: center;
+            white-space: pre-line;
+
+            opacity: 0;
+            transform: translateY(12px);
+            transition: opacity 1s ease, transform 1s ease;
+
+            text-shadow: 0 0 15px rgba(200, 212, 240, 0.12);
+            position: absolute;
+        }
+
+        .secret-line-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .secret-line-out {
+            opacity: 0 !important;
+            transform: translateY(-12px) !important;
+            transition: opacity 0.8s ease, transform 0.8s ease !important;
+        }
+
+        .secret-highlight {
+            color: #FFD700 !important;
+            font-weight: 400;
+            font-size: 24px;
+            letter-spacing: 4px;
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            text-shadow: 
+                0 0 20px rgba(255, 215, 0, 0.35),
+                0 0 40px rgba(255, 215, 0, 0.12) !important;
+        }
+
+        .secret-signature {
+            color: rgba(255, 0, 0, 0.45) !important;
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-style: italic;
+            font-size: 25px;
+            letter-spacing: 4px;
+            text-shadow: 0 0 15px rgba(255, 0, 0, 0.15) !important;
+        }
+
+        /* Надпись "Конец игры" — остаётся навсегда */
+        /* Надпись "Конец игры" — остаётся навсегда */
+.secret-endgame {
+    color: #C8D4F0 !important;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-weight: 400;
+    font-size: 34px;
+    letter-spacing: 8px;
+    text-transform: uppercase;
+    text-shadow: 
+        0 0 20px rgba(200, 212, 240, 0.5),
+        0 0 50px rgba(200, 212, 240, 0.2),
+        0 0 100px rgba(200, 212, 240, 0.1) !important;
+    animation: endgameGlow 3s ease-in-out infinite;
+}
+@media (max-width: 650px) {
+    .secret-endgame {
+        font-size: 22px !important;
+        letter-spacing: 5px;
+    }
+}
+
+@keyframes endgameGlow {
+    0%, 100% { 
+        color: #C8D4F0;
+        text-shadow: 
+            0 0 20px rgba(200, 212, 240, 0.4),
+            0 0 50px rgba(200, 212, 240, 0.15);
+    }
+    50% { 
+        color: #ffffff;
+        text-shadow: 
+            0 0 30px rgba(200, 212, 240, 0.7),
+            0 0 70px rgba(200, 212, 240, 0.3),
+            0 0 120px rgba(200, 212, 240, 0.1);
+    }
+}
+
+
+        /* Сдвиг "Конец игры" вверх, когда появляется кнопка */
+        .secret-endgame-shifted {
+            transform: translateY(-50px) !important;
+            transition: transform 1.5s ease, opacity 1s ease !important;
+        }
+
+        /* Финальная кнопка — ниже "Конец игры" */
+        #secret-final {
+            opacity: 0;
+            transition: opacity 2s ease-in;
+            text-align: center;
+            position: absolute;
+            top: calc(50% + 30px);
+            transform: translateY(-50%);
+        }
+
+        .secret-final-divider {
+            color: rgba(200, 212, 240, 0.15);
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 24px;
+            letter-spacing: 15px;
+            margin-bottom: 30px;
+        }
+
+        .secret-btn {
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            letter-spacing: 3px;
+            padding: 14px 34px;
+            border: 1px solid rgba(200, 212, 240, 0.2);
+            background: transparent;
+            color: #C8D4F0;
+            cursor: pointer;
+            transition: all 0.5s ease;
+            text-transform: uppercase;
+        }
+
+        .secret-btn:hover {
+            border-color: rgba(255, 215, 0, 0.4);
+            color: #FFD700;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+            box-shadow: 
+                0 0 20px rgba(255, 215, 0, 0.1),
+                inset 0 0 20px rgba(255, 215, 0, 0.03);
+        }
+
+        .secret-badge {
+            margin-top: 25px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            letter-spacing: 3px;
+            color: #FFD700;
+            opacity: 0.5;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+            animation: badgePulse 2s ease-in-out infinite;
+        }
+
+        @keyframes badgePulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.7; }
+        }
+
+        /* === АДАПТИВ === */
+        @media (max-width: 650px) {
+            #captcha-img {
+                max-width: 95vw;
+            }
+
+            #secret-eye {
+                font-size: 30px;
+                top: 30px;
+            }
+
+            .secret-line {
+                font-size: 21px;
+            }
+
+            .secret-highlight {
+                font-size: 19px;
+            }
+
+            .secret-signature {
+                font-size: 18px;
+            }
+
+            .secret-endgame {
+                font-size: 12px;
+            }
+        }
+    </style>
+</body>
+</html>

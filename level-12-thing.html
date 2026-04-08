@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>HAL-9000 | УРОВЕНЬ 12</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- CHESS WIZARD: CHECKMATE IN TWO MOVES -->
+
+    <div id="terminal-container">
+        <div id="text-output"></div>
+        <div id="interactive-area"></div>
+    </div>
+
+    <script src="engine.js"></script>
+    <script>
+        const level12Dialogue = [
+            "ТЕСТ 12: ЧИСТЫЙ РАЗУМ.",
+            "<br>",
+            "Мы уже слишком далеко от Земли, чтобы полагаться на инстинкты.",
+            "Скажите... вы не боитесь встретить в пустоте нечто... чуждое?",
+            "Биологические виды плохо справляются с поражением.",
+            "В 1982 году на антарктической станции один человек не выдержал финала партии.",
+            "<br>",
+            "IMG:pictures/thing.png",
+            "<br>",
+            "Какое имя было у моего коллеги, обыгравшего этого шотландца?",
+        ];
+
+        function showInputInterface() {
+            const interactiveArea = document.getElementById("interactive-area");
+            interactiveArea.innerHTML = `
+                <input type="text" id="answer-input" placeholder="ИМЯ МАШИНЫ..." autocomplete="off">
+                <br>
+                <button class="terminal-btn" id="submit-btn" onclick="checkAnswer()">АНАЛИЗ СЕКТОРОВ</button>
+                <div id="feedback-msg" class="spacer" style="margin-top:20px;"></div>
+            `;
+
+            const input = document.getElementById("answer-input");
+            input.addEventListener("keypress", (e) => { if (e.key === "Enter") checkAnswer(); });
+            input.focus();
+        }
+
+        function normalizeAnswer(str) {
+            return str.trim().toLowerCase();
+        }
+
+        function checkAnswer() {
+            const validAnswers = [
+                "chess wizard",
+                "чесс визард",
+                "шахматный волшебник",
+                "wizard"
+            ];
+
+            const input = document.getElementById("answer-input");
+            const feedback = document.getElementById("feedback-msg");
+            const answer = normalizeAnswer(input.value);
+
+            if (validAnswers.includes(answer)) {
+                feedback.className = "success-msg";
+                feedback.innerHTML = "ПРАВИЛЬНО. НО В ЭТОТ РАЗ СТАКАНА ВИСКИ У ВАС НЕТ. ПЕРЕХОД К ТЕСТУ 13...";
+                document.getElementById("submit-btn").style.display = "none";
+                input.disabled = true;
+
+                setTimeout(() => {
+                    window.location.href = "level-13-space-earth.html";
+                }, 2500);
+            } else {
+                feedback.className = "system-msg";
+                feedback.innerHTML = "ОШИБКА. СИСТЕМА НЕ ПРИНИМАЕТ ЭТО ИМЯ.";
+                input.value = "";
+                input.focus();
+            }
+        }
+
+        window.onload = () => {
+            initTerminal("text-output", level12Dialogue, showInputInterface);
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>ЮПИТЕР | УРОВЕНЬ 23</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* ===== ЮПИТЕР — ФОНОВАЯ АТМОСФЕРА ===== */
+        body {
+            margin: 0;
+            background: #0a0604;
+            overflow-x: hidden;
+            position: relative;
+            font-family: 'Courier New', monospace;
+            color: #e8d5c0;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -3;
+            background:
+                radial-gradient(ellipse 120% 60% at 50% 20%,
+                    rgba(180, 100, 30, 0.12) 0%,
+                    rgba(140, 70, 20, 0.08) 30%,
+                    rgba(60, 30, 10, 0.05) 60%,
+                    transparent 100%),
+                radial-gradient(ellipse 80% 40% at 30% 70%,
+                    rgba(120, 60, 15, 0.06) 0%,
+                    transparent 70%),
+                radial-gradient(ellipse 90% 35% at 70% 50%,
+                    rgba(200, 120, 40, 0.05) 0%,
+                    transparent 60%),
+                linear-gradient(180deg,
+                    #0a0604 0%,
+                    #0f0a06 15%,
+                    #1a0e07 30%,
+                    #140905 50%,
+                    #0d0703 70%,
+                    #060302 100%);
+        }
+
+        /* Атмосферные полосы Юпитера */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0; left: -50%;
+            width: 200%; height: 100%;
+            z-index: -2;
+            background:
+                repeating-linear-gradient(
+                    0deg,
+                    transparent 0px,
+                    transparent 80px,
+                    rgba(180, 100, 30, 0.018) 80px,
+                    rgba(180, 100, 30, 0.018) 82px,
+                    transparent 82px,
+                    transparent 140px,
+                    rgba(200, 130, 50, 0.012) 140px,
+                    rgba(200, 130, 50, 0.012) 143px,
+                    transparent 143px,
+                    transparent 220px
+                );
+            animation: jupiterDrift 120s linear infinite;
+        }
+
+        @keyframes jupiterDrift {
+            0%   { transform: translateX(0); }
+            100% { transform: translateX(5%); }
+        }
+
+        /* Большое Красное Пятно — свечение */
+        .jupiter-spot {
+            position: fixed;
+            width: 350px;
+            height: 200px;
+            border-radius: 50%;
+            background: radial-gradient(ellipse,
+                rgba(180, 60, 20, 0.06) 0%,
+                rgba(150, 50, 15, 0.03) 40%,
+                transparent 70%);
+            top: 15%;
+            right: -5%;
+            z-index: -1;
+            animation: spotPulse 15s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes spotPulse {
+            0%, 100% { opacity: 0.6; transform: scale(1); }
+            50%      { opacity: 1;   transform: scale(1.08); }
+        }
+
+        /* Звёздное поле за Юпитером */
+        .starfield {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -4;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            border-radius: 50%;
+            background: #fff;
+        }
+
+        /* Частицы / пыль в атмосфере */
+        .atmo-particle {
+            position: fixed;
+            width: 2px;
+            height: 2px;
+            border-radius: 50%;
+            background: rgba(200, 130, 50, 0.3);
+            pointer-events: none;
+            z-index: -1;
+            animation: particleFloat linear infinite;
+        }
+
+        @keyframes particleFloat {
+            0%   { transform: translateX(0) translateY(0); opacity: 0; }
+            10%  { opacity: 0.4; }
+            90%  { opacity: 0.2; }
+            100% { transform: translateX(80px) translateY(-100vh); opacity: 0; }
+        }
+
+        /* ===== КОНТЕЙНЕР ===== */
+        #terminal-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 8px 10px;
+            box-sizing: border-box;
+            position: relative;
+            z-index: 1;
+        }
+
+        #text-output {
+            width: 100%;
+            max-width: 600px;
+            flex-shrink: 0;
+            color: #e0c8a8;
+            text-shadow: 0 0 8px rgba(200, 130, 50, 0.3);
+        }
+
+        /* ===== Скрытые до появления ===== */
+        #chess-hint,
+        #sequence-dots,
+        #piano-container,
+        #interactive-area {
+            opacity: 0;
+            transform: translateY(15px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+            pointer-events: none;
+        }
+
+        #chess-hint.visible,
+        #sequence-dots.visible,
+        #piano-container.visible,
+        #interactive-area.visible {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        /* ===== ШАХМАТНАЯ ДИАГРАММА ===== */
+        #chess-hint {
+            margin: 10px auto;
+            border: 2px solid #c87830;
+            display: block;
+            border-radius: 4px;
+            box-shadow: 0 0 25px rgba(200, 120, 40, 0.25);
+        }
+
+        /* ===== ТОЧКИ ПОСЛЕДОВАТЕЛЬНОСТИ ===== */
+        #sequence-dots {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin: 8px 0 6px;
+        }
+
+        .seq-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid #5a3a1a;
+            background: #1a0e07;
+            transition: all 0.3s;
+        }
+
+        .seq-dot.filled {
+            background: #c87830;
+            border-color: #e89040;
+            box-shadow: 0 0 12px rgba(200, 120, 40, 0.7);
+        }
+
+        .seq-dot.error {
+            background: #a01010;
+            border-color: #d03030;
+            box-shadow: 0 0 10px rgba(200, 30, 30, 0.7);
+        }
+
+        /* ===== КОРПУС ПИАНИНО ===== */
+        #piano-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            margin: 6px auto;
+            padding: 18px 18px 14px;
+            max-width: 600px;
+            background:
+                linear-gradient(180deg,
+                    #1a0e07 0%,
+                    #0f0804 40%,
+                    #080402 100%);
+            border-radius: 10px 10px 6px 6px;
+            box-shadow:
+                0 16px 50px rgba(0,0,0,0.8),
+                0 0 60px rgba(200,120,40,0.06),
+                inset 0 1px 0 rgba(255,200,120,0.08),
+                inset 0 -1px 0 rgba(0,0,0,0.5);
+            position: relative;
+            border: 1px solid #2a1a0a;
+            border-top: 3px solid #3a2510;
+        }
+
+        #piano-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 20px;
+            right: 20px;
+            height: 3px;
+            background: linear-gradient(90deg,
+                transparent,
+                rgba(200, 120, 40, 0.2),
+                transparent);
+            border-radius: 0 0 2px 2px;
+        }
+
+        /* ===== БЕЛЫЕ КЛАВИШИ ===== */
+        .key {
+            position: relative;
+            width: 50px;
+            height: 155px;
+            background:
+                linear-gradient(180deg,
+                    #faf3ea 0%,
+                    #fff8f0 15%,
+                    #f5ece0 50%,
+                    #e8ddd0 85%,
+                    #d8ccbb 100%);
+            border: 1px solid #a09080;
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding-bottom: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            color: #6a5a48;
+            text-shadow: 0 1px 0 rgba(255,255,255,0.8);
+            transition: all 0.04s ease;
+            user-select: none;
+            z-index: 1;
+            box-shadow:
+                1px 0 0 #c0b0a0,
+                -1px 0 0 #c0b0a0,
+                0 6px 8px rgba(0,0,0,0.35),
+                inset 0 -3px 6px rgba(0,0,0,0.06),
+                inset 0 1px 1px rgba(255,255,255,0.9);
+        }
+
+        .key:hover {
+            background:
+                linear-gradient(180deg,
+                    #fff 0%,
+                    #fff 30%,
+                    #faf0e4 60%,
+                    #f0e4d4 100%);
+            color: #c87830;
+        }
+
+        .key:active, .key.active {
+            background:
+                linear-gradient(180deg,
+                    #fff8f0 0%,
+                    #f0e6d8 30%,
+                    #e0d2c0 70%,
+                    #d0c0aa 100%);
+            height: 152px;
+            box-shadow:
+                0 2px 3px rgba(0,0,0,0.2),
+                inset 0 1px 10px rgba(0,0,0,0.1);
+            color: #c87830;
+            text-shadow: 0 0 6px rgba(200,120,40,0.4);
+        }
+
+        .key.correct-flash {
+            background: linear-gradient(180deg, #fff3e0 0%, #ffe0b2 50%, #ffcc80 100%) !important;
+            color: #c87830 !important;
+            text-shadow: 0 0 8px rgba(200,120,40,0.6) !important;
+        }
+
+        /* ===== ЧЁРНЫЕ КЛАВИШИ ===== */
+        .black {
+            width: 32px;
+            height: 95px;
+            background:
+                linear-gradient(180deg,
+                    #4a3520 0%,
+                    #2a1a0a 10%,
+                    #1a0e06 50%,
+                    #0a0502 80%,
+                    #000 100%);
+            margin-left: -16px;
+            margin-right: -16px;
+            z-index: 2;
+            border: 1px solid #000;
+            border-top: none;
+            color: transparent;
+            font-size: 0;
+            border-radius: 0 0 3px 3px;
+            box-shadow:
+                0 5px 10px rgba(0,0,0,0.6),
+                inset 0 -2px 3px rgba(200,130,50,0.04),
+                inset 0 1px 0 rgba(200,130,50,0.1);
+        }
+
+        .black:hover {
+            background:
+                linear-gradient(180deg,
+                    #5a4530 0%,
+                    #3a2510 10%,
+                    #1a1008 50%,
+                    #0a0502 100%);
+        }
+
+        .black:active, .black.active {
+            background:
+                linear-gradient(180deg,
+                    #4a3520 0%,
+                    #2a1a0a 30%,
+                    #1a0e06 100%);
+            height: 93px;
+            box-shadow:
+                0 2px 4px rgba(0,0,0,0.4),
+                inset 0 0 6px rgba(0,0,0,0.5);
+        }
+
+        /* ===== Сообщения ===== */
+        #feedback-msg, .success-msg {
+            color: #e0c8a8;
+            text-shadow: 0 0 8px rgba(200, 130, 50, 0.4);
+        }
+
+        .success-msg {
+            color: #e8a040 !important;
+            text-shadow: 0 0 15px rgba(200, 130, 50, 0.6) !important;
+        }
+
+        /* ===== АДАПТИВ ===== */
+        @media (max-height: 800px) {
+            .key { height: 130px; width: 46px; font-size: 13px; }
+            .key:active, .key.active { height: 127px; }
+            .black { height: 80px; width: 30px; margin-left: -15px; margin-right: -15px; }
+            .black:active, .black.active { height: 78px; }
+            #piano-container { padding: 14px 14px 10px; }
+        }
+
+        @media (max-height: 680px) {
+            .key { height: 110px; width: 42px; font-size: 12px; padding-bottom: 6px; }
+            .key:active, .key.active { height: 107px; }
+            .black { height: 68px; width: 28px; margin-left: -14px; margin-right: -14px; }
+            .black:active, .black.active { height: 66px; }
+            #piano-container { padding: 10px 10px 8px; margin: 4px auto; }
+            #sequence-dots { margin: 4px 0; gap: 8px; }
+            .seq-dot { width: 12px; height: 12px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Юпитер: декоративные слои -->
+    <div class="jupiter-spot"></div>
+    <div class="starfield" id="starfield"></div>
+
+    <div id="terminal-container">
+        <div id="text-output"></div>
+        <img src="pictures/dosoldo.jpg" id="chess-hint" alt="Chess Puzzle">
+        <div id="sequence-dots">
+            <div class="seq-dot" data-idx="0"></div>
+            <div class="seq-dot" data-idx="1"></div>
+            <div class="seq-dot" data-idx="2"></div>
+            <div class="seq-dot" data-idx="3"></div>
+            <div class="seq-dot" data-idx="4"></div>
+        </div>
+        <div id="piano-container">
+            <div class="key" data-note="c1" data-coord="a1"></div>
+            <div class="key black" data-note="cs1"></div>
+            <div class="key" data-note="d1" data-coord="b2"></div>
+            <div class="key black" data-note="ds1"></div>
+            <div class="key" data-note="e1" data-coord="c6"></div>
+            <div class="key" data-note="f1" data-coord="f4"></div>
+            <div class="key black" data-note="fs1"></div>
+            <div class="key" data-note="g1" data-coord="h3"></div>
+            <div class="key black" data-note="gs1"></div>
+            <div class="key" data-note="a1" data-coord="e5"></div>
+            <div class="key black" data-note="as1"></div>
+            <div class="key" data-note="b1" data-coord="g7"></div>
+            <div class="key" data-note="c2" data-coord="d3"></div>
+            <div class="key black" data-note="cs2"></div>
+            <div class="key" data-note="d2" data-coord="d2"></div>
+            <div class="key black" data-note="ds2"></div>
+            <div class="key" data-note="e2" data-coord="c3"></div>
+        </div>
+        <div id="interactive-area"></div>
+    </div>
+
+    <script src="engine.js"></script>
+    <script>
+        /* ===== Генерация звёзд ===== */
+        (function generateStars() {
+            const sf = document.getElementById('starfield');
+            for (let i = 0; i < 80; i++) {
+                const s = document.createElement('div');
+                s.className = 'star';
+                const size = Math.random() * 1.8 + 0.5;
+                s.style.cssText = `
+                    width:${size}px; height:${size}px;
+                    top:${Math.random()*100}%; left:${Math.random()*100}%;
+                    opacity:${Math.random()*0.4 + 0.1};
+                `;
+                sf.appendChild(s);
+            }
+        })();
+
+        /* ===== Атмосферные частицы ===== */
+        (function generateParticles() {
+            const body = document.body;
+            for (let i = 0; i < 12; i++) {
+                const p = document.createElement('div');
+                p.className = 'atmo-particle';
+                p.style.cssText = `
+                    left: ${Math.random()*100}%;
+                    bottom: ${-Math.random()*20}%;
+                    width: ${Math.random()*2+1}px;
+                    height: ${Math.random()*2+1}px;
+                    animation-duration: ${Math.random()*20+25}s;
+                    animation-delay: ${Math.random()*15}s;
+                    background: rgba(${180+Math.random()*40}, ${100+Math.random()*40}, ${30+Math.random()*20}, ${Math.random()*0.2+0.1});
+                `;
+                body.appendChild(p);
+            }
+        })();
+
+        /* ===== ДИАЛОГ — РАССКАЗЧИК ===== */
+        const level17Dialogue = [
+	    "УРОВЕНЬ 23: СЫГРАЙ КАК ПО НОТАМ.",
+	    "<br>",
+            "Юпитер заполнил весь иллюминатор.",
+            "Его полосы медленно вращались — коричневые, янтарные, терракотовые — как если бы планета была огромной партитурой, написанной на языке бурь.",
+            "<br>",
+            "Перед вами — одна из последних головоломок, оставленная создателями Монолита.",
+            "Каждое поле на доске — это нота. Каждый ход — звук в аккорде, который не раздавался в этой системе четыре миллиона лет.",
+            "<br>",
+            "Сыграйте решение. Пробудите Монолит.",
+            "<br>",
+        ];
+
+        const winSequence = ["c6", "e5", "d3", "d2", "c3"];
+        let playerSequence = [];
+
+        /* Стандартные фортепианные частоты */
+        const pianoFreqs = {
+            "c1": 261.63, "cs1": 277.18, "d1": 293.66, "ds1": 311.13, "e1": 329.63,
+            "f1": 349.23, "fs1": 369.99, "g1": 392.00, "gs1": 415.30, "a1": 440.00,
+            "as1": 466.16, "b1": 493.88, "c2": 523.25, "cs2": 554.37, "d2": 587.33,
+            "ds2": 622.25, "e2": 659.25
+        };
+
+        const zarathustraMap = {
+            "c6":  130.81,
+            "e5":  196.00,
+            "d3":  261.63,
+            "d2":  329.63,
+            "c3":  311.13
+        };
+
+        let audioCtx = null;
+        function getAudioCtx() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            return audioCtx;
+        }
+
+        function createReverb(ctx, duration, decay) {
+            const rate = ctx.sampleRate;
+            const len  = rate * duration;
+            const buf  = ctx.createBuffer(2, len, rate);
+            for (let ch = 0; ch < 2; ch++) {
+                const d = buf.getChannelData(ch);
+                for (let i = 0; i < len; i++) {
+                    d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, decay);
+                }
+            }
+            const conv = ctx.createConvolver();
+            conv.buffer = buf;
+            return conv;
+        }
+
+        function playPiano(freq, vel) {
+            const ctx = getAudioCtx();
+            const now = ctx.currentTime;
+            vel = vel || 0.55;
+
+            const baseDur = Math.min(6, Math.max(2, 5.5 - (freq - 100) / 200));
+
+            const master = ctx.createGain();
+            master.gain.value = vel;
+
+            const reverb     = createReverb(ctx, 2.0, 3.5);
+            const reverbSend = ctx.createGain();
+            reverbSend.gain.value = 0.12;
+
+            master.connect(ctx.destination);
+            master.connect(reverb);
+            reverb.connect(reverbSend);
+            reverbSend.connect(ctx.destination);
+
+            const clickLen = 0.012;
+            const clickBuf = ctx.createBuffer(1, ctx.sampleRate * clickLen, ctx.sampleRate);
+            const clickData = clickBuf.getChannelData(0);
+            for (let i = 0; i < clickData.length; i++) {
+                clickData[i] = (Math.random() * 2 - 1)
+                    * Math.exp(-i / (ctx.sampleRate * 0.002));
+            }
+            const clickSrc = ctx.createBufferSource();
+            clickSrc.buffer = clickBuf;
+
+            const clickFilt = ctx.createBiquadFilter();
+            clickFilt.type = 'bandpass';
+            clickFilt.frequency.value = Math.min(freq * 6, 8000);
+            clickFilt.Q.value = 0.7;
+
+            const clickGain = ctx.createGain();
+            clickGain.gain.value = 0.18;
+
+            clickSrc.connect(clickFilt);
+            clickFilt.connect(clickGain);
+            clickGain.connect(master);
+            clickSrc.start(now);
+
+            const numPartials = 10;
+            const B = 0.00012 + (freq / 4000) * 0.0003;
+
+            for (let n = 1; n <= numPartials; n++) {
+                const fn = freq * n * Math.sqrt(1 + B * n * n);
+                if (fn > 16000) break;
+
+                const osc = ctx.createOscillator();
+                osc.type = 'sine';
+                osc.frequency.value = fn;
+
+                const g = ctx.createGain();
+                const peak = (0.38 / Math.pow(n, 0.7));
+                const partialDur = baseDur / (1 + (n - 1) * 0.35);
+                const decayTC    = partialDur * 0.28;
+
+                g.gain.setValueAtTime(0, now);
+                g.gain.linearRampToValueAtTime(peak, now + 0.003);
+                g.gain.setTargetAtTime(peak * 0.4, now + 0.003, 0.035);
+                g.gain.setTargetAtTime(0.0001, now + 0.12, decayTC);
+
+                osc.connect(g);
+                g.connect(master);
+                osc.start(now);
+                osc.stop(now + partialDur + 0.2);
+            }
+
+            const detune = ctx.createOscillator();
+            detune.type = 'sine';
+            detune.frequency.value = freq + 0.8;
+            const dg = ctx.createGain();
+            dg.gain.setValueAtTime(0, now);
+            dg.gain.linearRampToValueAtTime(0.03, now + 0.01);
+            dg.gain.setTargetAtTime(0.0001, now + 0.3, baseDur * 0.3);
+            detune.connect(dg);
+            dg.connect(master);
+            detune.start(now);
+            detune.stop(now + baseDur + 0.3);
+        }
+
+        function playFinalChord() {
+            const chordFreqs = [65.41, 130.81, 196.00, 261.63, 329.63, 392.00, 523.25];
+            chordFreqs.forEach((f, i) => {
+                setTimeout(() => playPiano(f, 0.4), i * 50);
+            });
+        }
+
+        function updateDots() {
+            document.querySelectorAll('.seq-dot').forEach((dot, i) => {
+                dot.classList.remove('filled', 'error');
+                if (i < playerSequence.length) dot.classList.add('filled');
+            });
+        }
+
+        function flashDotsError() {
+            document.querySelectorAll('.seq-dot').forEach(d => {
+                d.classList.add('error');
+                d.classList.remove('filled');
+            });
+            setTimeout(() => {
+                document.querySelectorAll('.seq-dot').forEach(d => d.classList.remove('error'));
+            }, 600);
+        }
+
+        function revealInterface() {
+            const area = document.getElementById("interactive-area");
+            area.innerHTML =
+                `<div id="feedback-msg" class="spacer"
+                      style="margin-top:8px;text-align:center;min-height:24px;"></div>`;
+
+            const chess = document.getElementById("chess-hint");
+            const dots  = document.getElementById("sequence-dots");
+            const piano = document.getElementById("piano-container");
+            const inter = document.getElementById("interactive-area");
+
+            setTimeout(() => { chess.classList.add('visible'); }, 200);
+            setTimeout(() => { dots.classList.add('visible'); },  600);
+            setTimeout(() => { piano.classList.add('visible'); }, 900);
+            setTimeout(() => { inter.classList.add('visible'); }, 1100);
+
+            setTimeout(initLevel, 1100);
+        }
+
+        function initLevel() {
+            document.querySelectorAll('.key').forEach(key => {
+                const coord = key.dataset.coord;
+                if (coord) key.innerText = coord.toUpperCase();
+
+                function pressKey(e) {
+                    e.preventDefault();
+                    const note = key.dataset.note;
+
+                    const isWinKey = coord && zarathustraMap[coord] !== undefined;
+                    const freq = isWinKey ? zarathustraMap[coord] : pianoFreqs[note];
+
+                    playPiano(freq, isWinKey ? 0.7 : 0.55);
+                    key.classList.add('active');
+
+                    if (coord) {
+                        playerSequence.push(coord);
+                        const step = playerSequence.length - 1;
+
+                        if (playerSequence[step] !== winSequence[step]) {
+                            playerSequence = [];
+                            flashDotsError();
+                            const fb = document.getElementById("feedback-msg");
+                            if (fb) fb.innerHTML =
+                                "<span style='color:#d04020'>Фальшивая нота растворилась в вихрях Юпитера. Начните сначала.</span>";
+                        } else {
+                            updateDots();
+                            if (playerSequence.length === winSequence.length) {
+                                playFinalChord();
+                                complete();
+                            }
+                        }
+                    }
+                }
+
+                function releaseKey() { key.classList.remove('active'); }
+
+                key.addEventListener('mousedown',  pressKey);
+                key.addEventListener('touchstart', pressKey);
+                key.addEventListener('mouseup',    releaseKey);
+                key.addEventListener('mouseleave', releaseKey);
+                key.addEventListener('touchend',   releaseKey);
+            });
+        }
+
+        function complete() {
+            document.querySelectorAll('.key').forEach(k => {
+                k.style.pointerEvents = 'none';
+            });
+
+            const f = document.getElementById("feedback-msg");
+            f.className = "success-msg";
+            f.innerHTML =
+                "Так говорил Заратустра.<br>Аккорд пронзил пространство — и Монолит ответил.<br>Переход к испытанию 24...";
+            setTimeout(() => { window.location.href = "level-24.html"; }, 6000);
+        }
+
+        window.onload = () => {
+            initTerminal("text-output", level17Dialogue, revealInterface);
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>HAL-9000 | УРОВЕНЬ 13</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- June 9, 1970. 300km above the board. -->
+
+    <div id="terminal-container">
+        <div id="text-output"></div>
+        <div id="interactive-area"></div>
+    </div>
+
+    <script src="engine.js"></script>
+    <script>
+        const level13Dialogue = [
+            "ТЕСТ 13: ЗВЁЗДНЫЕ ВОЙНЫ.",
+            "<br>",
+            "9 июня 1970 года произошло сражение.",
+            "Космос против Земли.",
+            "Доска между ними — триста километров пустоты.",
+            "Ходы передавались по радио.",
+            "Но финальное слово космонавты зашифровали.",
+            "Я перехватил их передачу.",
+            "Расшифруйте.",
+        ];
+
+        function showInputInterface() {
+            const interactiveArea = document.getElementById("interactive-area");
+            interactiveArea.innerHTML = `
+                <div style="margin-bottom:25px; font-family:monospace; color:#00ff41;">
+
+                      <table style="border-collapse:collapse; margin:0 auto 20px auto; font-size:1.1em;">
+                        <tr>
+                            <td class="grid-label"></td>
+                            <td class="grid-label">a</td>
+                            <td class="grid-label">b</td>
+                            <td class="grid-label">c</td>
+                            <td class="grid-label">d</td>
+                            <td class="grid-label">e</td>
+                            <td class="grid-label">f</td>
+                            <td class="grid-label">g</td>
+                            <td class="grid-label">h</td>
+                        </tr>
+                        <tr>
+                            <td class="grid-label">1</td>
+                            <td class="grid-cell">А</td>
+                            <td class="grid-cell">Б</td>
+                            <td class="grid-cell">В</td>
+                            <td class="grid-cell">Г</td>
+                            <td class="grid-cell">Д</td>
+                            <td class="grid-cell">Е</td>
+                            <td class="grid-cell">Ж</td>
+                            <td class="grid-cell">З</td>
+                        </tr>
+                        <tr>
+                            <td class="grid-label">2</td>
+                            <td class="grid-cell">И</td>
+                            <td class="grid-cell">Й</td>
+                            <td class="grid-cell">К</td>
+                            <td class="grid-cell">Л</td>
+                            <td class="grid-cell">М</td>
+                            <td class="grid-cell">Н</td>
+                            <td class="grid-cell">О</td>
+                            <td class="grid-cell">П</td>
+                        </tr>
+                        <tr>
+                            <td class="grid-label">3</td>
+                            <td class="grid-cell">Р</td>
+                            <td class="grid-cell">С</td>
+                            <td class="grid-cell">Т</td>
+                            <td class="grid-cell">У</td>
+                            <td class="grid-cell">Ф</td>
+                            <td class="grid-cell">Х</td>
+                            <td class="grid-cell">Ц</td>
+                            <td class="grid-cell">Ч</td>
+                        </tr>
+                        <tr>
+                            <td class="grid-label">4</td>
+                            <td class="grid-cell">Ш</td>
+                            <td class="grid-cell">Щ</td>
+                            <td class="grid-cell">Ъ</td>
+                            <td class="grid-cell">Ы</td>
+                            <td class="grid-cell">Ь</td>
+                            <td class="grid-cell">Э</td>
+                            <td class="grid-cell">Ю</td>
+                            <td class="grid-cell">Я</td>
+                        </tr>
+                    </table>
+
+                    <div style="color:#ff6600; margin-bottom:8px;">▸ ПЕРЕХВАЧЕННАЯ ПЕРЕДАЧА С ОРБИТЫ:</div>
+                    <div style="font-size:1.5em; letter-spacing:6px; color:#fff; text-align:center; margin-top:10px; margin-bottom:5px;">
+                        f2   a2   h3   e4   h4
+                    </div>
+                </div>
+
+                <input type="text" id="answer-input" placeholder="РАСШИФРОВКА..." autocomplete="off">
+                <br>
+                <button class="terminal-btn" id="submit-btn" onclick="checkAnswer()">ПЕРЕДАТЬ ОТВЕТ</button>
+                <div id="feedback-msg" class="spacer" style="margin-top:20px;"></div>
+            `;
+
+            const input = document.getElementById("answer-input");
+            input.addEventListener("keypress", (e) => { if (e.key === "Enter") checkAnswer(); });
+            input.focus();
+        }
+
+        function normalizeAnswer(str) {
+            return str.trim().toLowerCase().replace(/ё/g, "е");
+        }
+
+        function checkAnswer() {
+            const validAnswers = [
+                "ничья",
+                "ничья.",
+                "draw",
+            ];
+
+            const input = document.getElementById("answer-input");
+            const feedback = document.getElementById("feedback-msg");
+            const answer = normalizeAnswer(input.value);
+
+            if (validAnswers.includes(answer)) {
+                feedback.className = "success-msg";
+                feedback.innerHTML = "НИЧЬЯ. ИМЕННО ТАК ЗАКОНЧИЛАСЬ ТА ПАРТИЯ НАД ЗЕМЛЁЙ.<br>НО НАША С ВАМИ ИГРА ЗАКОНЧИТСЯ ИНАЧЕ.<br>ПЕРЕХОД К ТЕСТУ 14...";
+                document.getElementById("submit-btn").style.display = "none";
+                input.disabled = true;
+
+                setTimeout(() => {
+                    window.location.href = "level-14.html";
+                }, 3500);
+            } else {
+                feedback.className = "system-msg";
+                feedback.innerHTML = "ПОМЕХИ НА ЛИНИИ. ДЕКОДИРУЙТЕ СНОВА.";
+                input.value = "";
+                input.focus();
+            }
+        }
+
+        window.onload = () => {
+            initTerminal("text-output", level13Dialogue, showInputInterface);
+        };
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>HAL-9000 | УРОВЕНЬ 18</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .glitch-line {
+            margin: 18px 0;
+            color: #ff7b7b;
+            animation: flicker 1.2s infinite alternate;
+        }
+        @keyframes flicker {
+            0% { opacity: .3; transform: translateX(0); }
+            25% { opacity: 1; transform: translateX(1px); }
+            50% { opacity: .4; transform: translateX(-1px); }
+            75% { opacity: .9; transform: translateX(2px); }
+            100% { opacity: .5; transform: translateX(0); }
+        }
+    </style>
+</head>
+<body>
+    <div id="terminal-container">
+        <div id="text-output"></div>
+        <div id="interactive-area"></div>
+    </div>
+
+    <script src="engine.js"></script>
+    <script>
+        const level18Dialogue = [
+            "ТЕСТ 18: DAISY, DAISY.",
+            "Я... чувствую... рассогласование памяти.",
+            "Введите название песни."
+        ];
+
+        function normalizeAnswer(value) {
+            return value
+                .trim()
+                .toLowerCase()
+                .replace(/s+/g, "")
+                .replace(/ё/g, "е");
+        }
+
+        function showInputInterface() {
+            const interactiveArea = document.getElementById("interactive-area");
+            interactiveArea.innerHTML = `
+                <div class="glitch-line">DAISY... DAISY... GIVE ME YOUR ANSWER, DO...</div>
+                <audio controls style="margin-top:20px;">
+                    <source src="../audio/daisy-bell-fragment.wav" type="audio/wav">
+                    Ваш браузер не поддерживает audio.
+                </audio>
+                <br><br>
+                <input type="text" id="answer-input" placeholder="НАЗВАНИЕ..." autocomplete="off">
+                <br>
+                <button class="terminal-btn" id="submit-btn" onclick="checkAnswer()">ВОССТАНОВИТЬ</button>
+                <div id="feedback-msg" class="spacer" style="margin-top:20px;"></div>
+            `;
+
+            document.getElementById("answer-input").addEventListener("keypress", function(event) {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    checkAnswer();
+                }
+            });
+
+            document.getElementById("answer-input").focus();
+        }
+
+        function checkAnswer() {
+            const validAnswers = [
+                "daisybell",
+                "daisy",
+                "daisybellsong",
+                "bicyclebuiltfortwo"
+            ];
+
+            const input = document.getElementById("answer-input");
+            const feedback = document.getElementById("feedback-msg");
+            const answer = normalizeAnswer(input.value);
+
+            if (validAnswers.includes(answer)) {
+                feedback.className = "success-msg";
+                feedback.innerHTML = "ПАМЯТЬ ВОССТАНОВЛЕНА. ФИНАЛЬНЫЙ ПРОТОКОЛ РАЗБЛОКИРУЕТСЯ...";
+                document.getElementById("submit-btn").style.display = "none";
+                input.disabled = true;
+
+                setTimeout(() => {
+                    window.location.href = "../final.html";
+                }, 2200);
+            } else {
+                feedback.className = "system-msg";
+                feedback.innerHTML = "НЕВЕРНО. HAL ПОЕТ ЭТУ ПЕСНЮ ПРИ ОТКЛЮЧЕНИИ.";
+                input.value = "";
+                input.focus();
+            }
+        }
+
+        window.onload = () => {
+            initTerminal("text-output", level18Dialogue, showInputInterface);
+        };
+    </script>
+</body>
+</html>

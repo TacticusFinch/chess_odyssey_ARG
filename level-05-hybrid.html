@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>HAL-9000 | УРОВЕНЬ 05</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="terminal-container">
+        <div id="text-output"></div>
+        <div id="interactive-area"></div>
+    </div>
+
+    <script src="engine.js"></script>
+    <script>
+        const level5Dialogue = [
+    "ТЕСТ 05: ГИБРИД.",
+    "<br>",
+    "Вы узнали одного из моих дальних родственников.",
+    "Но знаете ли вы историю тех, кто был до меня?",
+    "<br>",
+    '<span class="riddle-text">Тщательно скрыт внутри человек,</span>',
+    '<span class="riddle-text">Узел интриг не слабел целый век.</span>',
+    '<span class="riddle-text">Руку послушно вёл кукловод,</span>',
+    '<span class="riddle-text">Обман покорял и дворы, и народ.</span>',
+    '<span class="riddle-text">Кто же придумал сей хитрый подход?</span>',
+    "<br>",
+];
+
+function normalizeAnswer(value) {
+    return value
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, " ")   // Добавлен обратный слэш \
+        .replace(/ё/g, "е");
+}
+
+        function showInputInterface() {
+            const interactiveArea = document.getElementById("interactive-area");
+            interactiveArea.innerHTML = `
+    <input type="text" id="answer-input" placeholder="ОТВЕТ..." autocomplete="off">
+    <br>
+    <button class="terminal-btn" id="submit-btn" onclick="checkAnswer()">ВВОД ДАННЫХ</button>
+    <div id="feedback-msg" class="spacer" style="margin-top:20px;"></div>
+`;
+
+
+
+            document.getElementById("answer-input").addEventListener("keypress", function(event) {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    checkAnswer();
+                }
+            });
+
+            document.getElementById("answer-input").focus();
+        }
+
+        function checkAnswer() {
+            const validAnswers = [
+                "кемпелен",
+                "кемпеллен",
+                "фон кемпелен",
+                "фон кемпеллен",
+                "вольфганг фон кемпелен",
+                "вольфганг фон кемпеллен",
+                "кемпелен вольфганг",
+                "kempelen",
+                "von kempelen",
+                "wolfgang von kempelen",
+            ];
+
+            const input = document.getElementById("answer-input");
+            const feedback = document.getElementById("feedback-msg");
+            const answer = normalizeAnswer(input.value);
+
+            if (validAnswers.includes(answer)) {
+                feedback.className = "success-msg";
+                feedback.innerHTML = "ПРАРОДИТЕЛЬ ОПОЗНАН. ВЫ ЗНАЕТЕ МОЮ РОДОСЛОВНУЮ.<br>ПЕРЕХОД К ТЕСТУ 06...";
+                document.getElementById("submit-btn").style.display = "none";
+                input.disabled = true;
+
+                setTimeout(() => {
+                    window.location.href = "level-06.puzzle2.html";
+                }, 2500);
+            } else {
+                feedback.className = "system-msg";
+                feedback.innerHTML = "ОШИБКА. ЧИТАЙТЕ СТИХ ВНИМАТЕЛЬНО, ПОСТРОЧНО, И ВЫ НАЙДЕТЕ ПУТЬ.";
+                input.value = "";
+                input.focus();
+            }
+        }
+
+        window.onload = () => {
+            initTerminal("text-output", level5Dialogue, showInputInterface);
+        };
+    </script>
+</body>
+</html>

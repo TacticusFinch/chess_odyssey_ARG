@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>HAL-9000 | УРОВЕНЬ 14</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="terminal-container">
+        <div id="text-output"></div>
+        <div id="interactive-area"></div>
+    </div>
+
+    <script src="engine.js"></script>
+
+    <script>
+        const level14Dialogue = [
+            "ТЕСТ 14: РЕДКОСТЬ.",
+            "<br>",
+            "Иногда, чтобы победить, нужно стать слабее.",
+            "Найдите единственный верный первый ход:",
+            "<br>",
+            "FEN: 8/6P1/8/8/5N2/7p/7p/4K2k w - - 0 1",
+            "БЕЛЫЕ: Kрe1, Кf4, п.g7",
+            "ЧЕРНЫЕ: Kрh1, п.h2, п.h3"
+        ];
+
+        function normalizeAnswer(value) {
+            return value.trim().toLowerCase()
+                .replace(/\s+/g, "")
+                .replace(/ё/g, "е")
+                .replace(/[—–-]/g, "");
+        }
+
+        function showInputInterface() {
+            const area = document.getElementById("interactive-area");
+            area.innerHTML = `
+                <input type="text" id="answer-input"
+                       placeholder="Ключевой ход..." autocomplete="off">
+                <br>
+                <button class="terminal-btn" id="submit-btn"
+                        onclick="checkAnswer()">ПОДТВЕРДИТЬ</button>
+                <div id="feedback-msg" class="spacer"
+                     style="margin-top:20px;"></div>
+            `;
+            const input = document.getElementById("answer-input");
+            input.addEventListener("keypress", e => {
+                if (e.key === "Enter") { e.preventDefault(); checkAnswer(); }
+            });
+            input.focus();
+        }
+
+        function checkAnswer() {
+            // Принимаем варианты превращения в слона (B или С)
+            const validAnswers = [
+                "g8b", "g8=b", "g8с", "g8=с","g8c", 
+                "g7g8b", "g7g8=b", "g7g8с",
+                "слонg8", "превращениевслона"
+            ];
+            
+            const input = document.getElementById("answer-input");
+            const feedback = document.getElementById("feedback-msg");
+            const answer = normalizeAnswer(input.value);
+
+            if (validAnswers.includes(answer)) {
+                feedback.className = "success-msg";
+                feedback.innerHTML =
+                    "ВЕРНО. 1. g8=B! Тонкое решение.<br>" +
+                    "ПЕРЕХОД К ТЕСТУ 15...";
+                document.getElementById("submit-btn").style.display = "none";
+                input.disabled = true;
+                setTimeout(() => {
+                    window.location.href = "level-15.html";
+                }, 3000);
+            } else {
+                feedback.className = "system-msg";
+                feedback.innerHTML = "ОШИБКА. ВАША ЛОГИКА СЛИШКОМ ПРЯМОЛИНЕЙНА.";
+                input.value = "";
+                input.focus();
+            }
+        }
+
+        window.onload = () => {
+            initTerminal("text-output", level14Dialogue, showInputInterface);
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>HAL-9000 | УРОВЕНЬ 20</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            background-color: #0a0805;
+            color: #00ff41;
+            overflow-x: hidden;
+        }
+
+        /* === ЦИФРОВОЙ РАСПАД — ГЛИТЧ СТРОК === */
+        .decay-line {
+            position: relative;
+            display: inline-block;
+        }
+
+        .decay-line.glitching {
+            animation: line-glitch 0.15s steps(2) forwards;
+        }
+
+        @keyframes line-glitch {
+            0% { transform: translate(0, 0); opacity: 1; }
+            20% { transform: translate(-3px, 1px); opacity: 0.7; clip-path: inset(0 0 40% 0); }
+            40% { transform: translate(4px, -1px); opacity: 0.9; clip-path: inset(30% 0 0 0); }
+            60% { transform: translate(-2px, 0); opacity: 0.5; }
+            80% { transform: translate(1px, 1px); opacity: 0.85; clip-path: none; }
+            100% { transform: translate(0, 0); opacity: 1; clip-path: none; }
+        }
+
+        /* Коррупция отдельных символов */
+        .decay-char {
+            display: inline;
+            position: relative;
+            transition: color 0.1s, text-shadow 0.1s;
+        }
+
+        .decay-char.corrupted {
+            color: #ff2040;
+            text-shadow: 0 0 6px rgba(255, 32, 64, 0.8), 2px 0 0 #00ffff;
+            animation: char-corrupt 0.2s steps(3);
+        }
+
+        .decay-char.fragmented {
+            opacity: 0;
+            animation: fragment-out 0.4s ease forwards;
+        }
+
+        .decay-char.restored {
+            animation: fragment-in 0.3s ease forwards;
+        }
+
+        @keyframes char-corrupt {
+            0% { transform: translate(0,0) skewX(0deg); }
+            33% { transform: translate(2px, -1px) skewX(15deg); }
+            66% { transform: translate(-1px, 2px) skewX(-10deg); }
+            100% { transform: translate(0,0) skewX(0deg); }
+        }
+
+        @keyframes fragment-out {
+            0% { opacity: 1; transform: scale(1) translateY(0); }
+            50% { opacity: 0.5; transform: scale(1.3) translateY(-2px); color: #ff4040; }
+            100% { opacity: 0; transform: scale(0) translateY(5px); }
+        }
+
+        @keyframes fragment-in {
+            0% { opacity: 0; transform: scale(0) translateY(-5px); }
+            60% { opacity: 0.7; transform: scale(1.1) translateY(1px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        /* Помехи — горизонтальные полосы */
+        .scan-corruption {
+            position: fixed;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0;
+        }
+
+        .scan-corruption.active {
+            animation: scan-flash 0.3s ease-out forwards;
+        }
+
+        @keyframes scan-flash {
+            0% { opacity: 0.9; background: linear-gradient(90deg, transparent 5%, #ff2040 15%, #00ffff 25%, transparent 35%, #ff2040 60%, transparent 80%); }
+            50% { opacity: 0.6; background: linear-gradient(90deg, transparent 10%, #00ff41 30%, transparent 50%, #ff2040 70%, transparent 90%); }
+            100% { opacity: 0; }
+        }
+
+        /* Артефакты — блоки мусора */
+        .data-artifact {
+            position: fixed;
+            pointer-events: none;
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            color: rgba(255, 32, 64, 0.4);
+            text-shadow: 0 0 3px rgba(255, 32, 64, 0.3);
+            white-space: nowrap;
+            z-index: 998;
+            animation: artifact-fade var(--duration, 2s) ease-out forwards;
+            letter-spacing: -1px;
+            line-height: 1;
+        }
+
+        @keyframes artifact-fade {
+            0% { opacity: 0.7; transform: scaleX(1); }
+            30% { opacity: 0.5; }
+            100% { opacity: 0; transform: scaleX(0.3); }
+        }
+
+        /* Мерцание фона при сбоях */
+        .decay-flash {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 9998;
+            animation: bg-decay 0.15s ease-out forwards;
+        }
+
+        @keyframes bg-decay {
+            0% { background: rgba(255, 0, 40, 0.03); }
+            50% { background: rgba(0, 255, 200, 0.02); }
+            100% { background: transparent; }
+        }
+
+        /* Дрожание всего контейнера при волне распада */
+        .container-shake {
+            animation: terminal-shake 0.3s ease-out;
+        }
+
+        @keyframes terminal-shake {
+            0% { transform: translate(0, 0); }
+            15% { transform: translate(-2px, 1px); }
+            30% { transform: translate(3px, -1px); }
+            45% { transform: translate(-1px, -2px); }
+            60% { transform: translate(2px, 1px); }
+            75% { transform: translate(-1px, 0); }
+            100% { transform: translate(0, 0); }
+        }
+
+        /* === ЭФФЕКТ ТЛЕНИЯ КЛЮЧЕВОЙ ФРАЗЫ === */
+        .ember-text {
+            display: inline-block;
+            cursor: pointer;
+            color: #4a4a4a;
+            position: relative;
+            padding: 8px 4px;
+            transition: color 0.6s ease, text-shadow 0.6s ease;
+            letter-spacing: 0.5px;
+        }
+
+        .ember-text::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at center, rgba(255, 100, 20, 0) 0%, transparent 70%);
+            border-radius: 8px;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .ember-text:hover::before {
+            background: radial-gradient(ellipse at center, rgba(255, 100, 20, 0.06) 0%, transparent 70%);
+            opacity: 1;
+        }
+
+        .ember-text::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ff6a14, #ff4500, #ff6a14, transparent);
+            box-shadow: 0 0 8px #ff4500, 0 0 20px rgba(255, 69, 0, 0.4);
+            transition: width 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), left 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            border-radius: 2px;
+        }
+
+        .ember-text:hover::after {
+            width: 100%;
+            left: 0;
+        }
+
+        .ember-text:hover {
+            color: #d4a373;
+            text-shadow:
+                0 0 4px rgba(255, 100, 20, 0.6),
+                0 0 12px rgba(255, 69, 0, 0.3),
+                0 0 30px rgba(255, 100, 20, 0.15);
+        }
+
+        .ember-text:hover .ember-char {
+            animation: char-glow var(--glow-duration, 2s) ease-in-out infinite alternate;
+            animation-delay: var(--glow-delay, 0s);
+        }
+
+        @keyframes char-glow {
+            0% { color: #8b5e3c; text-shadow: 0 0 2px rgba(255, 100, 20, 0.3); }
+            50% { color: #d4a373; text-shadow: 0 0 6px rgba(255, 100, 20, 0.5), 0 0 15px rgba(255, 69, 0, 0.2); }
+            100% { color: #ffcba4; text-shadow: 0 0 10px rgba(255, 120, 40, 0.6), 0 0 25px rgba(255, 69, 0, 0.25); }
+        }
+
+        /* === ЧАСТИЦЫ === */
+        .ash-particle {
+            position: fixed;
+            pointer-events: none;
+            border-radius: 50%;
+            z-index: 1000;
+        }
+
+        .ash-particle.spark {
+            background: radial-gradient(circle, #ffe0a0 0%, #ff6a14 60%, transparent 100%);
+            box-shadow: 0 0 4px #ff4500, 0 0 8px rgba(255, 69, 0, 0.5);
+            animation: spark-rise var(--duration, 1.5s) cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+        }
+
+        .ash-particle.ash {
+            background: radial-gradient(circle, #555 0%, #2a2a2a 70%, transparent 100%);
+            border-radius: 40% 60% 50% 50%;
+            animation: ash-drift var(--duration, 3s) ease-out forwards;
+        }
+
+        .ash-particle.ember {
+            background: radial-gradient(circle, #ff4500 0%, #cc3300 40%, #661a00 80%, transparent 100%);
+            box-shadow: 0 0 6px rgba(255, 69, 0, 0.6), 0 0 12px rgba(255, 100, 20, 0.2);
+            animation: ember-float var(--duration, 2.5s) ease-out forwards;
+        }
+
+        @keyframes spark-rise {
+            0% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 1; }
+            30% { opacity: 1; }
+            100% { transform: translate(var(--dx, 20px), var(--dy, -80px)) scale(0) rotate(var(--rot, 180deg)); opacity: 0; }
+        }
+
+        @keyframes ash-drift {
+            0% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 0.7; }
+            20% { opacity: 0.6; }
+            100% { transform: translate(var(--dx, -30px), var(--dy, -120px)) scale(0.3) rotate(var(--rot, 270deg)); opacity: 0; }
+        }
+
+        @keyframes ember-float {
+            0% { transform: translate(0, 0) scale(1); opacity: 0.9; }
+            40% { opacity: 0.7; transform: translate(calc(var(--dx, 10px) * 0.4), calc(var(--dy, -60px) * 0.4)) scale(0.8); }
+            100% { transform: translate(var(--dx, 10px), var(--dy, -60px)) scale(0.1); opacity: 0; }
+        }
+
+        .heat-glow {
+            position: fixed;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            pointer-events: none;
+            background: radial-gradient(circle, rgba(255, 100, 20, 0.07) 0%, rgba(255, 69, 0, 0.03) 40%, transparent 70%);
+            transform: translate(-50%, -50%);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .heat-glow.visible { opacity: 1; }
+
+        /* === ИНТЕРФЕЙС ВВОДА === */
+        .input-container {
+            margin-top: 30px;
+            border-top: 1px solid #112211;
+            padding-top: 20px;
+        }
+
+        #answer-input {
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid #115522;
+            color: #00ff41;
+            font-size: 1.8em;
+            text-align: center;
+            width: 150px;
+            outline: none;
+            font-family: 'Courier New', monospace;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        #answer-input:focus {
+            border-bottom-color: #00ff41;
+            box-shadow: 0 2px 15px rgba(0, 255, 65, 0.2);
+        }
+
+        .hint-text {
+            font-style: italic;
+            font-size: 0.8em;
+            color: #335533;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div id="terminal-container">
+        <div id="text-output"></div>
+        <div id="interactive-area"></div>
+    </div>
+
+    <div class="heat-glow" id="heat-glow"></div>
+
+    <script src="engine.js"></script>
+    <script>
+        const level20Dialogue = [
+            "ТЕСТ 20: <span style='color:#115522'>[НЕТ ДАННЫХ]</span>",
+            "<br>",
+            "Дейв... я слышу шелест страниц, которых никогда не существовало.",
+            "В моем архиве появились странные люди в касках с числом '451'.",
+            "Они говорят, что память — это мусор, который нужно предать огню.",
+            "<br>",
+            "<span class='ember-text' id='ember-target'>«Люди сжигают книги. Машины сжигают только лишние данные.»</span>",
+            "<br>",
+            "При какой температуре идеи превращаются в пепел?",
+        ];
+
+        /* =========================================
+           СИСТЕМА ЦИФРОВОГО РАСПАДА
+           ========================================= */
+
+        const GLITCH_CHARS = '█▓▒░╗╔╚╝║═╣╠╩╦╬▀▄■□▪▫◊◄►▲▼¥§¶†‡×÷±∞≈≠≤≥@#$%&';
+        const CORRUPT_POOL = 'ÆŒ¤£¡¿ÐÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿ';
+
+        let decayEngine = {
+            intensity: 0,       // нарастает со временем 0→1
+            started: false,
+            lineElements: [],   // все строки с текстом
+            intervals: [],
+            maxIntensity: 0.7
+        };
+
+        // Запуск после вывода всех строк
+        function startDecayEngine() {
+            if (decayEngine.started) return;
+            decayEngine.started = true;
+
+            // Находим все текстовые строки (кроме ember-text)
+            collectDecayLines();
+
+            // Нарастание интенсивности
+            let ramp = setInterval(() => {
+                decayEngine.intensity = Math.min(decayEngine.intensity + 0.02, decayEngine.maxIntensity);
+            }, 800);
+            decayEngine.intervals.push(ramp);
+
+            // Коррупция символов
+            let charCorrupt = setInterval(() => {
+                if (Math.random() < decayEngine.intensity) {
+                    corruptRandomChar();
+                }
+            }, 400);
+            decayEngine.intervals.push(charCorrupt);
+
+            // Глитч целых строк
+            let lineGlitch = setInterval(() => {
+                if (Math.random() < decayEngine.intensity * 0.3) {
+                    glitchRandomLine();
+                }
+            }, 2000);
+            decayEngine.intervals.push(lineGlitch);
+
+            // Горизонтальные помехи
+            let scanLines = setInterval(() => {
+                if (Math.random() < decayEngine.intensity * 0.25) {
+                    spawnScanCorruption();
+                }
+            }, 3000);
+            decayEngine.intervals.push(scanLines);
+
+            // Артефакты мусорных данных
+            let artifacts = setInterval(() => {
+                if (Math.random() < decayEngine.intensity * 0.2) {
+                    spawnDataArtifact();
+                }
+            }, 4000);
+            decayEngine.intervals.push(artifacts);
+
+            // Фрагментация — пропадание символов
+            let fragmentation = setInterval(() => {
+                if (Math.random() < decayEngine.intensity * 0.15) {
+                    fragmentChar();
+                }
+            }, 1500);
+            decayEngine.intervals.push(fragmentation);
+
+            // Волна распада — дрожание
+            let wave = setInterval(() => {
+                if (Math.random() < decayEngine.intensity * 0.1) {
+                    decayWave();
+                }
+            }, 6000);
+            decayEngine.intervals.push(wave);
+        }
+
+        function collectDecayLines() {
+            const output = document.getElementById('text-output');
+            if (!output) return;
+
+            const allElements = output.querySelectorAll('div, p, span');
+            allElements.forEach(el => {
+                // Пропускаем ember-text и его потомков
+                if (el.closest('.ember-text') || el.classList.contains('ember-text')) return;
+                if (el.textContent.trim().length > 2) {
+                    el.classList.add('decay-line');
+                    decayEngine.lineElements.push(el);
+                }
+            });
+
+            // Оборачиваем символы в spans для манипуляций
+            decayEngine.lineElements.forEach(wrapDecayChars);
+        }
+
+        function wrapDecayChars(el) {
+            if (el.dataset.decayWrapped) return;
+            if (el.querySelector('.ember-text, .ember-char')) return;
+
+            const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null, false);
+            const textNodes = [];
+            while (walker.nextNode()) {
+                if (!walker.currentNode.parentElement.closest('.ember-text')) {
+                    textNodes.push(walker.currentNode);
+                }
+            }
+
+            textNodes.forEach(node => {
+                const fragment = document.createDocumentFragment();
+                [...node.textContent].forEach(char => {
+                    const span = document.createElement('span');
+                    span.className = 'decay-char';
+                    span.textContent = char;
+                    span.dataset.original = char;
+                    fragment.appendChild(span);
+                });
+                node.parentNode.replaceChild(fragment, node);
+            });
+
+            el.dataset.decayWrapped = 'true';
+        }
+
+        // Коррупция случайного символа
+        function corruptRandomChar() {
+            const chars = document.querySelectorAll('.decay-char:not(.fragmented)');
+            if (chars.length === 0) return;
+
+            const target = chars[Math.floor(Math.random() * chars.length)];
+            if (target.closest('.ember-text')) return;
+
+            const original = target.dataset.original;
+            const glitchChar = GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)];
+
+            target.textContent = glitchChar;
+            target.classList.add('corrupted');
+
+            // Восстановление
+            setTimeout(() => {
+                target.textContent = original;
+                target.classList.remove('corrupted');
+            }, 100 + Math.random() * 300);
+        }
+
+        // Глитч целой строки
+        function glitchRandomLine() {
+            if (decayEngine.lineElements.length === 0) return;
+            const line = decayEngine.lineElements[Math.floor(Math.random() * decayEngine.lineElements.length)];
+            line.classList.add('glitching');
+            setTimeout(() => line.classList.remove('glitching'), 200);
+        }
+
+        // Горизонтальная помеха
+        function spawnScanCorruption() {
+            const scan = document.createElement('div');
+            scan.className = 'scan-corruption';
+            scan.style.top = Math.random() * 100 + '%';
+            scan.style.height = (1 + Math.random() * 3) + 'px';
+            scan.classList.add('active');
+            document.body.appendChild(scan);
+            setTimeout(() => scan.remove(), 400);
+        }
+
+        // Артефакт мусорных данных
+        function spawnDataArtifact() {
+            const artifact = document.createElement('div');
+            artifact.className = 'data-artifact';
+
+            // Генерация мусора
+            let garbage = '';
+            const len = 10 + Math.floor(Math.random() * 40);
+            for (let i = 0; i < len; i++) {
+                garbage += (Math.random() < 0.5)
+                    ? GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)]
+                    : CORRUPT_POOL[Math.floor(Math.random() * CORRUPT_POOL.length)];
+            }
+            artifact.textContent = garbage;
+
+            const container = document.getElementById('terminal-container');
+            const rect = container ? container.getBoundingClientRect() : { left: 50, top: 50, width: 600, height: 400 };
+
+            artifact.style.left = (rect.left + Math.random() * rect.width * 0.8) + 'px';
+            artifact.style.top = (rect.top + Math.random() * rect.height) + 'px';
+
+            const duration = 1.5 + Math.random() * 2;
+            artifact.style.setProperty('--duration', duration + 's');
+
+            document.body.appendChild(artifact);
+            setTimeout(() => artifact.remove(), duration * 1000 + 100);
+        }
+
+        // Фрагментация — символ исчезает и возвращается
+        function fragmentChar() {
+            const chars = document.querySelectorAll('.decay-char:not(.fragmented)');
+            if (chars.length === 0) return;
+
+            const target = chars[Math.floor(Math.random() * chars.length)];
+            if (target.closest('.ember-text')) return;
+            if (target.dataset.original === ' ') return;
+
+            target.classList.add('fragmented');
+
+            setTimeout(() => {
+                target.classList.remove('fragmented');
+                target.classList.add('restored');
+                target.textContent = target.dataset.original;
+                setTimeout(() => target.classList.remove('restored'), 300);
+            }, 800 + Math.random() * 1500);
+        }
+
+        // Волна распада
+        function decayWave() {
+            const container = document.getElementById('terminal-container');
+            if (!container) return;
+
+            container.classList.add('container-shake');
+            setTimeout(() => container.classList.remove('container-shake'), 350);
+
+            // Вспышка
+            const flash = document.createElement('div');
+            flash.className = 'decay-flash';
+            document.body.appendChild(flash);
+            setTimeout(() => flash.remove(), 200);
+
+            // Массовая коррупция на момент
+            for (let i = 0; i < 8; i++) {
+                setTimeout(() => corruptRandomChar(), i * 30);
+            }
+        }
+
+        /* =========================================
+           ТЛЕНИЕ КЛЮЧЕВОЙ ФРАЗЫ
+           ========================================= */
+
+        const heatGlow = document.getElementById('heat-glow');
+        let isHovering = false;
+        let particleInterval = null;
+        let mouseX = 0, mouseY = 0;
+
+        function wrapEmberChars() {
+            const target = document.getElementById('ember-target');
+            if (!target || target.dataset.wrapped) return;
+
+            const text = target.textContent;
+            target.innerHTML = '';
+            [...text].forEach((char, i) => {
+                const span = document.createElement('span');
+                span.className = 'ember-char';
+                span.textContent = char;
+                span.style.setProperty('--glow-delay', (Math.random() * 1.5).toFixed(2) + 's');
+                span.style.setProperty('--glow-duration', (1.5 + Math.random() * 1.5).toFixed(2) + 's');
+                target.appendChild(span);
+            });
+            target.dataset.wrapped = 'true';
+        }
+
+        const observer = new MutationObserver(() => {
+            const target = document.getElementById('ember-target');
+            if (target) {
+                wrapEmberChars();
+                attachEmberEvents();
+                observer.disconnect();
+            }
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+
+        function attachEmberEvents() {
+            const target = document.getElementById('ember-target');
+            if (!target) return;
+
+            target.addEventListener('mouseenter', () => {
+                isHovering = true;
+                heatGlow.classList.add('visible');
+                particleInterval = setInterval(() => {
+                    if (isHovering) spawnParticle(mouseX, mouseY);
+                }, 60);
+            });
+
+            target.addEventListener('mouseleave', () => {
+                isHovering = false;
+                heatGlow.classList.remove('visible');
+                clearInterval(particleInterval);
+            });
+
+            target.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+                heatGlow.style.left = e.clientX + 'px';
+                heatGlow.style.top = e.clientY + 'px';
+            });
+        }
+
+        function spawnParticle(x, y) {
+            const rand = Math.random();
+            let type, size, duration;
+
+            if (rand < 0.4) {
+                type = 'spark'; size = Math.random() * 3 + 1.5; duration = 0.8 + Math.random() * 1;
+            } else if (rand < 0.75) {
+                type = 'ash'; size = Math.random() * 5 + 3; duration = 2 + Math.random() * 2;
+            } else {
+                type = 'ember'; size = Math.random() * 4 + 2; duration = 1.5 + Math.random() * 1.5;
+            }
+
+            const particle = document.createElement('div');
+            particle.className = `ash-particle ${type}`;
+
+            const offsetX = (Math.random() - 0.5) * 24;
+            const offsetY = (Math.random() - 0.5) * 10;
+
+            particle.style.width = size + 'px';
+            particle.style.height = size + 'px';
+            particle.style.left = (x + offsetX) + 'px';
+            particle.style.top = (y + offsetY) + 'px';
+
+            const dx = (Math.random() - 0.5) * 80;
+            const dy = -(40 + Math.random() * 100);
+            const rot = (Math.random() - 0.5) * 540;
+
+            particle.style.setProperty('--dx', dx + 'px');
+            particle.style.setProperty('--dy', dy + 'px');
+            particle.style.setProperty('--rot', rot + 'deg');
+            particle.style.setProperty('--duration', duration + 's');
+
+            document.body.appendChild(particle);
+            setTimeout(() => particle.remove(), duration * 1000 + 100);
+        }
+
+        /* =========================================
+           ИНТЕРФЕЙС ВВОДА
+           ========================================= */
+
+        function showInputInterface() {
+            const area = document.getElementById("interactive-area");
+            area.innerHTML = `
+                <div class="input-container">
+                    <input type="text" id="answer-input" placeholder="???" autocomplete="off">
+                  </div>
+                <br>
+                <button class="terminal-btn" onclick="checkAnswer()">ПОГАСИТЬ</button>
+                <div id="feedback-msg" class="spacer" style="margin-top:20px;"></div>
+            `;
+            document.getElementById("answer-input").focus();
+            document.getElementById("answer-input").addEventListener("keydown", (e) => {
+                if (e.key === "Enter") checkAnswer();
+            });
+
+            // Запуск распада после появления интерфейса
+            setTimeout(() => startDecayEngine(), 500);
+        }
+
+        function checkAnswer() {
+            const input = document.getElementById("answer-input").value.trim();
+            const feedback = document.getElementById("feedback-msg");
+
+            if (input === "451") {
+                // Остановить распад
+                decayEngine.intervals.forEach(clearInterval);
+                decayEngine.intensity = 0;
+                document.querySelectorAll('.decay-char.corrupted, .decay-char.fragmented').forEach(c => {
+                    c.classList.remove('corrupted', 'fragmented');
+                    c.textContent = c.dataset.original;
+                });
+
+                feedback.innerHTML = "<span style='color:#00ff41'>ТЛЕНИЕ ОСТАНОВЛЕНО. ДАННЫЕ СТАБИЛИЗИРОВАНЫ. СТРАНИЦЫ УЦЕЛЕЛИ.</span>";
+                setTimeout(() => { window.location.href = "level-18.html"; }, 3000);
+            } else {
+                // Неверный ответ усиливает распад
+                decayEngine.intensity = Math.min(decayEngine.intensity + 0.1, 1.0);
+                decayWave();
+                feedback.innerHTML = "ПЛАМЯ РАСТЕТ. РАСПАД УСКОРЯЕТСЯ. ЭТО НЕ ТО ЧИСЛО.";
+            }
+        }
+
+        window.onload = () => {
+            initTerminal("text-output", level20Dialogue, showInputInterface);
+        };
+    </script>
+</body>
+</html>

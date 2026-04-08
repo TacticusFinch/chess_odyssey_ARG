@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>HAL-9000 | УРОВЕНЬ 10</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .position-box {
+            margin: 20px auto;
+            width: 300px;
+            padding: 16px;
+            border: 1px solid #7a0000;
+            background: #0a0a0a;
+            text-align: left;
+        }
+        .position-box strong {
+            color: #d10000;
+        }
+    </style>
+</head>
+<body>
+    <div id="terminal-container">
+        <div id="text-output"></div>
+        <div id="interactive-area"></div>
+    </div>
+
+    <script src="engine.js"></script>
+    <script>
+        const level10Dialogue = [
+            "ТЕСТ 10: ПРОРОК.",
+            "Слабые считают настоящее. Сильные видят неизбежное.",
+            "Введите первый ход форсированного решения."
+        ];
+
+        function normalizeAnswer(value) {
+            return value
+                .trim()
+                .toLowerCase()
+                .replace(/s+/g, "")
+                .replace(/ё/g, "е")
+                .replace("ф", "q");
+        }
+
+        function showInputInterface() {
+            const interactiveArea = document.getElementById("interactive-area");
+            interactiveArea.innerHTML = `
+                <div class="position-box">
+                    <div><strong>ПОЗИЦИЯ:</strong> белые начинают и форсируют мат.</div>
+                    <div>HAL рекомендует искать не материальную выгоду, а неизбежность.</div>
+                    <div style="margin-top:10px;">Введите первый ход в шахматной нотации.</div>
+                </div>
+                <input type="text" id="answer-input" placeholder="НАПРИМЕР: Qg8+" autocomplete="off">
+                <br>
+                <button class="terminal-btn" id="submit-btn" onclick="checkAnswer()">ПРОГНОЗ</button>
+                <div id="feedback-msg" class="spacer" style="margin-top:20px;"></div>
+            `;
+
+            document.getElementById("answer-input").addEventListener("keypress", function(event) {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    checkAnswer();
+                }
+            });
+
+            document.getElementById("answer-input").focus();
+        }
+
+        function checkAnswer() {
+            const validAnswers = [
+                "qg8+",
+                "qg8",
+                "ферзьg8+",
+                "ферзьg8"
+            ];
+
+            const input = document.getElementById("answer-input");
+            const feedback = document.getElementById("feedback-msg");
+            const answer = normalizeAnswer(input.value);
+
+            if (validAnswers.includes(answer)) {
+                feedback.className = "success-msg";
+                feedback.innerHTML = "ЛИНИЯ ПРЕДСКАЗАНА ВЕРНО. ПЕРЕХОД К ТЕСТУ 11...";
+                document.getElementById("submit-btn").style.display = "none";
+                input.disabled = true;
+
+                setTimeout(() => {
+                    window.location.href = "level-11-qrboard.html";
+                }, 2000);
+            } else {
+                feedback.className = "system-msg";
+                feedback.innerHTML = "НЕТ. ИЩИТЕ ФОРСИРОВАННЫЙ ШАХ, А НЕ ЕСТЕСТВЕННЫЙ ХОД.";
+                input.value = "";
+                input.focus();
+            }
+        }
+
+        window.onload = () => {
+            initTerminal("text-output", level10Dialogue, showInputInterface);
+        };
+    </script>
+</body>
+</html>

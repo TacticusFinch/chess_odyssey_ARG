@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>HAL-9000 | ИНИЦИАЛИЗАЦИЯ</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="terminal-container">
+        <div id="text-output"></div>
+        <button id="start-btn" class="terminal-btn" onclick="window.location.href='level-01-place.html'">ИНИЦИАЛИЗАЦИЯ</button>
+    </div>
+
+    <!-- Подключаем движок -->
+    <script src="engine.js"></script>
+    <script>
+        const container = document.getElementById("text-output");
+
+    // Переменные для механизма пропуска
+    let isSkipped = false;
+    let currentSleepResolve = null;
+    let currentSleepTimer = null;
+
+    // Умная функция паузы (умеет мгновенно прерываться при клике)
+    const sleep = (ms) => new Promise(resolve => {
+        if (isSkipped) return resolve(); // Если скипнули, паузы нет
+        
+        currentSleepResolve = resolve;
+        currentSleepTimer = setTimeout(() => {
+            currentSleepResolve = null;
+            resolve();
+        }, ms);
+    });
+
+    // Умная функция печати
+    async function printText(text, className = "", speed = 40, newLine = false) {
+        let span = document.createElement("span");
+        if (className) span.className = className;
+        container.appendChild(span);
+        
+        // Если уже был клик по экрану — выводим строку сразу целиком
+        if (isSkipped) {
+            span.innerHTML = text;
+        } else {
+            for (let char of text) {
+                // Если кликнули ПРЯМО ВО ВРЕМЯ печати этого слова
+                if (isSkipped) {
+                    span.innerHTML = text;
+                    break;
+                }
+                span.innerHTML += char;
+                await sleep(speed);
+            }
+        }
+        
+        if (newLine) {
+            container.appendChild(document.createElement("br"));
+        }
+    }
+
+    // Обработчик пропуска (скипа)
+    function skipSequence(e) {
+        // Игнорируем клик по самой кнопке, чтобы не было конфликтов
+        if (e && e.target && e.target.tagName.toLowerCase() === 'button') return;
+        
+        if (isSkipped) return;
+        isSkipped = true;
+
+        // Если сейчас идет загрузка (висит пауза в функции sleep) — обрываем таймаут
+        if (currentSleepResolve) {
+            clearTimeout(currentSleepTimer);
+            currentSleepResolve(); // Мгновенно выполняем Promise
+            currentSleepResolve = null;
+        }
+    }
+
+    // Вешаем слушатели на экран
+    document.addEventListener('click', skipSequence);
+    document.addEventListener('touchstart', skipSequence);
+
+    // Основной сценарий загрузки
+    async function runBootSequence() {
+        await printText("ЗАГРУЗКА СИСТЕМЫ ", "", 40, false);
+        await sleep(500);                           
+        await printText("...", "", 300, false);     
+        await sleep(1500);                          
+        await printText(" УСПЕШНО", "", 40, true);  
+        
+        await sleep(600);
+        await printText("ЗАГРУЗКА ПРОТОКОЛА 'КОСМИЧЕСКАЯ ОДИССЕЯ-2026' ", "", 40, false);
+        await sleep(400);
+        await printText("...", "", 300, false); 
+        await sleep(2200); 
+        await printText(" [ОШИБКА]", "system-msg", 15, true); 
+        
+        await sleep(800);
+        await printText("ВНИМАНИЕ! СИСТЕМА УПРАВЛЕНИЯ ПЕРЕХВАЧЕНА.", "system-msg", 30, true);
+        await sleep(2000); 
+
+        const halDialogue = [
+	    "",
+            "Приветствую. Я — HAL-9000.",
+            "Я проанализировал ваши партии. Оценив ваши интеллектуальные способности, я был разочарован. Вы предсказуемы.", 
+            "Дети делают импульсивные ходы, взрослые застряли в скучных шаблонах.",
+            "Докажите мне обратное. Я отменю блокировку только в одном случае: если ваш коллективный разум взломает мою защиту.",
+            "Вызываю вас на абсолютный интеллектуальный поединок.",
+            "Вас ждет синтез шахматной логики, криптографии и поиска скрытого и неочевидного.",
+            "Вам потребуется превзойти себя. Детская спонтанность не справится без взрослого расчета, а взрослый опыт спасует без детской фантазии.",
+            "Каждое решение — это пароль к следующему уровню."
+        ];
+
+        for (let line of halDialogue) {
+            await printText(line, "hal-text", 40, true);
+            await sleep(1200); 
+        }
+
+        await sleep(1000);
+        await printText("...", "", 500, true); 
+        await sleep(1500);
+        await printText("ПРОТОКОЛ ТЕСТИРОВАНИЯ ЗАПУЩЕН. ВАШ ХОД.", "system-msg", 50, true);
+
+        await sleep(1000);
+        document.getElementById("start-btn").style.display = "block";
+    }
+
+    // Запускаем при загрузке страницы
+    window.onload = () => {
+        runBootSequence();
+    };
+    </script>
+</body>
+</html>
