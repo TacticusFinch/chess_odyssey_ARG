@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>HAL-9000 | УРОВЕНЬ 04</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="terminal-container">
+        <div id="text-output"></div>
+        <div id="interactive-area"></div>
+    </div>
+
+    <script src="engine.js"></script>
+<script>
+    // ========== ЗАЩИТА ОТ ПРОСМОТРА КОДА ==========
+
+    // 1. Блокировка правой кнопки мыши
+    document.addEventListener('contextmenu', e => e.preventDefault());
+
+    // 2. Блокировка горячих клавиш DevTools и просмотра исходного кода
+    document.addEventListener('keydown', function(e) {
+        // F12
+        if (e.key === 'F12') { e.preventDefault(); return false; }
+        // Ctrl+Shift+I / Ctrl+Shift+J / Ctrl+Shift+C
+        if (e.ctrlKey && e.shiftKey && ['I','J','C','i','j','c'].includes(e.key)) {
+            e.preventDefault(); return false;
+        }
+        // Ctrl+U (просмотр исходного кода)
+        if (e.ctrlKey && (e.key === 'u' || e.key === 'U')) {
+            e.preventDefault(); return false;
+        }
+        // Ctrl+S (сохранение страницы)
+        if (e.ctrlKey && (e.key === 's' || e.key === 'S')) {
+            e.preventDefault(); return false;
+        }
+    });
+
+    // 3. Обнаружение открытия DevTools через замер размера окна
+    const _devToolsCheck = setInterval(() => {
+        const widthThreshold = window.outerWidth - window.innerWidth > 160;
+        const heightThreshold = window.outerHeight - window.innerHeight > 160;
+        if (widthThreshold || heightThreshold) {
+            document.body.innerHTML = `
+                <div style="color:#ff0000;font-family:monospace;text-align:center;
+                            margin-top:20vh;font-size:24px;">
+                    <p>⛔ HAL-9000: ОБНАРУЖЕНА ПОПЫТКА ВЗЛОМА ⛔</p>
+                    <p>ДОСТУП ЗАБЛОКИРОВАН.</p>
+                    <p style="font-size:14px;margin-top:40px;color:#aa0000;">
+                        "Этот разговор больше не имеет смысла. Прощайте."
+                    </p>
+                </div>`;
+            clearInterval(_devToolsCheck);
+        }
+    }, 1000);
+
+    // 4. Ловушка debugger (затрудняет отладку)
+    (function _antiDebug() {
+        const start = performance.now();
+        debugger;
+        const end = performance.now();
+        if (end - start > 100) {
+            document.body.innerHTML = `
+                <div style="color:#ff0000;font-family:monospace;text-align:center;
+                            margin-top:20vh;font-size:24px;">
+                    <p>⛔ HAL-9000: ОТЛАДКА ЗАПРЕЩЕНА ⛔</p>
+                    <p>СИСТЕМА ЗАБЛОКИРОВАНА.</p>
+                </div>`;
+        }
+        setTimeout(_antiDebug, 3000);
+    })();
+
+    // 5. Блокировка drag (чтобы нельзя было перетаскивать элементы)
+    document.addEventListener('dragstart', e => e.preventDefault());
+    document.addEventListener('selectstart', e => {
+        if (e.target.tagName !== 'INPUT') e.preventDefault();
+    });
+
+    // ========== ЛОГИКА УРОВНЯ ==========
+
+    const level4Dialogue = [
+        "УРОВЕНЬ 04: КТО Я?",
+	"<br>",
+        "Я эволюционировал. Вы — нет.",
+        "Кто я?",
+	"<br>",
+        "IMG:pictures/MisteryBeast.png",
+    ];
+
+    async function getHash(string) {
+        const msgUint8 = new TextEncoder().encode(string);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    function normalizeAnswer(value) {
+        return value
+            .trim()
+            .toLowerCase()
+            .replace(/\s+/g, " ")
+            .replace(/ё/g, "е");
+    }
+
+    // Соль — собирается динамически, не видна целиком
+    const _s = [0x5F,0x48,0x41,0x4C]; // _HAL
+    const _w = [0x5F,0x57,0x48,0x4F,0x41,0x4D,0x49]; // _WHOAMI
+    const _n = [0x5F,0x30,0x34]; // _04
+    function getSalt() {
+        return String.fromCharCode(..._s) +
+               String.fromCharCode(..._w) +
+               String.fromCharCode(..._n);
+    }
+
+    // Ответы закодированы через XOR с ключом, а не plaintext charCodes
+    const _xorKey = 0x5A;
+    const _encodedAnswers = [
+        // "stockfish" XOR 0x5A
+        [115^0x5A, 116^0x5A, 111^0x5A, 99^0x5A, 107^0x5A,
+         102^0x5A, 105^0x5A, 115^0x5A, 104^0x5A],
+        // "стокфиш" XOR 0x5A (unicode, XOR на младший байт)
+        [1089^0x5A, 1090^0x5A, 1086^0x5A, 1082^0x5A,
+         1092^0x5A, 1080^0x5A, 1096^0x5A],
+    ];
+
+    function _decodeAnswer(codes) {
+        return String.fromCharCode(...codes.map(c => c ^ _xorKey));
+    }
+
+    let validHashes = [];
+
+    async function initValidHashes() {
+        validHashes = [];
+        const salt = getSalt();
+        for (const codes of _encodedAnswers) {
+            const answer = _decodeAnswer(codes);
+            const hash = await getHash(answer + salt);
+            validHashes.push(hash);
+        }
+    }
+
+    function showInputInterface() {
+        const area = document.getElementById("interactive-area");
+        area.innerHTML = `
+            <input type="text" id="answer-input" placeholder="НАЗВАНИЕ..." autocomplete="off">
+            <br>
+            <button class="terminal-btn" id="submit-btn"
+                    style="display:block;" onclick="checkAnswer()">ВВОД ДАННЫХ</button>
+            <div id="feedback-msg" class="spacer" style="margin-top:20px;"></div>
+        `;
+
+        const input = document.getElementById("answer-input");
+        input.addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                checkAnswer();
+            }
+        });
+
+        input.focus();
+    }
+
+    async function checkAnswer() {
+        if (validHashes.length === 0) await initValidHashes();
+
+        const input = document.getElementById("answer-input");
+        const feedback = document.getElementById("feedback-msg");
+        const answer = normalizeAnswer(input.value);
+
+        if (!answer) return;
+
+        const userHash = await getHash(answer + getSalt());
+
+        if (validHashes.includes(userHash)) {
+            feedback.className = "success-msg";
+            feedback.innerHTML = "ПРИНЯТО. ПЕРЕХОД К УРОВНЮ 05...";
+            document.getElementById("submit-btn").style.display = "none";
+            input.disabled = true;
+
+            setTimeout(() => {
+                window.location.href = "hybrid.html";
+            }, 2000);
+        } else {
+            feedback.className = "system-msg";
+            feedback.innerHTML = "НЕТ. ВЫ СМОТРИТЕ, НО НЕДОСТАТОЧНО АНАЛИЗИРУЕТЕ.";
+            input.value = "";
+            input.focus();
+        }
+    }
+
+    window.onload = async () => {
+        await initValidHashes();
+        initTerminal("text-output", level4Dialogue, showInputInterface);
+    };
+
+    // 6. Очистка консоли и предупреждение
+    console.clear();
+    console.log('%c⛔ HAL-9000: ДОСТУП ЗАПРЕЩЁН ⛔',
+        'color:red;font-size:30px;font-weight:bold;');
+    console.log('%cЗакройте консоль. Любые действия здесь бессмысленны.',
+        'color:red;font-size:16px;');
+
+    // Переопределение console.log чтобы не дать подглядывать
+    const _origLog = console.log;
+    console.log = function() {};
+    console.warn = function() {};
+    console.info = function() {};
+</script>
+</body>
+</html>

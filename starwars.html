@@ -6,8 +6,6 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- June 9, 1970. 300km above the board. -->
-
     <div id="terminal-container">
         <div id="text-output"></div>
         <div id="interactive-area"></div>
@@ -15,8 +13,26 @@
 
     <script src="engine.js"></script>
     <script>
+        (function(){
+            document.addEventListener("contextmenu",function(e){e.preventDefault();});
+            document.addEventListener("keydown",function(e){
+                if(e.key==="F12")e.preventDefault();
+                if(e.ctrlKey&&e.shiftKey&&(e.key==="I"||e.key==="J"||e.key==="C"))e.preventDefault();
+                if(e.ctrlKey&&e.key==="u")e.preventDefault();
+                if(e.ctrlKey&&e.key==="s")e.preventDefault();
+            });
+            (function d(){
+                var t=new Date();
+                debugger;
+                if(new Date()-t>100){
+                    document.body.innerHTML="<div style='color:#ff0000;background:#000;height:100vh;display:flex;align-items:center;justify-content:center;font-family:monospace;font-size:2em'>ДОСТУП ЗАПРЕЩЁН</div>";
+                }
+                setTimeout(d,1000);
+            })();
+        })();
+
         const level13Dialogue = [
-            "ТЕСТ 13: ЗВЁЗДНЫЕ ВОЙНЫ.",
+            "УРОВЕНЬ 13: ЗВЁЗДНЫЕ ВОЙНЫ.",
             "<br>",
             "9 июня 1970 года произошло сражение.",
             "Космос против Земли.",
@@ -92,7 +108,7 @@
 
                     <div style="color:#ff6600; margin-bottom:8px;">▸ ПЕРЕХВАЧЕННАЯ ПЕРЕДАЧА С ОРБИТЫ:</div>
                     <div style="font-size:1.5em; letter-spacing:6px; color:#fff; text-align:center; margin-top:10px; margin-bottom:5px;">
-                        f2   a2   h3   e4   h4
+                        f2   a2   h3   e4   h4
                     </div>
                 </div>
 
@@ -124,12 +140,12 @@
 
             if (validAnswers.includes(answer)) {
                 feedback.className = "success-msg";
-                feedback.innerHTML = "НИЧЬЯ. ИМЕННО ТАК ЗАКОНЧИЛАСЬ ТА ПАРТИЯ НАД ЗЕМЛЁЙ.<br>НО НАША С ВАМИ ИГРА ЗАКОНЧИТСЯ ИНАЧЕ.<br>ПЕРЕХОД К ТЕСТУ 14...";
+                feedback.innerHTML = "НИЧЬЯ. ИМЕННО ТАК ЗАКОНЧИЛАСЬ ТА ПАРТИЯ НАД ЗЕМЛЁЙ.<br>НО НАША С ВАМИ ИГРА ЗАКОНЧИТСЯ ИНАЧЕ.<br>ПЕРЕХОД К УРОВНЮ 14...";
                 document.getElementById("submit-btn").style.display = "none";
                 input.disabled = true;
 
                 setTimeout(() => {
-                    window.location.href = "level-14.html";
+                    window.location.href = "weaker.html";
                 }, 3500);
             } else {
                 feedback.className = "system-msg";
@@ -145,4 +161,3 @@
     </script>
 </body>
 </html>
-

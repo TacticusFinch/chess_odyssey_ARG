@@ -14,8 +14,25 @@
     <script src="engine.js"></script>
 
     <script>
+        (function(){
+            document.addEventListener("contextmenu",function(e){e.preventDefault();});
+            document.addEventListener("keydown",function(e){
+                if(e.key==="F12")e.preventDefault();
+                if(e.ctrlKey&&e.shiftKey&&["I","J","C"].includes(e.key.toUpperCase()))e.preventDefault();
+                if(e.ctrlKey&&e.key.toLowerCase()==="u")e.preventDefault();
+                if(e.ctrlKey&&e.key.toLowerCase()==="s")e.preventDefault();
+                if(e.ctrlKey&&e.key.toLowerCase()==="p")e.preventDefault();
+            });
+            (function d(){
+                const t=new Date();
+                debugger;
+                if(new Date()-t>100){document.body.innerHTML="";}
+                setTimeout(d,1000);
+            })();
+        })();
+
         const level14Dialogue = [
-            "ТЕСТ 14: РЕДКОСТЬ.",
+            "УРОВЕНЬ 14: РЕДКОСТЬ.",
             "<br>",
             "Иногда, чтобы победить, нужно стать слабее.",
             "Найдите единственный верный первый ход:",
@@ -27,37 +44,32 @@
 
         function normalizeAnswer(value) {
             return value.trim().toLowerCase()
-                .replace(/\s+/g, "")
+                .replace(/s+/g, "")
                 .replace(/ё/g, "е")
                 .replace(/[—–-]/g, "");
         }
 
         function showInputInterface() {
             const area = document.getElementById("interactive-area");
-            area.innerHTML = `
-                <input type="text" id="answer-input"
-                       placeholder="Ключевой ход..." autocomplete="off">
-                <br>
-                <button class="terminal-btn" id="submit-btn"
-                        onclick="checkAnswer()">ПОДТВЕРДИТЬ</button>
-                <div id="feedback-msg" class="spacer"
-                     style="margin-top:20px;"></div>
-            `;
+            area.innerHTML =
+                '<input type="text" id="answer-input" placeholder="Ключевой ход..." autocomplete="off">' +
+                '<br>' +
+                '<button class="terminal-btn" id="submit-btn" onclick="checkAnswer()">ПОДТВЕРДИТЬ</button>' +
+                '<div id="feedback-msg" class="spacer" style="margin-top:20px;"></div>';
             const input = document.getElementById("answer-input");
-            input.addEventListener("keypress", e => {
+            input.addEventListener("keypress", function(e) {
                 if (e.key === "Enter") { e.preventDefault(); checkAnswer(); }
             });
             input.focus();
         }
 
         function checkAnswer() {
-            // Принимаем варианты превращения в слона (B или С)
             const validAnswers = [
-                "g8b", "g8=b", "g8с", "g8=с","g8c", 
+                "g8b", "g8=b", "g8с", "g8=с","g8c",
                 "g7g8b", "g7g8=b", "g7g8с",
                 "слонg8", "превращениевслона"
             ];
-            
+
             const input = document.getElementById("answer-input");
             const feedback = document.getElementById("feedback-msg");
             const answer = normalizeAnswer(input.value);
@@ -66,11 +78,11 @@
                 feedback.className = "success-msg";
                 feedback.innerHTML =
                     "ВЕРНО. 1. g8=B! Тонкое решение.<br>" +
-                    "ПЕРЕХОД К ТЕСТУ 15...";
+                    "ПЕРЕХОД К УРОВНЮ 15...";
                 document.getElementById("submit-btn").style.display = "none";
                 input.disabled = true;
-                setTimeout(() => {
-                    window.location.href = "level-15.html";
+                setTimeout(function() {
+                    window.location.href = "layers.html";
                 }, 3000);
             } else {
                 feedback.className = "system-msg";
@@ -80,7 +92,7 @@
             }
         }
 
-        window.onload = () => {
+        window.onload = function() {
             initTerminal("text-output", level14Dialogue, showInputInterface);
         };
     </script>

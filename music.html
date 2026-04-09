@@ -669,7 +669,7 @@
                         } else {
                             updateDots();
                             if (playerSequence.length === winSequence.length) {
-                                playFinalChord();
+                                //playFinalChord();
                                 complete();
                             }
                         }
@@ -695,7 +695,7 @@
             f.className = "success-msg";
             f.innerHTML =
                 "Так говорил Заратустра.<br>Аккорд пронзил пространство — и Монолит ответил.<br>Переход к испытанию 24...";
-            setTimeout(() => { window.location.href = "level-24.html"; }, 6000);
+            setTimeout(() => { window.location.href = "monolith.html"; }, 6000);
         }
 
         window.onload = () => {

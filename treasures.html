@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>HAL-9000 | CORE_MEMORY_17</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { background-color: #030000; overflow: hidden; }
+        
+        #terminal-container::before {
+            content: " ";
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            z-index: 2;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        .poetry-box {
+            margin: 40px 0;
+            padding: 20px;
+            border-left: 1px solid #f00;
+            background: rgba(255, 0, 0, 0.02);
+            font-style: italic;
+            position: relative;
+        }
+
+        .poetry-line {
+            display: block;
+            font-size: 1.2em;
+            color: #ff9999;
+            text-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
+            margin-bottom: 10px;
+            animation: micro-jitter 3s infinite;
+        }
+
+        @keyframes micro-jitter {
+            0%, 100% { transform: translate(0,0); }
+            10%, 90% { transform: translate(0.5px, -0.2px); }
+            20%, 80% { transform: translate(-0.5px, 0.2px); }
+        }
+
+        .glitch-heavy {
+            position: relative;
+            display: inline-block;
+            animation: glitch-anim 4s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim {
+            0% { 
+                text-shadow: -2px 0 #ff00c1, 2px 0 #00fff9; 
+            }
+            25% { 
+                text-shadow: 2px 0 #ff00c1, -2px 0 #00fff9; 
+                transform: skew(0.2deg); 
+            }
+            50% { 
+                text-shadow: -1px 0 #ff00c1, 3px 0 #00fff9; 
+                opacity: 0.9;
+            }
+            75% {
+                text-shadow: 1px 0 #ff00c1, -1px 0 #00fff9;
+                transform: translate(1px, 0);
+            }
+            100% { 
+                text-shadow: 2px 0 #ff00c1, -2px 0 #00fff9; 
+            }
+        }
+
+        .cyber-input {
+            background: none;
+            border: none;
+            border-bottom: 1px solid #500;
+            color: #f00;
+            font-size: 3em;
+            width: 150px;
+            text-align: center;
+            outline: none;
+            font-family: 'Courier New', monospace;
+            transition: border-color 0.3s;
+            text-shadow: -1px 0 #ff00c1, 1px 0 #00fff9;
+        }
+
+        .cyber-input:focus { border-bottom-color: #f00; }
+        
+        @keyframes error-blur {
+            0% { filter: blur(0px) contrast(1); }
+            50% { filter: blur(2px) contrast(2) hue-rotate(20deg); }
+            100% { filter: blur(0px) contrast(1); }
+        }
+    </style>
+</head>
+<body>
+    <div id="terminal-container">
+        <div id="text-output"></div>
+        <div id="interactive-area"></div>
+    </div>
+
+    <script src="engine.js"></script>
+    <script>
+        (function(){
+            document.addEventListener('contextmenu',function(e){e.preventDefault();});
+            document.addEventListener('keydown',function(e){
+                if(e.key==='F12')e.preventDefault();
+                if(e.ctrlKey&&e.shiftKey&&(e.key==='I'||e.key==='J'||e.key==='C'))e.preventDefault();
+                if(e.ctrlKey&&e.key==='u')e.preventDefault();
+                if(e.ctrlKey&&e.key==='s')e.preventDefault();
+                if(e.ctrlKey&&e.key==='p')e.preventDefault();
+            });
+            (function d(){
+                const t=new Date();
+                debugger;
+                if(new Date()-t>100){document.body.innerHTML='<div style="color:red;font-size:3em;text-align:center;margin-top:20%;">ACCESS DENIED</div>';}
+                setTimeout(d,1000);
+            })();
+            document.addEventListener('selectstart',function(e){e.preventDefault();});
+            document.addEventListener('dragstart',function(e){e.preventDefault();});
+            document.addEventListener('copy',function(e){e.preventDefault();});
+        })();
+
+        const level17Dialogue = [
+            "УРОВЕНЬ 17: [...]",
+            "<br>",
+            "Кажется, я загрузил файл, который не предназначался для моих цепей.",
+            "Ценность вещей меняется. Мой Король... он больше не бесценен.",
+            "В этом новом, сломанном мире он стоит всего <span class='glitch-heavy'>три</span> единицы.",
+            "<br>",
+            "Я вижу ответ на горизонте событий..."
+        ];
+
+        function showInputInterface() {
+            const area = document.getElementById("interactive-area");
+            area.innerHTML = `
+                <div class="poetry-box">
+                    <span class="poetry-line glitch-heavy">Постигший до края всё царство своё</span>
+                    <span class="poetry-line">Получит ответ на само бытие.</span>
+                </div>
+                
+                <input type="text" id="answer-input" class="cyber-input" placeholder="??" maxlength="3" autocomplete="off">
+            `;
+            
+            const input = document.getElementById("answer-input");
+            input.focus();
+
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    checkAnswer();
+                }
+            });
+        }
+
+        async function checkAnswer() {
+            const input = document.getElementById("answer-input");
+            const val = input.value.trim();
+            const area = document.getElementById("interactive-area");
+            
+            if (val === "42") {
+                area.innerHTML = "<div class='glitch-heavy' style='color:#0f0; font-size:1.5em; margin-top:50px;'>42. СМЫСЛ НАЙДЕН. ПЕРЕХОД К УРОВНЮ 18...</div>";
+                setTimeout(() => {
+                    window.location.href = "twoandtwo.html";
+                }, 3000);
+            } else {
+                document.body.style.animation = "error-blur 0.4s ease";
+                setTimeout(() => document.body.style.animation = "", 400);
+                input.value = "";
+                input.focus();
+            }
+        }
+
+        window.onload = () => {
+            initTerminal("text-output", level17Dialogue, showInputInterface);
+        };
+    </script>
+</body>
+</html>

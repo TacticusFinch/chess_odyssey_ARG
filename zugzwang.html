@@ -14,17 +14,33 @@
     <script src="engine.js"></script>
 
     <script>
+        (function(){
+            document.addEventListener("contextmenu",function(e){e.preventDefault();});
+            document.addEventListener("keydown",function(e){
+                if(e.key==="F12")e.preventDefault();
+                if(e.ctrlKey&&e.shiftKey&&(e.key==="I"||e.key==="J"||e.key==="C"))e.preventDefault();
+                if(e.ctrlKey&&e.key==="u")e.preventDefault();
+                if(e.ctrlKey&&e.key==="s")e.preventDefault();
+            });
+            (function d(){
+                var t=new Date();
+                debugger;
+                if(new Date()-t>100){document.body.innerHTML="<div style='color:#ff0000;background:#000;height:100vh;display:flex;align-items:center;justify-content:center;font-family:monospace;font-size:2em'>ДОСТУП ЗАПРЕЩЁН</div>";}
+                setTimeout(d,1000);
+            })();
+        })();
+
         const level7Dialogue = [
-            "ТЕСТ 07: ЦУГЦВАНГ.",
+            "УРОВЕНЬ 07: ЦУГЦВАНГ.",
             "<br>",
-	    "Кстати, о цугцванге...",
+            "Кстати, о цугцванге...",
             "Вы знаете, что это такое?",
             "Это позиция, в которой любой ход ведёт к поражению.",
             "<br>",
             "Введите ваш ответ.",
         ];
 
-        let wrongAttempts = 0;
+        var wrongAttempts = 0;
 
         const wrongHints = [
             "ОШИБКА. ЛЮБОЙ ХОД — ОШИБКА. ПОДУМАЙТЕ.",
@@ -42,27 +58,18 @@
         }
 
         function showInputInterface() {
-            const area = document.getElementById("interactive-area");
-            area.innerHTML = `
-                <input type="text" id="answer-input"
-                       placeholder="Ход..." autocomplete="off">
-                <br>
-                <button class="terminal-btn" id="submit-btn"
-                        onclick="checkAnswer()">ВВОД ДАННЫХ</button>
-                <div id="feedback-msg" class="spacer"
-                     style="margin-top:20px;"></div>
-            `;
-            document.getElementById("answer-input")
-                .addEventListener("keypress", e => {
-                    if (e.key === "Enter") { e.preventDefault(); checkAnswer(); }
-                });
+            var area = document.getElementById("interactive-area");
+            area.innerHTML = '<input type="text" id="answer-input" placeholder="Ход..." autocomplete="off"><br><button class="terminal-btn" id="submit-btn" onclick="checkAnswer()">ВВОД ДАННЫХ</button><div id="feedback-msg" class="spacer" style="margin-top:20px;"></div>';
+            document.getElementById("answer-input").addEventListener("keypress", function(e) {
+                if (e.key === "Enter") { e.preventDefault(); checkAnswer(); }
+            });
             document.getElementById("answer-input").focus();
         }
 
         function checkAnswer() {
-            const input    = document.getElementById("answer-input");
-            const feedback = document.getElementById("feedback-msg");
-            const answer   = normalizeAnswer(input.value);
+            var input = document.getElementById("answer-input");
+            var feedback = document.getElementById("feedback-msg");
+            var answer = normalizeAnswer(input.value);
 
             if (answer === "") {
                 feedback.className = "success-msg";
@@ -71,14 +78,14 @@
                     "ВЕРНО.<br><br>" +
                     "Вы понимаете цугцванг лучше, чем большинство людей.<br>" +
                     "Или... вам просто повезло.<br><br>" +
-                    "ПЕРЕХОД К ТЕСТУ 08...";
+                    "ПЕРЕХОД К УРОВНЮ 08...";
                 document.getElementById("submit-btn").style.display = "none";
                 input.disabled = true;
-                setTimeout(() => {
-                    window.location.href = "level-08-onlyone.html";
+                setTimeout(function() {
+                    window.location.href = "onlyone.html";
                 }, 6000);
             } else {
-                const hintIndex = Math.min(wrongAttempts, wrongHints.length - 1);
+                var hintIndex = Math.min(wrongAttempts, wrongHints.length - 1);
                 feedback.className = "system-msg";
                 feedback.innerHTML = wrongHints[hintIndex];
                 wrongAttempts++;
@@ -87,7 +94,7 @@
             }
         }
 
-        window.onload = () => {
+        window.onload = function() {
             initTerminal("text-output", level7Dialogue, showInputInterface);
         };
     </script>

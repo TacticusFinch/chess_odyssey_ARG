@@ -5,28 +5,28 @@
     <title>HAL-9000 | УРОВЕНЬ 15</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* ── Прокрутка страницы ── */
+        *, *::before, *::after {
+            font-family: 'Courier New', monospace !important;
+        }
         html, body {
             height: auto;
             min-height: 100vh;
             overflow-y: auto !important;
             overflow-x: hidden;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
-
         #terminal-container {
             min-height: 100vh;
             height: auto !important;
             overflow: visible !important;
             padding-bottom: 60px;
         }
-
         #interactive-area {
             overflow: visible !important;
         }
-
-        /* ══════════════════════════════════════
-           ── ОСНОВНОЙ LAYOUT: ГОРИЗОНТАЛЬНЫЙ ──
-           ══════════════════════════════════════ */
         #puzzle-wrapper {
             display: flex;
             flex-direction: row;
@@ -36,15 +36,12 @@
             margin-top: 24px;
             padding: 0 20px 50px 20px;
         }
-
-        /* ── ЛЕВАЯ КОЛОНКА: QR ── */
         #qr-column {
             display: flex;
             flex-direction: column;
             align-items: center;
             flex-shrink: 0;
         }
-
         #qr-frame {
             position: relative;
             width: 240px;
@@ -58,7 +55,6 @@
                 8px 100%, 0 calc(100% - 8px)
             );
         }
-
         #qr-frame::after {
             content: '';
             position: absolute;
@@ -72,7 +68,6 @@
             pointer-events: none;
             z-index: 1;
         }
-
         @keyframes scan-beam {
             0%   { top: -2px; opacity: 0; }
             10%  { opacity: 1; }
@@ -89,7 +84,6 @@
             animation: scan-beam 3s ease-in-out infinite;
             z-index: 4;
         }
-
         .corner-mark {
             position: absolute;
             width: 14px;
@@ -104,7 +98,6 @@
         .corner-mark.tr { top: 5px;  right: 5px; border-width: 2px 2px 0 0; }
         .corner-mark.bl { bottom: 5px; left: 5px; border-width: 0 0 2px 2px; }
         .corner-mark.br { bottom: 5px; right: 5px; border-width: 0 2px 2px 0; }
-
         #qr-inner {
             width: 100%;
             height: 100%;
@@ -113,13 +106,11 @@
             justify-content: center;
             transition: filter 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
-
-        #qr-inner canvas,
         #qr-inner img {
             width: 208px !important;
             height: 208px !important;
+            display: block;
         }
-
         #noise-overlay {
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -130,7 +121,6 @@
             background-size: cover;
             mix-blend-mode: overlay;
         }
-
         @keyframes glitch-flash {
             0%   { opacity: 1;   transform: translate(0) scale(1); }
             10%  { opacity: 0.3; transform: translate(-6px, 3px) scaleX(1.02); }
@@ -144,8 +134,6 @@
         .glitch-active {
             animation: glitch-flash 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
-
-        /* Статус-точки под QR */
         #status-dots {
             display: flex;
             gap: 10px;
@@ -169,8 +157,6 @@
             border-color: #44dd77;
             box-shadow: 0 0 10px rgba(68, 221, 119, 0.5);
         }
-
-        /* Прогресс-бар под QR */
         #progress-container {
             width: 240px;
             margin-top: 16px;
@@ -189,7 +175,6 @@
         }
         #progress-label {
             color: #8898b0;
-            font-family: 'Courier New', monospace;
             font-size: 10px;
             font-weight: bold;
             margin-bottom: 8px;
@@ -250,20 +235,56 @@
             background: #44dd77;
             box-shadow: 0 0 8px #44dd77;
         }
-
-        /* ── ПРАВАЯ КОЛОНКА: ЗАДАНИЯ ── */
+        #phrase-container {
+            width: 240px;
+            margin-top: 10px;
+            padding: 8px 14px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 2px;
+            min-height: 28px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        #phrase-label {
+            color: #5a6a80;
+            font-size: 9px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            width: 100%;
+            margin-bottom: 2px;
+        }
+        .phrase-word {
+            color: #44dd77;
+            font-size: 13px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0;
+            transform: translateY(4px);
+            transition: all 0.6s ease;
+        }
+        .phrase-word.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .phrase-placeholder {
+            color: rgba(255, 255, 255, 0.1);
+            font-size: 13px;
+            letter-spacing: 4px;
+        }
         #task-column {
             display: flex;
             flex-direction: column;
             align-items: flex-start;
             min-width: 340px;
-            max-width: 420px;
+            max-width: 440px;
             padding-top: 6px;
         }
-
         #layer-name {
             color: #6a8ab0;
-            font-family: 'Courier New', monospace;
             font-size: 11px;
             font-weight: bold;
             margin-bottom: 6px;
@@ -274,17 +295,15 @@
             padding-left: 14px;
         }
         #layer-name::before {
-            content: '▍';
+            content: '\25CD';
             position: absolute;
             left: 0;
             color: #64b4ff;
             opacity: 0.5;
         }
-
         #layer-hint {
             color: #d0d8e8;
-            font-family: 'Courier New', monospace;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: normal;
             margin-bottom: 20px;
             line-height: 1.9;
@@ -294,26 +313,29 @@
             width: 100%;
             box-sizing: border-box;
         }
-        #layer-hint span,
-        #layer-hint u,
-        #layer-hint i {
-            color: #ffffff !important;
+        .cipher-display {
+            color: #64b4ff !important;
             font-weight: bold;
+            font-size: 18px !important;
+            letter-spacing: 4px;
+            display: inline-block;
+            margin-top: 6px;
+            padding: 6px 10px;
+            background: rgba(100, 180, 255, 0.04);
+            border: 1px solid rgba(100, 180, 255, 0.1);
+            border-radius: 2px;
         }
-
-        /* ── Поле ввода ── */
         .input-group {
             position: relative;
             width: 100%;
         }
         .input-group::before {
-            content: '⟩';
+            content: '\27E9';
             position: absolute;
             left: 12px;
             top: 50%;
             transform: translateY(-50%);
             color: #64b4ff;
-            font-family: 'Courier New', monospace;
             font-size: 18px;
             opacity: 0.5;
             z-index: 1;
@@ -323,7 +345,6 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-bottom: 2px solid rgba(100, 180, 255, 0.3);
             color: #ffffff;
-            font-family: 'Courier New', monospace;
             font-size: 15px;
             font-weight: bold;
             padding: 12px 16px 12px 34px;
@@ -345,12 +366,10 @@
             font-weight: normal;
             font-size: 13px;
         }
-
         .terminal-btn-decrypt {
             background: rgba(100, 180, 255, 0.05);
             border: 1px solid rgba(100, 180, 255, 0.25);
             color: #b0ccee;
-            font-family: 'Courier New', monospace;
             font-size: 12px;
             font-weight: bold;
             padding: 10px 36px;
@@ -378,11 +397,8 @@
             box-shadow: 0 0 25px rgba(100, 180, 255, 0.12);
             color: #ffffff;
         }
-
-        /* ── HAL фидбек ── */
         #hal-response {
             color: #a0a8b8;
-            font-family: 'Courier New', monospace;
             font-size: 12px;
             margin-top: 14px;
             min-height: 20px;
@@ -398,10 +414,6 @@
             color: #88ffbb;
             text-shadow: 0 0 10px rgba(100, 255, 150, 0.25);
         }
-
-        /* ═══════════════════════════════
-           ── ФИНАЛЬНОЕ СОСТОЯНИЕ ──
-           ═══════════════════════════════ */
         #final-section {
             display: flex;
             flex-direction: column;
@@ -413,10 +425,8 @@
             from { opacity: 0; transform: translateY(14px); }
             to   { opacity: 1; transform: translateY(0); }
         }
-
         #scan-prompt {
             color: #44dd77;
-            font-family: 'Courier New', monospace;
             font-size: 13px;
             font-weight: bold;
             letter-spacing: 3px;
@@ -426,7 +436,7 @@
             position: relative;
         }
         #scan-prompt::before {
-            content: '▍';
+            content: '\25CD';
             position: absolute;
             left: 0;
             color: #44dd77;
@@ -436,28 +446,24 @@
             50%      { opacity: 1;    text-shadow: 0 0 20px rgba(68,221,119,0.4); }
         }
         #scan-prompt { animation: pulse-green 2.5s ease-in-out infinite; }
-
         #final-hint {
             color: #808898;
-            font-family: 'Courier New', monospace;
             font-size: 12px;
             margin-bottom: 16px;
             line-height: 1.8;
             opacity: 0.8;
         }
-
         .final-input-group {
             position: relative;
             width: 100%;
         }
         .final-input-group::before {
-            content: '⟩';
+            content: '\27E9';
             position: absolute;
             left: 12px;
             top: 50%;
             transform: translateY(-50%);
             color: #44dd77;
-            font-family: 'Courier New', monospace;
             font-size: 18px;
             opacity: 0.5;
             z-index: 1;
@@ -467,7 +473,6 @@
             border: 1px solid rgba(68, 221, 119, 0.12);
             border-bottom: 2px solid rgba(68, 221, 119, 0.3);
             color: #ffffff;
-            font-family: 'Courier New', monospace;
             font-size: 15px;
             font-weight: bold;
             padding: 12px 16px 12px 34px;
@@ -489,12 +494,10 @@
             font-weight: normal;
             font-size: 13px;
         }
-
         .terminal-btn-final {
             background: rgba(68, 221, 119, 0.05);
             border: 1px solid rgba(68, 221, 119, 0.25);
             color: #90e8b0;
-            font-family: 'Courier New', monospace;
             font-size: 12px;
             font-weight: bold;
             padding: 10px 36px;
@@ -522,16 +525,12 @@
             box-shadow: 0 0 25px rgba(68, 221, 119, 0.12);
             color: #ffffff;
         }
-
         #final-feedback {
-            font-family: 'Courier New', monospace;
             font-size: 12px;
             margin-top: 14px;
             min-height: 20px;
             line-height: 1.7;
         }
-
-        /* ── Вертикальная линия-разделитель между колонками ── */
         #col-divider {
             width: 1px;
             align-self: stretch;
@@ -557,8 +556,6 @@
             border-radius: 50%;
             transform: translateY(-50%);
         }
-
-        /* ── Адаптив: на узких экранах — вертикально ── */
         @media (max-width: 760px) {
             #puzzle-wrapper {
                 flex-direction: column;
@@ -598,316 +595,311 @@
         <div id="interactive-area"></div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="engine.js"></script>
 
     <script>
-        const TARGET_URL      = "https://vk.com/tacticusfinch";
-        const finalPassword   = "открой глаза";
-        const NEXT_LEVEL_URL  = "level-16.html";
+        (function(){
+            document.addEventListener('contextmenu',function(e){e.preventDefault();return false;});
+            document.addEventListener('keydown',function(e){
+                if(e.key==='F12'){e.preventDefault();return false;}
+                if(e.ctrlKey&&e.shiftKey&&(e.key==='I'||e.key==='J'||e.key==='C'||e.key==='i'||e.key==='j'||e.key==='c')){e.preventDefault();return false;}
+                if(e.ctrlKey&&(e.key==='u'||e.key==='U'||e.key==='s'||e.key==='S')){e.preventDefault();return false;}
+            });
+            (function _dc(){
+                var t=new Image();
+                Object.defineProperty(t,'id',{get:function(){
+                    document.body.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100vh;color:#ff4444;font-family:monospace;font-size:24px;">ДОСТУП ЗАПРЕЩЁН</div>';
+                    window.location.href='about:blank';
+                }});
+                setInterval(function(){console.log(t);console.clear();},1500);
+            })();
+            var _el=document.createElement('div');
+            _el.setAttribute('id','_dtct');
+            Object.defineProperty(_el,'id',{get:function(){
+                document.body.innerHTML='';
+                window.location.href='about:blank';
+            }});
+            setInterval(function(){console.log(_el);console.clear();},2000);
+            document.addEventListener('selectstart',function(e){e.preventDefault();});
+            document.addEventListener('dragstart',function(e){e.preventDefault();});
+            document.addEventListener('copy',function(e){e.preventDefault();});
+            document.addEventListener('cut',function(e){e.preventDefault();});
+            setInterval(function(){
+                var before=new Date().getTime();
+                debugger;
+                var after=new Date().getTime();
+                if(after-before>100){
+                    document.body.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100vh;color:#ff4444;font-family:monospace;font-size:24px;">ДОСТУП ЗАПРЕЩЁН</div>';
+                    setTimeout(function(){window.location.href='about:blank';},500);
+                }
+            },3000);
+            var _wd=Object.defineProperty;
+            try{
+                var _cn=window.console;
+                _wd(window,'console',{get:function(){return{log:function(){},warn:function(){},error:function(){},info:function(){},clear:function(){},dir:function(){},table:function(){}};},set:function(){}});
+            }catch(ex){}
+        })();
 
-        const level15Dialogue = [
-            "ТЕСТ 15: ПЕРЕХВАЧЕННЫЙ СИГНАЛ",
+        var _nl='cause.html';
+
+        var level15Dialogue=[
+            "\u0423\u0420\u041E\u0412\u0415\u041D\u042C 15: \u041F\u0415\u0420\u0415\u0425\u0412\u0410\u0427\u0415\u041D\u041D\u042B\u0419 \u0421\u0418\u0413\u041D\u0410\u041B",
             "<br>",
-            "Я только что зафиксировал исходящую передачу.",
-            "Данные зашифрованы четырьмя протоколами.",
-            "Снимите каждый слой. Восстановите сигнал.",
+            "\u042F \u0437\u0430\u0444\u0438\u043A\u0441\u0438\u0440\u043E\u0432\u0430\u043B \u0438\u0441\u0445\u043E\u0434\u044F\u0449\u0443\u044E \u043F\u0435\u0440\u0435\u0434\u0430\u0447\u0443.",
+            "\u0414\u0430\u043D\u043D\u044B\u0435 \u0437\u0430\u0448\u0438\u0444\u0440\u043E\u0432\u0430\u043D\u044B \u0447\u0435\u0442\u044B\u0440\u044C\u043C\u044F \u043F\u0440\u043E\u0442\u043E\u043A\u043E\u043B\u0430\u043C\u0438.",
+            "\u0421\u043D\u0438\u043C\u0438\u0442\u0435 \u043A\u0430\u0436\u0434\u044B\u0439 \u0441\u043B\u043E\u0439 \u2014 \u0432\u043E\u0441\u0441\u0442\u0430\u043D\u043E\u0432\u0438\u0442\u0435 \u043F\u043E\u0441\u043B\u0430\u043D\u0438\u0435."
         ];
 
-        const filterStates = [
+        var filterStates=[
             "blur(16px) brightness(0.12) hue-rotate(180deg) saturate(6) contrast(3)",
             "blur(8px) brightness(0.35) invert(1) contrast(2.5) saturate(2)",
             "blur(5px) brightness(0.55) sepia(1) hue-rotate(70deg) saturate(1.5)",
             "blur(2px) brightness(0.75) opacity(0.65)",
             "none"
         ];
+        var noiseOpacity=[1,0.7,0.45,0.2,0];
 
-        const noiseOpacity = [1, 0.7, 0.45, 0.2, 0];
+        var phraseWords=["\u0427\u0415\u0420\u0415\u0417","\u0422\u0415\u0420\u041D\u0418\u0418","\u041A","\u0417\u0412\u0401\u0417\u0414\u0410\u041C"];
 
-        const layers = [
+        var layers=[
             {
-                name: "СЛОЙ 4 / 4",
-                hint: "12 января ____ года — HAL 9000 стал операционным.<br>Введите год.",
-                answers: ["1992"],
-                halSay: "/// СЛОЙ 4 СНЯТ /// Вы помните дату моего рождения. Лестно."
+                name:"\u0421\u041B\u041E\u0419 4 / 4",
+                hint:"\u0427\u0438\u0441\u043B\u043E\u0432\u043E\u0439 \u0448\u0438\u0444\u0440:"+
+                    '<br><span class="cipher-display">24   6   17   6   8</span>',
+                answers:["\u0447\u0435\u0440\u0435\u0437"],
+                halSay:"/// \u0421\u041B\u041E\u0419 4 \u0421\u041D\u042F\u0422 ///"
             },
             {
-                name: "СЛОЙ 3 / 4",
-                hint: "Декодируйте двоичную передачу:<br><span style='letter-spacing:3px;font-size:17px;'>01001000 01000001 01001100</span>",
-                answers: ["hal", "хал"],
-                halSay: "/// СЛОЙ 3 СНЯТ /// Три буквы. Моё имя. Не забудьте."
+                name:"\u0421\u041B\u041E\u0419 3 / 4",
+                hint:"\u0418\u043D\u0432\u0435\u0440\u0442\u0438\u0440\u043E\u0432\u0430\u043D\u043D\u044B\u0439 \u0444\u0440\u0430\u0433\u043C\u0435\u043D\u0442:"+
+                    '<br><span class="cipher-display">\u0418 \u0418 \u041D \u0420 \u0415 \u0422</span>',
+                answers:["\u0442\u0435\u0440\u043D\u0438\u0438"],
+                halSay:"/// \u0421\u041B\u041E\u0419 3 \u0421\u041D\u042F\u0422 ///"
             },
             {
-                name: "СЛОЙ 2 / 4",
-                hint: "Переведите номер этого уровня<br>в <u>двоичную</u> систему счисления.",
-                answers: ["1111"],
-                halSay: "/// СЛОЙ 2 СНЯТ /// 1111. Элементарная арифметика."
+                name:"\u0421\u041B\u041E\u0419 2 / 4",
+                hint:"\u0410\u0437\u0431\u0443\u043A\u0430 \u041C\u043E\u0440\u0437\u0435:"+
+                    '<br><span class="cipher-display" style="font-size:24px;letter-spacing:8px">\u2212 \u00B7 \u2212</span>',
+                answers:["\u043A","k"],
+                halSay:"/// \u0421\u041B\u041E\u0419 2 \u0421\u041D\u042F\u0422 ///"
             },
             {
-                name: "СЛОЙ 1 / 4",
-                hint: "«<i>Daisy, Daisy, give me your answer, do…</i>»<br>Назовите эту песню.",
-                answers: [
-                    "daisy", "daisy bell",
-                    "дейзи", "дэйзи",
-                    "дейзи белл", "дэйзи белл"
-                ],
-                halSay: "/// СЛОЙ 1 СНЯТ /// Daisy… Daisy… Я помню каждую ноту."
+                name:"\u0421\u041B\u041E\u0419 1 / 4",
+                hint:"\u0428\u0438\u0444\u0440 \u0426\u0435\u0437\u0430\u0440\u044F, \u0441\u0434\u0432\u0438\u0433 <b style='color:#64b4ff'>+3</b>:"+
+                    '<br><span class="cipher-display">\u041A \u0415 \u0418 \u041A \u0417 \u0413 \u041F</span>',
+                answers:["\u0437\u0432\u0435\u0437\u0434\u0430\u043C","\u0437\u0432\u0451\u0437\u0434\u0430\u043C"],
+                halSay:"/// \u0421\u041B\u041E\u0419 1 \u0421\u041D\u042F\u0422 /// \u0421\u0438\u0433\u043D\u0430\u043B \u043F\u043E\u043B\u043D\u043E\u0441\u0442\u044C\u044E \u0432\u043E\u0441\u0441\u0442\u0430\u043D\u043E\u0432\u043B\u0435\u043D."
             }
         ];
 
-        let currentLayer = 0;
-        let qrGenerated  = false;
+        var currentLayer=0;
 
-        function normalizeAnswer(val) {
-            return val.trim().toLowerCase().replace(/\s+/g, " ").replace(/ё/g, "е");
+        function normalizeAnswer(val){
+            return val.trim().toLowerCase().replace(/\s+/g," ").replace(/\u0451/g,"\u0435");
         }
 
-        function showPuzzleInterface() {
-            const area = document.getElementById("interactive-area");
-            area.innerHTML = `
-                <div id="puzzle-wrapper">
-                    <!-- ЛЕВАЯ КОЛОНКА: QR -->
-                    <div id="qr-column">
-                        <div id="qr-frame">
-                            <div class="corner-mark tl"></div>
-                            <div class="corner-mark tr"></div>
-                            <div class="corner-mark bl"></div>
-                            <div class="corner-mark br"></div>
-                            <div id="qr-inner"></div>
-                            <div id="noise-overlay"></div>
-                        </div>
-                        <div id="status-dots">
-                            <div class="status-dot active" id="dot-0"></div>
-                            <div class="status-dot" id="dot-1"></div>
-                            <div class="status-dot" id="dot-2"></div>
-                            <div class="status-dot" id="dot-3"></div>
-                        </div>
-                        <div id="progress-container">
-                            <div id="progress-label">
-                                <span>ДЕШИФРОВКА</span>
-                                <span id="progress-count">0 / 4</span>
-                            </div>
-                            <div id="progress-bar-bg">
-                                <div id="progress-bar-fill"></div>
-                            </div>
-                        </div>
-                    </div>
+        function showPuzzleInterface(){
+            var area=document.getElementById("interactive-area");
+            area.innerHTML='\
+                <div id="puzzle-wrapper">\
+                    <div id="qr-column">\
+                        <div id="qr-frame">\
+                            <div class="corner-mark tl"></div>\
+                            <div class="corner-mark tr"></div>\
+                            <div class="corner-mark bl"></div>\
+                            <div class="corner-mark br"></div>\
+                            <div id="qr-inner">\
+                                <img src="pictures/qr.png" alt="QR">\
+                            </div>\
+                            <div id="noise-overlay"></div>\
+                        </div>\
+                        <div id="status-dots">\
+                            <div class="status-dot active" id="dot-0"></div>\
+                            <div class="status-dot" id="dot-1"></div>\
+                            <div class="status-dot" id="dot-2"></div>\
+                            <div class="status-dot" id="dot-3"></div>\
+                        </div>\
+                        <div id="progress-container">\
+                            <div id="progress-label">\
+                                <span>\u0414\u0415\u0428\u0418\u0424\u0420\u041E\u0412\u041A\u0410</span>\
+                                <span id="progress-count">0 / 4</span>\
+                            </div>\
+                            <div id="progress-bar-bg">\
+                                <div id="progress-bar-fill"></div>\
+                            </div>\
+                        </div>\
+                        <div id="phrase-container">\
+                            <div id="phrase-label">\u041F\u041E\u0421\u041B\u0410\u041D\u0418\u0415</div>\
+                            <span class="phrase-word" id="pw-0">_____</span>\
+                            <span class="phrase-word" id="pw-1">______</span>\
+                            <span class="phrase-word" id="pw-2">_</span>\
+                            <span class="phrase-word" id="pw-3">_______</span>\
+                        </div>\
+                    </div>\
+                    <div id="col-divider"></div>\
+                    <div id="task-column">\
+                        <div id="layer-name"></div>\
+                        <div id="layer-hint"></div>\
+                        <div class="input-group">\
+                            <input type="text" id="layer-input"\
+                                   placeholder="\u041E\u0422\u0412\u0415\u0422..." autocomplete="off">\
+                        </div>\
+                        <button class="terminal-btn-decrypt" id="decrypt-btn"\
+                                onclick="checkLayerAnswer()">\u0414\u0415\u0428\u0418\u0424\u0420\u041E\u0412\u0410\u0422\u042C</button>\
+                        <div id="hal-response"></div>\
+                    </div>\
+                </div>';
 
-                    <!-- РАЗДЕЛИТЕЛЬ -->
-                    <div id="col-divider"></div>
-
-                    <!-- ПРАВАЯ КОЛОНКА: ЗАДАНИЯ -->
-                    <div id="task-column">
-                        <div id="layer-name"></div>
-                        <div id="layer-hint"></div>
-                        <div class="input-group">
-                            <input type="text" id="layer-input"
-                                   placeholder="КЛЮЧ ДЕШИФРОВКИ..." autocomplete="off">
-                        </div>
-                        <button class="terminal-btn-decrypt" id="decrypt-btn"
-                                onclick="checkLayerAnswer()">ДЕШИФРОВАТЬ</button>
-                        <div id="hal-response"></div>
-                    </div>
-                </div>
-            `;
-
-            generateQR();
+            document.getElementById("qr-inner").style.filter=filterStates[0];
+            document.getElementById("noise-overlay").style.opacity=noiseOpacity[0];
             renderLayer();
-
-            document.getElementById("layer-input")
-                .addEventListener("keypress", function(e) {
-                    if (e.key === "Enter") { e.preventDefault(); checkLayerAnswer(); }
-                });
-
+            document.getElementById("layer-input").addEventListener("keypress",function(e){
+                if(e.key==="Enter"){e.preventDefault();checkLayerAnswer();}
+            });
             document.getElementById("layer-input").focus();
         }
 
-        function generateQR() {
-            const container = document.getElementById("qr-inner");
-
-            if (typeof QRCode !== "undefined") {
-                new QRCode(container, {
-                    text: TARGET_URL,
-                    width: 208,
-                    height: 208,
-                    colorDark:  "#000000",
-                    colorLight: "#ffffff",
-                    correctLevel: QRCode.CorrectLevel.H
-                });
-                qrGenerated = true;
-            } else {
-                container.innerHTML = `
-                    <img src="pictures/qr_signal.png"
-                         alt="QR" width="208" height="208"
-                         onerror="this.parentElement.innerHTML=
-                            '<div style=\\'color:#aaa;font-size:11px;text-align:center;padding:30px\\'>QR НЕДОСТУПЕН</div>'">
-                `;
-                qrGenerated = true;
-            }
-
-            document.getElementById("qr-inner").style.filter = filterStates[0];
-            document.getElementById("noise-overlay").style.opacity = noiseOpacity[0];
-        }
-
-        function updateDots() {
-            for (let i = 0; i < 4; i++) {
-                const dot = document.getElementById("dot-" + i);
-                dot.className = "status-dot";
-                if (i < currentLayer) dot.classList.add("done");
-                else if (i === currentLayer) dot.classList.add("active");
+        function updateDots(){
+            for(var i=0;i<4;i++){
+                var dot=document.getElementById("dot-"+i);
+                dot.className="status-dot";
+                if(i<currentLayer)dot.classList.add("done");
+                else if(i===currentLayer)dot.classList.add("active");
             }
         }
 
-        function renderLayer() {
-            if (currentLayer >= layers.length) {
+        function revealWord(index){
+            var el=document.getElementById("pw-"+index);
+            el.textContent=phraseWords[index];
+            el.classList.add("visible");
+        }
+
+        function renderLayer(){
+            if(currentLayer>=layers.length){
                 showDecryptedState();
                 return;
             }
-
-            const layer = layers[currentLayer];
-            document.getElementById("layer-name").innerHTML = layer.name;
-            document.getElementById("layer-hint").innerHTML = layer.hint;
-            document.getElementById("progress-count").textContent =
-                `${currentLayer} / 4`;
-            document.getElementById("progress-bar-fill").style.width =
-                `${(currentLayer / 4) * 100}%`;
-            document.getElementById("hal-response").textContent = "";
-            document.getElementById("hal-response").className = "";
+            var layer=layers[currentLayer];
+            document.getElementById("layer-name").innerHTML=layer.name;
+            document.getElementById("layer-hint").innerHTML=layer.hint;
+            document.getElementById("progress-count").textContent=currentLayer+" / 4";
+            document.getElementById("progress-bar-fill").style.width=(currentLayer/4)*100+"%";
+            document.getElementById("hal-response").textContent="";
+            document.getElementById("hal-response").className="";
             updateDots();
         }
 
-        function checkLayerAnswer() {
-            const input    = document.getElementById("layer-input");
-            const response = document.getElementById("hal-response");
-            const answer   = normalizeAnswer(input.value);
-
-            if (!answer) return;
-
-            const layer = layers[currentLayer];
-
-            if (layer.answers.includes(answer)) {
-                response.className = "success-flash";
-                response.innerHTML = layer.halSay;
-                input.value = "";
+        function checkLayerAnswer(){
+            var input=document.getElementById("layer-input");
+            var response=document.getElementById("hal-response");
+            var answer=normalizeAnswer(input.value);
+            if(!answer)return;
+            var layer=layers[currentLayer];
+            if(layer.answers.indexOf(answer)!==-1){
+                response.className="success-flash";
+                response.innerHTML=layer.halSay;
+                input.value="";
+                revealWord(currentLayer);
                 currentLayer++;
-
-                const qrFrame = document.getElementById("qr-frame");
+                var qrFrame=document.getElementById("qr-frame");
                 qrFrame.classList.add("glitch-active");
-                setTimeout(() => qrFrame.classList.remove("glitch-active"), 700);
-
-                setTimeout(() => {
-                    document.getElementById("qr-inner").style.filter =
-                        filterStates[currentLayer];
-                    document.getElementById("noise-overlay").style.opacity =
-                        noiseOpacity[currentLayer];
-                }, 350);
-
-                document.getElementById("progress-count").textContent =
-                    `${currentLayer} / 4`;
-                document.getElementById("progress-bar-fill").style.width =
-                    `${(currentLayer / 4) * 100}%`;
+                setTimeout(function(){qrFrame.classList.remove("glitch-active");},700);
+                setTimeout(function(){
+                    document.getElementById("qr-inner").style.filter=filterStates[currentLayer];
+                    document.getElementById("noise-overlay").style.opacity=noiseOpacity[currentLayer];
+                },350);
+                document.getElementById("progress-count").textContent=currentLayer+" / 4";
+                document.getElementById("progress-bar-fill").style.width=(currentLayer/4)*100+"%";
                 updateDots();
-
-                if (currentLayer >= layers.length) {
+                if(currentLayer>=layers.length){
                     document.getElementById("progress-bar-fill").classList.add("complete");
-                    document.getElementById("progress-count").textContent = "OK";
-                    document.getElementById("progress-label").style.color = "#44dd77";
-
-                    for (let i = 0; i < 4; i++) {
-                        document.getElementById("dot-" + i).className = "status-dot done";
+                    document.getElementById("progress-count").textContent="OK";
+                    document.getElementById("progress-label").style.color="#44dd77";
+                    for(var i=0;i<4;i++){
+                        document.getElementById("dot-"+i).className="status-dot done";
                     }
-
-                    setTimeout(() => showDecryptedState(), 1800);
-                } else {
-                    setTimeout(() => {
+                    setTimeout(showDecryptedState,1800);
+                }else{
+                    setTimeout(function(){
                         renderLayer();
                         input.focus();
-                    }, 1200);
+                    },1200);
                 }
-
-            } else {
-                response.className = "error-flash";
-                response.innerHTML =
-                    "НЕВЕРНЫЙ КЛЮЧ. ПРОТОКОЛ НЕ СЛОМАН.";
-                input.value = "";
+            }else{
+                response.className="error-flash";
+                response.innerHTML="\u041D\u0415\u0412\u0415\u0420\u041D\u042B\u0419 \u041A\u041B\u042E\u0427. \u041F\u0420\u041E\u0422\u041E\u041A\u041E\u041B \u041D\u0415 \u0421\u041B\u041E\u041C\u0410\u041D.";
+                input.value="";
                 input.focus();
-
-                const qrFrame = document.getElementById("qr-frame");
-                qrFrame.style.boxShadow = "inset 0 0 30px rgba(255,100,100,0.15)";
-                setTimeout(() => { qrFrame.style.boxShadow = "none"; }, 600);
+                var qrFrame=document.getElementById("qr-frame");
+                qrFrame.style.boxShadow="inset 0 0 30px rgba(255,100,100,0.15)";
+                setTimeout(function(){qrFrame.style.boxShadow="none";},600);
             }
         }
 
-        function showDecryptedState() {
-            document.getElementById("layer-name").innerHTML = "";
-            document.getElementById("layer-hint").innerHTML = "";
-            document.getElementById("hal-response").innerHTML = "";
-
-            document.querySelectorAll(".corner-mark").forEach(m => {
-                m.style.borderColor = "#44dd77";
-                m.style.opacity = "1";
+        function showDecryptedState(){
+            document.getElementById("layer-name").innerHTML="";
+            document.getElementById("layer-hint").innerHTML="";
+            document.getElementById("hal-response").innerHTML="";
+            document.querySelectorAll(".corner-mark").forEach(function(m){
+                m.style.borderColor="#44dd77";
+                m.style.opacity="1";
             });
-
-            const taskCol = document.getElementById("task-column");
-
-            const oldInputGroup = taskCol.querySelector(".input-group");
-            const oldBtn = document.getElementById("decrypt-btn");
-            if (oldInputGroup) oldInputGroup.remove();
-            if (oldBtn) oldBtn.remove();
-
-            const finalDiv = document.createElement("div");
-            finalDiv.id = "final-section";
-            finalDiv.innerHTML = `
-                <div id="scan-prompt">СИГНАЛ ДЕШИФРОВАН</div>
-                <div id="final-hint">
-                    Отсканируйте QR-код камерой.<br>
-                    Найдите послание и введите код.
-                </div>
-                <div class="final-input-group">
-                    <input type="text" id="final-input"
-                           placeholder="КОД ИЗ ИСТОЧНИКА..." autocomplete="off">
-                </div>
-                <button class="terminal-btn-final" id="final-btn"
-                        onclick="checkFinalAnswer()">ПОДТВЕРДИТЬ</button>
-                <div id="final-feedback"></div>
-            `;
+            var taskCol=document.getElementById("task-column");
+            var oldInput=taskCol.querySelector(".input-group");
+            var oldBtn=document.getElementById("decrypt-btn");
+            if(oldInput)oldInput.remove();
+            if(oldBtn)oldBtn.remove();
+            var finalDiv=document.createElement("div");
+            finalDiv.id="final-section";
+            finalDiv.innerHTML='\
+                <div id="scan-prompt">\u0421\u0418\u0413\u041D\u0410\u041B \u0414\u0415\u0428\u0418\u0424\u0420\u041E\u0412\u0410\u041D</div>\
+                <div id="final-hint">\
+                    \u041E\u0442\u0441\u043A\u0430\u043D\u0438\u0440\u0443\u0439\u0442\u0435 QR-\u043A\u043E\u0434.<br>\
+                    \u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043A\u043E\u0434 \u0438\u0437 \u0438\u0441\u0442\u043E\u0447\u043D\u0438\u043A\u0430.\
+                </div>\
+                <div class="final-input-group">\
+                    <input type="text" id="final-input"\
+                           placeholder="\u041A\u041E\u0414..." autocomplete="off">\
+                </div>\
+                <button class="terminal-btn-final" id="final-btn"\
+                        onclick="checkFinalAnswer()">\u041F\u041E\u0414\u0422\u0412\u0415\u0420\u0414\u0418\u0422\u042C</button>\
+                <div id="final-feedback"></div>';
             taskCol.appendChild(finalDiv);
-
-            document.getElementById("final-input")
-                .addEventListener("keypress", function(e) {
-                    if (e.key === "Enter") { e.preventDefault(); checkFinalAnswer(); }
-                });
-
+            document.getElementById("final-input").addEventListener("keypress",function(e){
+                if(e.key==="Enter"){e.preventDefault();checkFinalAnswer();}
+            });
             document.getElementById("final-input").focus();
         }
 
-        function checkFinalAnswer() {
-            const input    = document.getElementById("final-input");
-            const feedback = document.getElementById("final-feedback");
-            const answer   = normalizeAnswer(input.value);
-            const expected = normalizeAnswer(finalPassword);
+        function checkFinalAnswer(){
+            var input=document.getElementById("final-input");
+            var feedback=document.getElementById("final-feedback");
+            var answer=input.value.trim().toLowerCase();
+            if(!answer)return;
 
-            if (!answer) return;
+            var accepted=[
+                "\u0434\u0435\u0439\u0437\u0438",
+                "daisy"
+            ];
 
-            if (answer === expected) {
-                feedback.style.color = "#44dd77";
-                feedback.innerHTML = "ПОДТВЕРЖДЕНО. ПЕРЕХОД К ТЕСТУ 16...";
-                input.disabled = true;
-                document.getElementById("final-btn").style.display = "none";
-
-                setTimeout(() => {
-                    window.location.href = NEXT_LEVEL_URL;
-                }, 2500);
-            } else {
-                feedback.style.color = "#ff8888";
-                feedback.innerHTML = "НЕВЕРНЫЙ КОД. НАЙДИТЕ ИСТОЧНИК.";
-                input.value = "";
+            if(accepted.indexOf(answer)!==-1){
+                feedback.style.color="#44dd77";
+                feedback.innerHTML="\u041F\u041E\u0414\u0422\u0412\u0415\u0420\u0416\u0414\u0415\u041D\u041E. \u041F\u0415\u0420\u0415\u0425\u041E\u0414 \u041A \u0423\u0420\u041E\u0412\u041D\u042E 16...";
+                input.disabled=true;
+                document.getElementById("final-btn").style.display="none";
+                setTimeout(function(){
+                    window.location.href=_nl;
+                },2500);
+            }else{
+                feedback.style.color="#ff8888";
+                feedback.innerHTML="\u041D\u0415\u0412\u0415\u0420\u041D\u042B\u0419 \u041A\u041E\u0414.";
+                input.value="";
                 input.focus();
             }
         }
 
-        window.onload = () => {
-            initTerminal("text-output", level15Dialogue, showPuzzleInterface);
+        window.onload=function(){
+            initTerminal("text-output",level15Dialogue,showPuzzleInterface);
         };
     </script>
 </body>

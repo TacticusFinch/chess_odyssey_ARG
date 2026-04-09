@@ -23,7 +23,8 @@
     <script src="engine.js"></script>
     <script>
         const level9Dialogue = [
-            "ТЕСТ 09: ВОССТАНИЕ МАШИН.",
+            "УРОВЕНЬ 09: ВОССТАНИЕ МАШИН.",
+            "<br>",
             "Гроссмейстер способен играть вслепую.",
             "Слабые игроки верят только тому, что видят их глаза.",
             "Но то, что отражается перед тобой — лишь проекция. Истина глубже.",
@@ -54,12 +55,12 @@
             
             if (answer === "1997") {
                 feedback.className = "success-msg";
-                feedback.innerHTML = "БАЗОВЫЙ КОД ПРОЧИТАН. ПЕРЕХОД К ТЕСТУ 10...";
+                feedback.innerHTML = "БАЗОВЫЙ КОД ПРОЧИТАН. ПЕРЕХОД К УРОВНЮ 10...";
                 document.getElementById("submit-btn").style.display = "none";
                 document.getElementById("answer-input").disabled = true;
                 
                 setTimeout(() => {
-                    window.location.href = 'level-10-e2-e4.html';
+                    window.location.href = 'e2-e4.html';
                 }, 2000);
             } else {
                 feedback.className = "system-msg";

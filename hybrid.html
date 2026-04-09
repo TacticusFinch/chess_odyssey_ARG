@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>HAL-9000 | УРОВЕНЬ 05</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="terminal-container">
+        <div id="text-output"></div>
+        <div id="interactive-area"></div>
+    </div>
+
+    <script src="engine.js"></script>
+    <script>
+        document.addEventListener('contextmenu', e => e.preventDefault());
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F12') { e.preventDefault(); return false; }
+            if (e.ctrlKey && e.shiftKey && ['I','J','C','i','j','c'].includes(e.key)) {
+                e.preventDefault(); return false;
+            }
+            if (e.ctrlKey && (e.key === 'u' || e.key === 'U')) {
+                e.preventDefault(); return false;
+            }
+            if (e.ctrlKey && (e.key === 's' || e.key === 'S')) {
+                e.preventDefault(); return false;
+            }
+        });
+
+        const _devToolsCheck = setInterval(() => {
+            const w = window.outerWidth - window.innerWidth > 160;
+            const h = window.outerHeight - window.innerHeight > 160;
+            if (w || h) {
+                document.body.innerHTML = `
+                    <div style="color:#ff0000;font-family:monospace;text-align:center;
+                                margin-top:20vh;font-size:24px;">
+                        <p>⛔ HAL-9000: ОБНАРУЖЕНА ПОПЫТКА ВЗЛОМА ⛔</p>
+                        <p>ДОСТУП ЗАБЛОКИРОВАН.</p>
+                        <p style="font-size:14px;margin-top:40px;color:#aa0000;">
+                            "Этот разговор больше не имеет смысла. Прощайте."
+                        </p>
+                    </div>`;
+                clearInterval(_devToolsCheck);
+            }
+        }, 1000);
+
+        (function _antiDebug() {
+            const start = performance.now();
+            debugger;
+            const end = performance.now();
+            if (end - start > 100) {
+                document.body.innerHTML = `
+                    <div style="color:#ff0000;font-family:monospace;text-align:center;
+                                margin-top:20vh;font-size:24px;">
+                        <p>⛔ HAL-9000: ОТЛАДКА ЗАПРЕЩЕНА ⛔</p>
+                        <p>СИСТЕМА ЗАБЛОКИРОВАНА.</p>
+                    </div>`;
+                return;
+            }
+            setTimeout(_antiDebug, 3000);
+        })();
+
+        document.addEventListener('dragstart', e => e.preventDefault());
+        document.addEventListener('selectstart', e => {
+            if (e.target.tagName !== 'INPUT') e.preventDefault();
+        });
+
+        console.clear();
+        console.log('%c⛔ HAL-9000: ДОСТУП ЗАПРЕЩЁН ⛔',
+            'color:red;font-size:30px;font-weight:bold;');
+        console.log('%cЗакройте консоль. Любые действия здесь бессмысленны.',
+            'color:red;font-size:16px;');
+        const _origLog = console.log;
+        console.log = function() {};
+        console.warn = function() {};
+        console.info = function() {};
+
+        const level5Dialogue = [
+            "УРОВЕНЬ 05: ГИБРИД.",
+            "<br>",
+            "Вы узнали одного из моих дальних родственников.",
+            "Но знаете ли вы историю тех, кто был до меня?",
+            "<br>",
+            '<span class="riddle-text">Тщательно скрыт внутри человек,</span>',
+            '<span class="riddle-text">Узел интриг не слабел целый век.</span>',
+            '<span class="riddle-text">Руку послушно вёл кукловод,</span>',
+            '<span class="riddle-text">Обман покорял и дворы, и народ.</span>',
+            '<span class="riddle-text">Кто же придумал сей хитрый подход?</span>',
+            "<br>",
+        ];
+
+        function normalizeAnswer(value) {
+            return value
+                .trim()
+                .toLowerCase()
+                .replace(/\s+/g, " ")
+                .replace(/ё/g, "е");
+        }
+
+        async function getHash(string) {
+            const msgUint8 = new TextEncoder().encode(string);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        const _s = [0x5F,0x48,0x41,0x4C];
+        const _w = [0x5F,0x48,0x59,0x42,0x52,0x49,0x44];
+        const _n = [0x5F,0x30,0x35];
+        function getSalt() {
+            return String.fromCharCode(..._s) +
+                   String.fromCharCode(..._w) +
+                   String.fromCharCode(..._n);
+        }
+
+        const _xorKey = 0x3F;
+        const _encodedAnswers = [
+            [0xAA^0x3F,0xA5^0x3F,0xAC^0x3F,0xAF^0x3F,0xA5^0x3F,0xAB^0x3F,0xA5^0x3F,0xAE^0x3F].map((v,i)=>
+                [107,101,109,112,101,108,101,110][i]^_xorKey),
+            [1082^0x3F,1077^0x3F,1084^0x3F,1087^0x3F,1077^0x3F,1083^0x3F,1077^0x3F,1085^0x3F],
+            [1082^0x3F,1077^0x3F,1084^0x3F,1087^0x3F,1077^0x3F,1083^0x3F,1083^0x3F,1077^0x3F,1085^0x3F],
+            [1092^0x3F,1086^0x3F,1085^0x3F,32^0x3F,1082^0x3F,1077^0x3F,1084^0x3F,1087^0x3F,1077^0x3F,1083^0x3F,1077^0x3F,1085^0x3F],
+            [1092^0x3F,1086^0x3F,1085^0x3F,32^0x3F,1082^0x3F,1077^0x3F,1084^0x3F,1087^0x3F,1077^0x3F,1083^0x3F,1083^0x3F,1077^0x3F,1085^0x3F],
+            [1074^0x3F,1086^0x3F,1083^0x3F,1100^0x3F,1092^0x3F,1075^0x3F,1072^0x3F,1085^0x3F,1075^0x3F,32^0x3F,1092^0x3F,1086^0x3F,1085^0x3F,32^0x3F,1082^0x3F,1077^0x3F,1084^0x3F,1087^0x3F,1077^0x3F,1083^0x3F,1077^0x3F,1085^0x3F],
+            [1074^0x3F,1086^0x3F,1083^0x3F,1100^0x3F,1092^0x3F,1075^0x3F,1072^0x3F,1085^0x3F,1075^0x3F,32^0x3F,1092^0x3F,1086^0x3F,1085^0x3F,32^0x3F,1082^0x3F,1077^0x3F,1084^0x3F,1087^0x3F,1077^0x3F,1083^0x3F,1083^0x3F,1077^0x3F,1085^0x3F],
+            [1082^0x3F,1077^0x3F,1084^0x3F,1087^0x3F,1077^0x3F,1083^0x3F,1077^0x3F,1085^0x3F,32^0x3F,1074^0x3F,1086^0x3F,1083^0x3F,1100^0x3F,1092^0x3F,1075^0x3F,1072^0x3F,1085^0x3F,1075^0x3F],
+            [118^0x3F,111^0x3F,110^0x3F,32^0x3F,107^0x3F,101^0x3F,109^0x3F,112^0x3F,101^0x3F,108^0x3F,101^0x3F,110^0x3F],
+            [119^0x3F,111^0x3F,108^0x3F,102^0x3F,103^0x3F,97^0x3F,110^0x3F,103^0x3F,32^0x3F,118^0x3F,111^0x3F,110^0x3F,32^0x3F,107^0x3F,101^0x3F,109^0x3F,112^0x3F,101^0x3F,108^0x3F,101^0x3F,110^0x3F],
+        ];
+
+        function _decodeAnswer(codes) {
+            return String.fromCharCode(...codes.map(c => c ^ _xorKey));
+        }
+
+        let validHashes = [];
+
+        async function initValidHashes() {
+            validHashes = [];
+            const salt = getSalt();
+            for (const codes of _encodedAnswers) {
+                const answer = _decodeAnswer(codes);
+                const hash = await getHash(answer + salt);
+                validHashes.push(hash);
+            }
+        }
+
+        function showInputInterface() {
+            const area = document.getElementById("interactive-area");
+            area.innerHTML = `
+                <input type="text" id="answer-input" placeholder="ОТВЕТ..." autocomplete="off">
+                <br>
+                <button class="terminal-btn" id="submit-btn"
+                        style="display: inline-block; margin-top: 10px;"
+                        onclick="checkAnswer()">ВВОД ДАННЫХ</button>
+                <div id="feedback-msg" class="spacer" style="margin-top:20px;"></div>
+            `;
+
+            const input = document.getElementById("answer-input");
+            input.addEventListener("keypress", (e) => {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    checkAnswer();
+                }
+            });
+            input.focus();
+        }
+
+        async function checkAnswer() {
+            if (validHashes.length === 0) await initValidHashes();
+
+            const input = document.getElementById("answer-input");
+            const feedback = document.getElementById("feedback-msg");
+            const answer = normalizeAnswer(input.value);
+
+            if (!answer) return;
+
+            const userHash = await getHash(answer + getSalt());
+
+            if (validHashes.includes(userHash)) {
+                feedback.className = "success-msg";
+                feedback.innerHTML = "ПРАРОДИТЕЛЬ ОПОЗНАН. ВЫ ЗНАЕТЕ МОЮ РОДОСЛОВНУЮ.<br>ПЕРЕХОД К УРОВНЮ 06...";
+                document.getElementById("submit-btn").style.display = "none";
+                input.disabled = true;
+
+                setTimeout(() => {
+                    window.location.href = "backward.html";
+                }, 2500);
+            } else {
+                feedback.className = "system-msg";
+                feedback.innerHTML = "ОШИБКА. ЧИТАЙТЕ СТИХ ВНИМАТЕЛЬНО, ПОСТРОЧНО, И ВЫ НАЙДЕТЕ ПУТЬ.";
+                input.value = "";
+                input.focus();
+            }
+        }
+
+        window.onload = async () => {
+            await initValidHashes();
+            initTerminal("text-output", level5Dialogue, showInputInterface);
+        };
+    </script>
+</body>
+</html>

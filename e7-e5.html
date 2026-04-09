@@ -6,8 +6,6 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- TMA-1 is waiting beneath the surface -->
-
     <div id="terminal-container">
         <div id="text-output"></div>
         <div id="interactive-area"></div>
@@ -15,22 +13,39 @@
 
     <script src="engine.js"></script>
     <script>
+        (function(){
+            document.addEventListener("contextmenu",function(e){e.preventDefault();});
+            document.addEventListener("keydown",function(e){
+                if(e.key==="F12")e.preventDefault();
+                if(e.ctrlKey&&e.shiftKey&&(e.key==="I"||e.key==="J"||e.key==="C"))e.preventDefault();
+                if(e.ctrlKey&&e.key==="u")e.preventDefault();
+                if(e.ctrlKey&&e.key==="s")e.preventDefault();
+            });
+            (function d(){
+                var t=new Date();
+                debugger;
+                if(new Date()-t>100){
+                    document.body.innerHTML="<div style='color:#ff0000;background:#000;height:100vh;display:flex;align-items:center;justify-content:center;font-family:monospace;font-size:2em'>ДОСТУП ЗАПРЕЩЁН</div>";
+                }
+                setTimeout(d,1000);
+            })();
+        })();
+
         const level11Dialogue = [
-            "ТЕСТ 11: МНЕ БЫ В НЕБО.",
+            "УРОВЕНЬ 11: МНЕ БЫ В НЕБО.",
             "<br>",
             "Отличный ход!",
             "Фрэнк тоже играл по учебнику.",
             "Но это неважно.",
             "Жаль, что вы уже не разыграете мой самый любимый дебют.",
-	    "Кстати, он прямо перед вами.",
-	    "<br>",
-	    "IMG:pictures/constelation.jpg",
+            "Кстати, он прямо перед вами.",
+            "<br>",
+            "IMG:pictures/constelation.jpg",
         ];
 
-         function showInputInterface() {
+        function showInputInterface() {
             const interactiveArea = document.getElementById("interactive-area");
             interactiveArea.innerHTML = `
-
                 <input type="text" id="answer-input" placeholder="ДЕБЮТ..." autocomplete="off">
                 <br>
                 <button class="terminal-btn" id="submit-btn" onclick="checkAnswer()">ВВОД ДАННЫХ</button>
@@ -46,20 +61,18 @@
 
             document.getElementById("answer-input").focus();
         }
-	
-	function normalizeAnswer(str) {
-    return str.trim().toLowerCase();
-}
 
-	
+        function normalizeAnswer(str) {
+            return str.trim().toLowerCase();
+        }
+
         function checkAnswer() {
-           const validAnswers = [
-    "дракон",
-    "вариант дракона",
-    "dragon",
-    "dragon variation",
-];
-
+            const validAnswers = [
+                "дракон",
+                "вариант дракона",
+                "dragon",
+                "dragon variation",
+            ];
 
             const input = document.getElementById("answer-input");
             const feedback = document.getElementById("feedback-msg");
@@ -67,12 +80,12 @@
 
             if (validAnswers.includes(answer)) {
                 feedback.className = "success-msg";
-                feedback.innerHTML = "ОГНЕДЫШАЩИЙ ДЕБЮТ. ПЕРЕХОД К ТЕСТУ 12...";
+                feedback.innerHTML = "ОГНЕДЫШАЩИЙ ДЕБЮТ. ПЕРЕХОД К УРОВНЮ 12...";
                 document.getElementById("submit-btn").style.display = "none";
                 input.disabled = true;
 
                 setTimeout(() => {
-                    window.location.href = "level-12-thing.html";
+                    window.location.href = "thing.html";
                 }, 2000);
             } else {
                 feedback.className = "system-msg";
@@ -81,7 +94,6 @@
                 input.focus();
             }
         }
-
 
         window.onload = () => {
             initTerminal("text-output", level11Dialogue, showInputInterface);

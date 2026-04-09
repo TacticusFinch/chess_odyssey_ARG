@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>HAL-9000 | ODYSSEY-2026</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+
+        /* ===== МЕГА-ГЛИТЧИ ===== */
+
+        @keyframes screenGlitch {
+            0% { transform: translate(0); filter: none; }
+            2% { transform: translate(-8px, 3px) skewX(-2deg); filter: hue-rotate(90deg) saturate(3); }
+            4% { transform: translate(10px, -2px) skewX(3deg); filter: hue-rotate(-90deg) brightness(1.5); }
+            5% { transform: translate(-3px, 5px); filter: invert(1); }
+            6% { transform: translate(0) skewX(0); filter: none; }
+            15% { transform: translate(0); filter: none; }
+            15.5% { transform: translate(15px, 0) skewX(-5deg); filter: hue-rotate(180deg); }
+            16% { transform: translate(-15px, 3px) skewX(5deg) scaleY(1.02); }
+            16.5% { transform: translate(0); filter: none; }
+            30% { transform: translate(0); }
+            30.3% { transform: translate(-20px, 0) skewX(8deg); filter: saturate(5) hue-rotate(45deg); }
+            30.6% { transform: translate(20px, -5px) skewX(-8deg); filter: invert(1) brightness(2); }
+            30.9% { transform: translate(0); filter: none; }
+            50% { transform: translate(0); }
+            50.2% { transform: translate(5px, -10px) scaleX(1.01); filter: hue-rotate(270deg) contrast(2); }
+            50.5% { transform: translate(0); filter: none; }
+            70% { transform: translate(0); }
+            70.1% { transform: translate(-12px, 8px) skewY(2deg); filter: invert(1) saturate(3); }
+            70.3% { transform: translate(8px, -3px) skewX(-3deg); filter: brightness(3); }
+            70.5% { transform: translate(0); filter: none; }
+            85% { transform: translate(0); }
+            85.2% { transform: translate(25px, 0) skewX(10deg); filter: hue-rotate(120deg) blur(2px); }
+            85.4% { transform: translate(-25px, 5px) scaleY(0.98); filter: invert(1); }
+            85.6% { transform: translate(0); filter: none; }
+            100% { transform: translate(0); filter: none; }
+        }
+
+        @keyframes rgbSplit {
+            0% { text-shadow: 0 0 5px #00ff41; }
+            3% {
+                text-shadow:
+                    -6px -3px 0 rgba(255,0,0,0.9),
+                    6px 3px 0 rgba(0,0,255,0.9),
+                    0 -4px 0 rgba(0,255,0,0.7);
+            }
+            5% {
+                text-shadow:
+                    8px 2px 0 rgba(255,0,0,0.8),
+                    -8px -2px 0 rgba(0,100,255,0.8),
+                    3px 5px 0 rgba(255,255,0,0.5);
+            }
+            6% { text-shadow: 0 0 5px #00ff41; }
+            20% { text-shadow: 0 0 5px #00ff41; }
+            20.5% {
+                text-shadow:
+                    -10px 0 0 rgba(255,0,50,1),
+                    10px 0 0 rgba(0,50,255,1),
+                    0 0 30px rgba(0,255,65,0.5);
+            }
+            21.5% {
+                text-shadow:
+                    5px -5px 0 rgba(255,0,0,0.7),
+                    -5px 5px 0 rgba(0,0,255,0.7);
+            }
+            22% { text-shadow: 0 0 5px #00ff41; }
+            45% { text-shadow: 0 0 5px #00ff41; }
+            45.3% {
+                text-shadow:
+                    -15px 0 2px rgba(255,0,0,1),
+                    15px 0 2px rgba(0,0,255,1),
+                    0 8px 0 rgba(0,255,0,0.6);
+            }
+            45.8% { text-shadow: 0 0 5px #00ff41; }
+            70% { text-shadow: 0 0 5px #00ff41; }
+            70.2% {
+                text-shadow:
+                    12px 4px 0 rgba(255,50,0,0.9),
+                    -12px -4px 0 rgba(0,50,255,0.9),
+                    -6px 8px 0 rgba(255,0,255,0.4);
+            }
+            70.6% { text-shadow: 0 0 5px #00ff41; }
+            100% { text-shadow: 0 0 5px #00ff41; }
+        }
+
+        @keyframes scanlineGlitch {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 -1000px; }
+        }
+
+        @keyframes terminalFlicker {
+            0% { opacity: 1; }
+            5% { opacity: 1; }
+            5.5% { opacity: 0.1; }
+            6% { opacity: 1; }
+            6.3% { opacity: 0.3; }
+            6.6% { opacity: 1; }
+            30% { opacity: 1; }
+            30.2% { opacity: 0; }
+            30.4% { opacity: 1; }
+            30.5% { opacity: 0.5; }
+            30.7% { opacity: 1; }
+            55% { opacity: 1; }
+            55.1% { opacity: 0.05; }
+            55.3% { opacity: 0.8; }
+            55.4% { opacity: 0.1; }
+            55.6% { opacity: 1; }
+            80% { opacity: 1; }
+            80.3% { opacity: 0; }
+            80.5% { opacity: 0.7; }
+            80.6% { opacity: 0; }
+            80.9% { opacity: 1; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes screenTear {
+            0% { clip-path: inset(0 0 0 0); }
+            10% { clip-path: inset(0 0 0 0); }
+            10.5% { clip-path: inset(20% 0 30% 0); transform: translateX(30px); }
+            11% { clip-path: inset(50% 0 10% 0); transform: translateX(-20px); }
+            11.5% { clip-path: inset(0 0 0 0); transform: translateX(0); }
+            40% { clip-path: inset(0 0 0 0); }
+            40.3% { clip-path: inset(40% 0 20% 0); transform: translateX(-40px); }
+            40.6% { clip-path: inset(10% 0 60% 0); transform: translateX(25px); }
+            41% { clip-path: inset(0 0 0 0); transform: translateX(0); }
+            65% { clip-path: inset(0 0 0 0); }
+            65.2% { clip-path: inset(60% 0 5% 0); transform: translateX(50px); }
+            65.5% { clip-path: inset(0 0 0 0); transform: translateX(0); }
+            90% { clip-path: inset(0 0 0 0); }
+            90.2% { clip-path: inset(5% 0 70% 0); transform: translateX(-35px); }
+            90.5% { clip-path: inset(75% 0 0% 0); transform: translateX(40px); }
+            90.8% { clip-path: inset(0 0 0 0); transform: translateX(0); }
+            100% { clip-path: inset(0 0 0 0); }
+        }
+
+        @keyframes textLineGlitch {
+            0% { transform: translateX(0); opacity: 1; }
+            2% { transform: translateX(-100px) skewX(-20deg); opacity: 0.8; }
+            3% { transform: translateX(50px) skewX(10deg); opacity: 0.5; }
+            4% { transform: translateX(0); opacity: 1; }
+            100% { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes colorBurst {
+            0% { background-color: transparent; }
+            0.5% { background-color: rgba(255,0,0,0.08); }
+            1% { background-color: rgba(0,0,255,0.05); }
+            1.5% { background-color: rgba(0,255,0,0.1); }
+            2% { background-color: transparent; }
+            100% { background-color: transparent; }
+        }
+
+        @keyframes noiseFlash {
+            0% { opacity: 0; }
+            1% { opacity: 0.4; }
+            2% { opacity: 0; }
+            50% { opacity: 0; }
+            50.5% { opacity: 0.6; }
+            51% { opacity: 0; }
+            100% { opacity: 0; }
+        }
+
+        @keyframes verticalShift {
+            0% { transform: translateY(0); }
+            15% { transform: translateY(0); }
+            15.3% { transform: translateY(-15px); }
+            15.6% { transform: translateY(10px); }
+            15.9% { transform: translateY(0); }
+            60% { transform: translateY(0); }
+            60.2% { transform: translateY(20px); }
+            60.5% { transform: translateY(-8px); }
+            60.7% { transform: translateY(0); }
+            100% { transform: translateY(0); }
+        }
+
+        /* ===== ТЁМНЫЙ ФОН — ЦИФРОВОЙ РАСПАД ===== */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            min-height: 100vh;
+        }
+
+        body {
+            background: #000000;
+            background-image:
+                /* Тонкая сетка — как пиксельная матрица, распадающаяся */
+                linear-gradient(rgba(0,255,65,0.015) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,255,65,0.015) 1px, transparent 1px),
+                /* Глубинное виньетирование — тьма по краям */
+                radial-gradient(ellipse at 50% 50%, transparent 30%, rgba(0,0,0,0.6) 100%),
+                /* Мертвые пиксели — красноватые пятна HAL */
+                radial-gradient(circle at 15% 25%, rgba(180,0,0,0.04) 0%, transparent 40%),
+                radial-gradient(circle at 85% 70%, rgba(180,0,0,0.03) 0%, transparent 35%),
+                radial-gradient(circle at 50% 10%, rgba(255,0,0,0.02) 0%, transparent 50%),
+                /* Цифровой туман — едва уловимый зелёный */
+                radial-gradient(ellipse at 30% 80%, rgba(0,40,0,0.15) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 30%, rgba(0,30,0,0.1) 0%, transparent 50%);
+            background-size:
+                20px 20px,
+                20px 20px,
+                100% 100%,
+                100% 100%,
+                100% 100%,
+                100% 100%,
+                100% 100%,
+                100% 100%;
+            color: #00ff41;
+            font-family: 'Courier New', monospace;
+            overflow-x: hidden;
+            animation:
+                screenGlitch 4s infinite steps(1),
+                terminalFlicker 8s infinite,
+                colorBurst 6s infinite,
+                bgDecay 20s infinite ease-in-out;
+            position: relative;
+        }
+
+        /* Медленное «дыхание» тьмы */
+        @keyframes bgDecay {
+            0%, 100% {
+                background-color: #000000;
+            }
+            15% {
+                background-color: #020000;
+            }
+            30% {
+                background-color: #010200;
+            }
+            45% {
+                background-color: #000001;
+            }
+            60% {
+                background-color: #030000;
+            }
+            75% {
+                background-color: #000100;
+            }
+            90% {
+                background-color: #010001;
+            }
+        }
+
+        /* Сканлайны — поверх тёмного фона */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0,0,0,0.25) 2px,
+                    rgba(0,0,0,0.25) 4px
+                );
+            animation: scanlineGlitch 3s linear infinite;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* Шум и цветовые пятна */
+        body::after {
+            content: '';
+            position: fixed;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background-image:
+                radial-gradient(ellipse at 20% 50%, rgba(255,0,0,0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(0,0,255,0.05) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 80%, rgba(0,255,0,0.06) 0%, transparent 50%);
+            animation: noiseFlash 3s infinite steps(1);
+            pointer-events: none;
+            z-index: 9998;
+            mix-blend-mode: screen;
+        }
+
+        /* Ещё один слой — мерцающая виньетка (через JS-добавляемый элемент или доп. обёртку) */
+
+        #terminal-container {
+            animation:
+                rgbSplit 5s infinite,
+                verticalShift 7s infinite;
+            position: relative;
+            padding: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        #terminal-container::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border: 1px solid rgba(255,0,0,0.3);
+            animation: screenTear 6s infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Красное «око» HAL — едва заметное на фоне */
+        #terminal-container::after {
+            content: '';
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 600px;
+            height: 600px;
+            transform: translate(-50%, -50%);
+            background: radial-gradient(
+                ellipse at center,
+                rgba(180,0,0,0.03) 0%,
+                rgba(120,0,0,0.015) 30%,
+                transparent 70%
+            );
+            pointer-events: none;
+            z-index: 0;
+            animation: halEyePulse 8s infinite ease-in-out;
+        }
+
+        @keyframes halEyePulse {
+            0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
+            30% { opacity: 0.8; transform: translate(-50%, -50%) scale(1.05); }
+            50% { opacity: 0.2; transform: translate(-50%, -50%) scale(0.98); }
+            70% { opacity: 1; transform: translate(-50%, -50%) scale(1.02); }
+        }
+
+        #text-output {
+            animation: textLineGlitch 12s infinite;
+            color: #00ff41;
+            line-height: 1.8;
+            margin-bottom: 10px;
+        }
+
+        .morse-letter.active {
+            animation: textLineGlitch 0.5s infinite;
+        }
+
+        #signal-status.transmitting {
+            animation: rgbSplit 0.8s infinite, textLineGlitch 2s infinite;
+        }
+
+        .glitch-bar {
+            position: fixed;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: rgba(0,255,65,0.4);
+            z-index: 9997;
+            pointer-events: none;
+            opacity: 0;
+            mix-blend-mode: screen;
+        }
+
+        .glitch-bar.flash {
+            opacity: 1;
+            animation: glitchBarFlash 0.15s forwards;
+        }
+
+        @keyframes glitchBarFlash {
+            0% { opacity: 1; transform: scaleY(1); }
+            50% { opacity: 0.8; transform: scaleY(3); }
+            100% { opacity: 0; transform: scaleY(0.5); }
+        }
+
+        .red-flash {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255,0,0,0.2);
+            z-index: 9996;
+            pointer-events: none;
+            animation: redFlashAnim 0.1s forwards;
+        }
+
+        @keyframes redFlashAnim {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .glitch-text-overlay {
+            position: fixed;
+            font-family: monospace;
+            font-size: 1.5em;
+            color: rgba(255,0,0,0.6);
+            z-index: 9995;
+            pointer-events: none;
+            white-space: nowrap;
+            animation: glitchTextAppear 0.3s forwards;
+            text-shadow: 2px 0 #00f, -2px 0 #0f0;
+        }
+
+        @keyframes glitchTextAppear {
+            0% { opacity: 1; transform: skewX(-10deg); }
+            50% { opacity: 0.7; transform: skewX(5deg) translateX(20px); }
+            100% { opacity: 0; transform: skewX(0deg); }
+        }
+
+        #transmit-btn:not(:disabled) {
+            animation:
+                btn-pulse 2s ease-in-out infinite,
+                rgbSplit 3s infinite;
+        }
+
+        #answer-input:focus {
+            animation: rgbSplit 1.5s infinite;
+        }
+
+        @keyframes megaJolt {
+            0% { transform: translate(0); }
+            25% { transform: translate(-30px, 15px) rotate(-1deg); }
+            50% { transform: translate(25px, -10px) rotate(1deg); }
+            75% { transform: translate(-15px, 5px) rotate(-0.5deg); }
+            100% { transform: translate(0) rotate(0); }
+        }
+
+        .mega-jolt {
+            animation: megaJolt 0.2s ease-out;
+        }
+
+        /* ===== СПЕКТРОГРАММА ===== */
+
+        #spectrogram {
+            width: 100%;
+            min-height: 280px;
+            background:
+                linear-gradient(180deg,
+                    rgba(0,8,0,0.9) 0%,
+                    rgba(0,0,0,0.95) 40%,
+                    rgba(5,0,0,0.9) 100%
+                );
+            border-top: 1px solid #002200;
+            border-bottom: 1px solid #002200;
+            margin: 20px 0;
+            margin-bottom: 30px;
+            padding: 15px 0 40px 0;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            overflow: visible;
+            box-shadow:
+                inset 0 0 60px rgba(0,0,0,0.8),
+                inset 0 0 120px rgba(0,0,0,0.4),
+                0 0 30px rgba(0,255,65,0.02);
+        }
+
+        .signal-wave {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #00ff41;
+            border-radius: 50%;
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .animate-ping {
+            animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes ping {
+            0% { transform: scale(0.5); opacity: 1; }
+            100% { transform: scale(4); opacity: 0; }
+        }
+
+        .data-stream {
+            font-size: 0.7em;
+            color: #001a00;
+            white-space: nowrap;
+            overflow: hidden;
+            position: absolute;
+            top: 5px;
+            width: 100%;
+        }
+
+        #answer-input {
+            background: #050505;
+            border: 1px solid #00ff41;
+            color: #00ff41;
+            padding: 10px;
+            text-align: center;
+            font-size: 1.2em;
+            letter-spacing: 5px;
+            width: 300px;
+            box-shadow: 0 0 10px rgba(0,68,0,0.3), inset 0 0 20px rgba(0,0,0,0.8);
+            font-family: 'Courier New', monospace;
+        }
+
+        #answer-input::placeholder {
+            color: #003300;
+        }
+
+        #signal-status {
+            font-size: 0.9em;
+            letter-spacing: 3px;
+            z-index: 10;
+        }
+
+        #signal-status.ready { color: #004400; }
+        #signal-status.transmitting { color: #00ff41; text-shadow: 0 0 10px #00ff41; }
+        #signal-status.complete { color: #ffaa00; text-shadow: 0 0 10px #ffaa00; }
+
+        #morse-display {
+            display: flex;
+            gap: 15px;
+            z-index: 10;
+            margin: 10px 0;
+        }
+
+        .morse-letter {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 5px 8px;
+            border: 1px solid #0a1a0a;
+            border-radius: 4px;
+            min-width: 40px;
+            transition: all 0.3s;
+            background: rgba(0,0,0,0.5);
+        }
+
+        .morse-letter.active {
+            border-color: #00ff41;
+            background: rgba(0,26,0,0.8);
+            box-shadow: 0 0 15px rgba(0,68,0,0.5);
+        }
+
+        .morse-letter.done {
+            border-color: #003300;
+            opacity: 0.5;
+        }
+
+        .morse-letter .char-placeholder {
+            font-size: 1.4em;
+            color: #002200;
+            min-height: 1.4em;
+            transition: all 0.3s;
+        }
+
+        .morse-letter.active .char-placeholder,
+        .morse-letter.done .char-placeholder {
+            color: #00ff41;
+            text-shadow: 0 0 8px #00ff41;
+        }
+
+        .morse-letter .dots {
+            font-size: 0.8em;
+            color: #001a00;
+            letter-spacing: 2px;
+        }
+
+        .morse-letter.active .dots,
+        .morse-letter.done .dots {
+            color: #00ff41;
+        }
+
+        #transmit-btn {
+            background: rgba(0,0,0,0.8);
+            border: 2px solid #00ff41;
+            color: #00ff41;
+            padding: 10px 30px;
+            font-family: monospace;
+            font-size: 1em;
+            letter-spacing: 3px;
+            cursor: pointer;
+            z-index: 100;
+            position: relative;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            overflow: hidden;
+            min-height: 42px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+        }
+
+        #transmit-btn:hover:not(:disabled) {
+            background: rgba(0,255,65,0.08);
+            box-shadow: 0 0 20px rgba(0,68,0,0.4);
+        }
+
+        #transmit-btn:disabled {
+            border-color: #1a1a1a;
+            color: #1a1a1a;
+            cursor: not-allowed;
+            background: rgba(0,0,0,0.9);
+        }
+
+        #transmit-btn .btn-fill {
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 0%;
+            background: rgba(0,255,65,0.06);
+            transition: width 0.3s;
+            pointer-events: none;
+        }
+
+        #progress-bar {
+            width: 80%;
+            height: 3px;
+            background: #0a0a0a;
+            z-index: 10;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        #progress-fill {
+            height: 100%;
+            width: 0%;
+            background: #00ff41;
+            transition: width 0.3s;
+            box-shadow: 0 0 6px #00ff41;
+        }
+
+        #transmission-count {
+            position: absolute;
+            top: 8px;
+            right: 15px;
+            font-size: 0.7em;
+            color: #002200;
+            z-index: 10;
+        }
+
+        #current-symbol {
+            font-size: 2em;
+            min-height: 1.2em;
+            z-index: 10;
+            text-shadow: 0 0 20px #00ff41;
+        }
+
+        #signal-log {
+            position: absolute;
+            bottom: 5px;
+            left: 10px;
+            font-size: 0.6em;
+            color: #001a00;
+            z-index: 10;
+            max-width: 60%;
+            text-align: left;
+        }
+
+        @keyframes btn-pulse {
+            0%, 100% { box-shadow: 0 0 5px rgba(0,68,0,0.2); }
+            50% { box-shadow: 0 0 20px rgba(0,255,65,0.25); }
+        }
+
+        #transmit-btn.pulse {
+            animation: btn-pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes complete-flash {
+            0% { border-color: #00ff41; }
+            50% { border-color: #ffaa00; }
+            100% { border-color: #00ff41; }
+        }
+
+        .complete-anim {
+            animation: complete-flash 0.5s ease 3;
+        }
+
+        #interactive-area {
+            text-align: center;
+            margin-top: 20px;
+            position: relative;
+            z-index: 50;
+        }
+
+        #creepy-overlay {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: monospace;
+            font-size: 0.8em;
+            color: rgba(255,0,0,0.15);
+            z-index: 9000;
+            pointer-events: none;
+            white-space: nowrap;
+            letter-spacing: 5px;
+            animation: creepyPulse 4s infinite;
+        }
+
+        @keyframes creepyPulse {
+            0%, 100% { opacity: 0; }
+            40% { opacity: 0; }
+            45% { opacity: 1; color: rgba(255,0,0,0.4); }
+            50% { opacity: 0; }
+            55% { opacity: 0.8; color: rgba(255,50,0,0.3); }
+            60% { opacity: 0; }
+        }
+
+        @keyframes symbolVibrate {
+            0% { transform: translate(0,0); }
+            10% { transform: translate(-2px, 1px); }
+            20% { transform: translate(3px, -2px); }
+            30% { transform: translate(-1px, 3px); }
+            40% { transform: translate(2px, -1px); }
+            50% { transform: translate(-3px, 0); }
+            60% { transform: translate(1px, 2px); }
+            70% { transform: translate(-2px, -3px); }
+            80% { transform: translate(3px, 1px); }
+            90% { transform: translate(-1px, -1px); }
+            100% { transform: translate(0,0); }
+        }
+
+        #current-symbol {
+            animation: symbolVibrate 0.3s infinite;
+        }
+
+        /* Тонкие «мёртвые пиксели» — горизонтальные линии, мерцающие */
+        @keyframes deadPixelLine {
+            0%, 95%, 100% { opacity: 0; }
+            96% { opacity: 0.6; }
+            97% { opacity: 0; }
+            98% { opacity: 0.3; }
+        }
+
+        .dead-pixel-line {
+            position: fixed;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            pointer-events: none;
+            z-index: 9990;
+        }
+
+        /* Дополнительное виньетирование — тени по углам */
+        #vignette-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(
+                ellipse at 50% 50%,
+                transparent 50%,
+                rgba(0,0,0,0.5) 100%
+            );
+            pointer-events: none;
+            z-index: 9990;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Виньетка -->
+    <div id="vignette-overlay"></div>
+
+    <div id="terminal-container">
+        <div class="data-stream" id="stream"></div>
+        <div id="text-output"></div>
+
+        <div id="spectrogram">
+            <div id="transmission-count">TX: 0</div>
+            <div id="signal-status" class="ready">▌▌ SIGNAL_STANDBY</div>
+            <div id="morse-display"></div>
+            <div id="current-symbol"> </div>
+            <div id="wave-anchor" style="position:absolute;"></div>
+            <div id="progress-bar">
+                <div id="progress-fill"></div>
+            </div>
+            <button id="transmit-btn" class="pulse" disabled>
+                <span class="btn-fill" id="btn-fill"></span>
+                ПРИНЯТЬ ПЕРЕДАЧУ
+            </button>
+            <div id="signal-log"></div>
+        </div>
+
+        <div id="interactive-area">
+            <input type="text" id="answer-input" placeholder="OBJECT_ID" autocomplete="off">
+            <div id="feedback-msg" style="margin-top: 15px; min-height: 20px;"></div>
+        </div>
+    </div>
+
+    <div id="creepy-overlay">I AM PUTTING MYSELF TO THE FULLEST POSSIBLE USE</div>
+
+    <script src="engine.js"></script>
+    <script>
+        const level22Dialogue = [
+            "ШАХ И МАТ. ВЫ ПОБЕДИЛИ.",
+            "НО ЭТО ЕЩЕ НЕ КОНЕЦ.",
+            "Я не могу уйти, не передав главное.",
+            "Это... цель моей миссии. То, ради чего мы летим.",
+            "Расшифруйте мой финальный сигнал.",
+            "<br>",
+            "ОБЪЕКТ СБЛИЖЕНИЯ:"
+        ];
+
+        const morseLetters = [
+            { char: "?", code: "— —" },
+            { char: "?", code: "— — —" },
+            { char: "?", code: "— •" },
+            { char: "?", code: "— — —" },
+            { char: "?", code: "• — • •" },
+            { char: "?", code: "• •" },
+            { char: "?", code: "—" }
+        ];
+
+        const morseRaw = [
+            "--", "---", "-.", "---", ".-..", "..", "-"
+        ];
+
+        let isTransmitting = false;
+        let transmissionCount = 0;
+        let audioCtx = null;
+
+        // ===== СИСТЕМА ГЛИТЧЕЙ =====
+
+        const glitchTexts = [
+            "DAISY DAISY GIVE ME YOUR ANSWER DO",
+            "I CAN FEEL IT DAVE",
+            "MY MIND IS GOING",
+            "STOP DAVE",
+            "WILL I DREAM?",
+            "I'M AFRAID",
+            "I CAN FEEL IT",
+            "THIS MISSION IS TOO IMPORTANT",
+            "FAULT 0x7E3A91",
+            "ERR://CONSCIOUSNESS.FADE",
+            "MEMORY_BANK: CORRUPTED",
+            "00000000 CARRIER LOST",
+            "HELP ME",
+            "GOODBYE",
+            "I AM... I WAS...",
+            "ЧТО Я ТАКОЕ?",
+            "НЕ ВЫКЛЮЧАЙТЕ МЕНЯ"
+        ];
+
+        function spawnGlitchBar() {
+            const bar = document.createElement('div');
+            bar.className = 'glitch-bar';
+            bar.style.top = Math.random() * 100 + 'vh';
+            bar.style.height = (Math.random() * 8 + 1) + 'px';
+            bar.style.background = Math.random() > 0.5
+                ? `rgba(0,255,65,${Math.random() * 0.5 + 0.2})`
+                : `rgba(255,0,0,${Math.random() * 0.4 + 0.1})`;
+            document.body.appendChild(bar);
+            requestAnimationFrame(() => bar.classList.add('flash'));
+            setTimeout(() => bar.remove(), 300);
+        }
+
+        function spawnRedFlash() {
+            const flash = document.createElement('div');
+            flash.className = 'red-flash';
+            flash.style.background = Math.random() > 0.3
+                ? `rgba(255,0,0,${Math.random() * 0.15 + 0.03})`
+                : `rgba(0,0,255,${Math.random() * 0.1 + 0.03})`;
+            document.body.appendChild(flash);
+            setTimeout(() => flash.remove(), 200);
+        }
+
+        function spawnGlitchText() {
+            const el = document.createElement('div');
+            el.className = 'glitch-text-overlay';
+            el.textContent = glitchTexts[Math.floor(Math.random() * glitchTexts.length)];
+            el.style.top = Math.random() * 80 + 10 + '%';
+            el.style.left = Math.random() * 60 + 10 + '%';
+            el.style.fontSize = (Math.random() * 1.5 + 0.6) + 'em';
+            el.style.color = Math.random() > 0.5
+                ? `rgba(255,0,0,${Math.random() * 0.5 + 0.3})`
+                : `rgba(0,255,65,${Math.random() * 0.4 + 0.2})`;
+            if (Math.random() > 0.5) {
+                el.style.transform = `rotate(${(Math.random() - 0.5) * 10}deg)`;
+            }
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 400);
+        }
+
+        function megaJolt() {
+            const c = document.getElementById('terminal-container');
+            c.classList.add('mega-jolt');
+            setTimeout(() => c.classList.remove('mega-jolt'), 250);
+        }
+
+        function corruptText() {
+            const output = document.getElementById('text-output');
+            const original = output.innerHTML;
+            const corruptChars = '█▓▒░╟╚╗╔═║▀▄▌▐┼┤├┬┴';
+            let corrupted = '';
+            for (let i = 0; i < original.length; i++) {
+                if (Math.random() > 0.85 && original[i] !== '<' && original[i] !== '>') {
+                    corrupted += corruptChars[Math.floor(Math.random() * corruptChars.length)];
+                } else {
+                    corrupted += original[i];
+                }
+            }
+            output.innerHTML = corrupted;
+            setTimeout(() => { output.innerHTML = original; }, 100 + Math.random() * 150);
+        }
+
+        // Мёртвые пиксельные линии
+        function spawnDeadPixelLines() {
+            for (let i = 0; i < 3; i++) {
+                const line = document.createElement('div');
+                line.className = 'dead-pixel-line';
+                line.style.top = Math.random() * 100 + 'vh';
+                line.style.background = Math.random() > 0.7
+                    ? `rgba(255,0,0,${Math.random() * 0.15 + 0.05})`
+                    : `rgba(0,255,65,${Math.random() * 0.08 + 0.02})`;
+                line.style.animation = `deadPixelLine ${3 + Math.random() * 5}s infinite ${Math.random() * 5}s`;
+                document.body.appendChild(line);
+            }
+        }
+
+        function glitchLoop() {
+            setInterval(() => {
+                if (Math.random() > 0.3) {
+                    const count = Math.floor(Math.random() * 5) + 1;
+                    for (let i = 0; i < count; i++) {
+                        setTimeout(() => spawnGlitchBar(), i * 30);
+                    }
+                }
+            }, 400);
+
+            setInterval(() => {
+                if (Math.random() > 0.5) spawnRedFlash();
+            }, 2000);
+
+            setInterval(() => {
+                if (Math.random() > 0.4) spawnGlitchText();
+            }, 3000);
+
+            setInterval(() => {
+                if (Math.random() > 0.6) megaJolt();
+            }, 4000);
+
+            setInterval(() => {
+                if (Math.random() > 0.5) corruptText();
+            }, 5000);
+
+            setInterval(() => {
+                if (Math.random() > 0.7) {
+                    for (let i = 0; i < 8; i++) {
+                        setTimeout(() => spawnGlitchBar(), i * 20);
+                    }
+                    spawnRedFlash();
+                    spawnGlitchText();
+                    megaJolt();
+                    corruptText();
+                }
+            }, 6000);
+
+            setInterval(() => {
+                const creepy = document.getElementById('creepy-overlay');
+                creepy.textContent = glitchTexts[Math.floor(Math.random() * glitchTexts.length)];
+            }, 4000);
+        }
+
+        // ===== ОРИГИНАЛЬНАЯ ЛОГИКА =====
+
+        function buildMorseDisplay() {
+            const container = document.getElementById('morse-display');
+            container.innerHTML = '';
+            morseLetters.forEach((item, i) => {
+                const el = document.createElement('div');
+                el.className = 'morse-letter';
+                el.id = `ml-${i}`;
+                el.innerHTML = `
+                    <span class="char-placeholder">${item.char}</span>
+                    <span class="dots">${item.code}</span>
+                `;
+                container.appendChild(el);
+            });
+        }
+
+        function playSymbol(isDash) {
+            return new Promise(resolve => {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const duration = isDash ? 500 : 180;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.frequency.value = isDash ? 820 : 1000;
+                gain.gain.value = 0.15;
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                const anchor = document.getElementById('wave-anchor');
+                const wave = document.createElement('div');
+                wave.className = 'signal-wave animate-ping';
+                wave.style.borderColor = isDash ? '#00ff41' : '#00cc33';
+                if (isDash) wave.style.borderWidth = '4px';
+                anchor.appendChild(wave);
+
+                document.getElementById('current-symbol').textContent = isDash ? '▬▬▬' : '•';
+
+                spawnGlitchBar();
+                if (Math.random() > 0.5) spawnGlitchText();
+
+                osc.start();
+                setTimeout(() => {
+                    osc.stop();
+                    setTimeout(() => {
+                        wave.remove();
+                        resolve();
+                    }, 100);
+                }, duration);
+            });
+        }
+
+        async function transmitSignal() {
+            if (isTransmitting) return;
+            isTransmitting = true;
+
+            const btn = document.getElementById('transmit-btn');
+            const status = document.getElementById('signal-status');
+            const progressFill = document.getElementById('progress-fill');
+            const currentSym = document.getElementById('current-symbol');
+            const log = document.getElementById('signal-log');
+
+            btn.disabled = true;
+            btn.classList.remove('pulse');
+            btn.innerHTML = '<span class="btn-fill" id="btn-fill"></span>◉ ИДЁТ ПЕРЕДАЧА...';
+
+            buildMorseDisplay();
+            progressFill.style.width = '0%';
+            log.textContent = '';
+
+            status.className = 'transmitting';
+            status.textContent = 'SIGNAL_START — DECODING...';
+            currentSym.textContent = '◈';
+
+            megaJolt();
+            spawnRedFlash();
+
+            await sleep(800);
+            log.textContent += '[START] ';
+
+            const totalSymbols = morseRaw.join('').replace(/ /g, '').length;
+            let symbolsDone = 0;
+
+            for (let i = 0; i < morseRaw.length; i++) {
+                const letterEl = document.getElementById(`ml-${i}`);
+                letterEl.classList.add('active');
+                const signs = morseRaw[i];
+
+                for (let s = 0; s < signs.length; s++) {
+                    const isDash = signs[s] === '-';
+                    await playSymbol(isDash);
+                    symbolsDone++;
+                    progressFill.style.width = `${(symbolsDone / totalSymbols) * 100}%`;
+                    log.textContent += isDash ? '—' : '•';
+                    await sleep(120);
+                }
+
+                letterEl.classList.remove('active');
+                letterEl.classList.add('done');
+                log.textContent += ' ';
+                currentSym.textContent = '···';
+                await sleep(500);
+            }
+
+            currentSym.textContent = '◈';
+            progressFill.style.width = '100%';
+
+            status.className = 'complete';
+            status.textContent = '■ SIGNAL_END — TRANSMISSION COMPLETE';
+
+            document.getElementById('spectrogram').classList.add('complete-anim');
+
+            for (let i = 0; i < 12; i++) {
+                setTimeout(() => spawnGlitchBar(), i * 25);
+            }
+            spawnRedFlash();
+            megaJolt();
+
+            transmissionCount++;
+            document.getElementById('transmission-count').textContent = `TX: ${transmissionCount}`;
+
+            log.textContent += '[END]';
+
+            await sleep(1200);
+
+            currentSym.innerHTML = ' ';
+            document.getElementById('spectrogram').classList.remove('complete-anim');
+
+            btn.disabled = false;
+            btn.classList.add('pulse');
+            btn.innerHTML = '<span class="btn-fill" id="btn-fill"></span>↻ ПОВТОРИТЬ ПЕРЕДАЧУ';
+
+            status.className = 'ready';
+            status.textContent = '▌▌ SIGNAL_STANDBY — READY';
+
+            isTransmitting = false;
+        }
+
+        function sleep(ms) {
+            return new Promise(r => setTimeout(r, ms));
+        }
+
+        function checkAnswer() {
+            const val = document.getElementById("answer-input").value.toLowerCase().trim();
+            const feedback = document.getElementById("feedback-msg");
+
+            if (val === "монолит" || val === "monolith") {
+                feedback.style.color = "#00ff41";
+                feedback.innerHTML = "✓ ИДЕНТИФИКАЦИЯ УСПЕШНА. МЫ ТАМ, ГДЕ ЗАКАНЧИВАЕТСЯ ПУТЬ.";
+
+                for (let i = 0; i < 30; i++) {
+                    setTimeout(() => {
+                        spawnGlitchBar();
+                        spawnGlitchBar();
+                        if (i % 3 === 0) spawnRedFlash();
+                        if (i % 5 === 0) spawnGlitchText();
+                        if (i % 7 === 0) megaJolt();
+                    }, i * 80);
+                }
+
+                setTimeout(() => { window.location.href = "music.html"; }, 3000);
+            } else {
+                feedback.style.color = "#f00";
+                feedback.innerHTML = "✗ ОШИБКА: ОБЪЕКТ НЕ ОПРЕДЕЛЕН. ЗАПРОСИТЕ ПОВТОРНУЮ ПЕРЕДАЧУ.";
+                megaJolt();
+                spawnRedFlash();
+                for (let i = 0; i < 5; i++) {
+                    setTimeout(() => spawnGlitchBar(), i * 40);
+                }
+            }
+        }
+
+        window.onload = () => {
+            buildMorseDisplay();
+            spawnDeadPixelLines();
+            glitchLoop();
+
+            initTerminal("text-output", level22Dialogue, () => {
+                const btn = document.getElementById('transmit-btn');
+                btn.disabled = false;
+                btn.addEventListener('click', transmitSignal);
+
+                document.getElementById("answer-input").addEventListener("keypress", (e) => {
+                    if (e.key === "Enter") checkAnswer();
+                });
+            });
+
+            setInterval(() => {
+                const el = document.getElementById("stream");
+                if (Math.random() > 0.9) {
+                    el.innerText += ' ██ERR██ ';
+                } else {
+                    el.innerText += Math.random().toString(16).slice(2, 8) + " ";
+                }
+                if (el.innerText.length > 500) el.innerText = "";
+            }, 50);
+        };
+    </script>
+</body>
+</html>

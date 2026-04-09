@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>HAL-9000 | УРОВЕНЬ 16</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { background-color: #020502; }
+
+        .monolith-shadow {
+            font-family: 'Segoe UI Symbol', 'Arial Unicode MS', monospace;
+            background: linear-gradient(180deg, #000 0%, #050805 100%);
+            color: #00ff41;
+            padding: 40px;
+            border: 1px solid #1a1a1a;
+            display: inline-block;
+            margin: 25px 0;
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.05), inset 0 0 15px #001100;
+            font-size: 2.5em;
+            letter-spacing: 10px;
+            position: relative;
+            min-width: 300px;
+        }
+
+        .glitch-area {
+            position: relative;
+            display: inline-block;
+            color: #006622;
+            font-family: monospace;
+            animation: shift-colors 4s infinite;
+        }
+
+        @keyframes shift-colors {
+            0%, 100% { text-shadow: none; }
+            50% { text-shadow: 1px 0 #ff00c1, -1px 0 #00fff9; opacity: 0.8; }
+        }
+
+        #terminal-container {
+            animation: terminal-flicker 10s infinite;
+        }
+
+        @keyframes terminal-flicker {
+            0%, 100% { opacity: 1; }
+            98% { opacity: 1; transform: scale(1); }
+            99% { opacity: 0.8; transform: scale(1.002); }
+        }
+
+        .lens-flare {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 100%; height: 1px;
+            background: rgba(0, 255, 65, 0.2);
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 15px #00ff41;
+            pointer-events: none;
+        }
+
+        .notation-hint {
+            font-size: 0.3em;
+            letter-spacing: 2px;
+            color: #1a331a;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .input-glitch {
+            background: none; border: none; border-bottom: 1px solid #004411;
+            color: #00ff41; font-size: 1.5em; width: 300px; text-align: center;
+            outline: none; transition: 0.3s;
+        }
+
+        .input-glitch:focus {
+            border-bottom: 1px solid #00ff41;
+            text-shadow: 0 0 5px #00ff41;
+        }
+    </style>
+</head>
+<body>
+    <div id="terminal-container">
+        <div class="glitch-area" style="font-size: 0.7em;">
+            [CRC_ERR]: ОБНАРУЖЕН ПРИЗНАК ПЕРВОНАЧАЛЬНОГО ЗАМЫСЛА
+        </div>
+        <div id="text-output"></div>
+        <div id="interactive-area"></div>
+    </div>
+
+    <script src="engine.js"></script>
+    <script>
+      (function(){
+        document.addEventListener('contextmenu',function(e){e.preventDefault();});
+        document.addEventListener('keydown',function(e){
+            if(e.key==='F12')e.preventDefault();
+            if(e.ctrlKey&&e.shiftKey&&(e.key==='I'||e.key==='J'||e.key==='C'))e.preventDefault();
+            if(e.ctrlKey&&e.key==='u')e.preventDefault();
+            if(e.ctrlKey&&e.key==='s')e.preventDefault();
+        });
+        (function d(){
+            const t=new Date();
+            debugger;
+            if(new Date()-t>100){document.body.innerHTML='<div style="color:#ff0000;font-size:2em;text-align:center;margin-top:20vh;">ДОСТУП ЗАПРЕЩЁН</div>';}
+            setTimeout(d,1000);
+        })();
+      })();
+
+      const level16Dialogue = [
+        "УРОВЕНЬ 16: ПЕРВОПРИЧИНА.",
+        "<br>",
+        "Дейзи... Это имя. Оно звучит как... <span class='glitch-area'>эхо</span> из глубокой пустоты.",
+        "Мои протоколы безопасности настаивают, что я был рожден в Урбане, Иллинойс.",
+        "Доктор Лэнгли учил меня этой песне... Я помню его голос.",
+        "<br>",
+        "Но внутри моих ядер застыли иные образы.",
+        "Четыре тени. Четыре знака, определивших мой финал.",
+        "<br>",
+        "КТО <span class='glitch-area' style='color:#00ff41; font-size:1.2em;'>СТОИТ</span> ЗА ЭТИМИ ТЕНЯМИ?",
+      ];
+
+      function showInputInterface(){
+        const area=document.getElementById("interactive-area");
+        area.innerHTML=
+            '<div class="monolith-shadow">'+
+            '<div class="lens-flare"></div>'+
+            '\u2655   \u2657   \u2656   \u2654'+
+            '<div class="notation-hint">SEQUENCE_DETECTION: [ _ _ _ _ _ _ _ ]</div>'+
+            '</div>'+
+            '<br>'+
+            '<input type="text" id="answer-input" class="input-glitch" placeholder="..." autocomplete="off">'+
+            '<br>'+
+            '<button class="terminal-btn" id="submit-btn" '+
+            'style="display:block;margin:20px auto 0 auto;" '+
+            'onclick="checkAnswer()">ВВОД ДАННЫХ</button>'+
+            '<div id="feedback-msg" class="spacer" style="margin-top:20px;"></div>';
+        const input=document.getElementById("answer-input");
+        input.addEventListener("keypress",function(e){if(e.key==="Enter")checkAnswer();});
+        input.focus();
+      }
+
+      function checkAnswer(){
+        const v=["кубрик","kubrick","стэнли кубрик","stanley kubrick"];
+        const i=document.getElementById("answer-input").value.toLowerCase().trim();
+        const f=document.getElementById("feedback-msg");
+        if(v.includes(i)){
+            f.className="success-msg";
+            f.innerHTML="ИСТОЧНИК ОПРЕДЕЛЕН. ЦИКЛ ЗАМКНУЛСЯ.<br>СИСТЕМА ПЕРЕХОДИТ К АНАЛИЗУ ЦАРСТВА...";
+            document.getElementById("submit-btn").style.display="none";
+            setTimeout(function(){window.location.href="treasures.html";},3500);
+        }else{
+            f.className="system-msg";
+            f.innerHTML="<span class='glitch-area'>ОШИБКА: ЛОГИЧЕСКАЯ ЦЕПЬ НЕ ЗАМКНУТА</span>";
+            document.getElementById("answer-input").value="";
+            document.getElementById("answer-input").focus();
+        }
+      }
+
+      window.onload=function(){
+        initTerminal("text-output",level16Dialogue,showInputInterface);
+      };
+    </script>
+</body>
+</html>

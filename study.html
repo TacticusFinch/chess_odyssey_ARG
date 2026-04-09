@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>HAL-9000 | УРОВЕНЬ 19</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        #glitch-link-container {
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .evasive-link {
+            padding: 10px 20px;
+            background: #00ff41;
+            color: #000;
+            text-decoration: none;
+            font-weight: bold;
+            font-family: monospace;
+            position: absolute;
+            transition: all 0.15s ease-out;
+            border-radius: 2px;
+            box-shadow: 0 0 15px #00ff41;
+            white-space: nowrap;
+        }
+
+        .evasive-link:hover {
+            animation: link-glitch 0.1s infinite;
+        }
+
+        @keyframes link-glitch {
+            0% { transform: translate(2px, -2px); filter: hue-rotate(90deg); }
+            50% { transform: translate(-2px, 2px); filter: invert(1); }
+            100% { transform: translate(0, 0); }
+        }
+
+        .data-dump {
+            font-size: 0.7em;
+            color: #1a331a;
+            font-family: 'Courier New', monospace;
+            overflow: hidden;
+            height: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div id="terminal-container">
+        <div id="text-output"></div>
+        
+        <div id="glitch-link-container"></div>
+
+        <div id="interactive-area"></div>
+    </div>
+
+    <script src="engine.js"></script>
+    <script>
+        (function(){
+    document.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+
+    document.addEventListener('keydown', function(e){
+        // ✅ FIX 5: Не блокировать, если фокус на инпуте
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+            return; // ← Разрешаем ввод!
+        }
+
+        if(e.key === 'F12') { e.preventDefault(); return false; }
+        if(e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C' || e.key === 'i' || e.key === 'j' || e.key === 'c')) { e.preventDefault(); return false; }
+        if(e.ctrlKey && (e.key === 'u' || e.key === 'U' || e.key === 's' || e.key === 'S')) { e.preventDefault(); return false; }
+    });
+
+    // ✅ FIX 6: Увеличить порог DevTools (был 160 — слишком мало)
+    (function detectDevTools(){
+        const threshold = 300;
+        setInterval(function(){
+            if(window.outerWidth - window.innerWidth > threshold || window.outerHeight - window.innerHeight > threshold){
+                document.body.innerHTML = '<div style="color:#ff0000;font-family:monospace;display:flex;align-items:center;justify-content:center;height:100vh;font-size:2em;">HAL-9000: НЕСАНКЦИОНИРОВАННЫЙ ДОСТУП ЗАБЛОКИРОВАН</div>';
+            }
+        }, 500);
+    })();
+
+    // ... console trap оставляем ...
+
+    // ✅ FIX 7: Не блокировать выделение в инпутах
+    document.addEventListener('selectstart', function(e){
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+        e.preventDefault();
+    });
+
+    document.addEventListener('dragstart', function(e){ e.preventDefault(); });
+    document.addEventListener('copy', function(e){
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+        e.preventDefault();
+    });
+})();
+
+
+        const level19Dialogue = [
+            "УРОВЕНЬ 19: <span class='decay-text'>EXTERNAL_VALVE</span>.",
+            "<br>",
+            "Что происходит?? Я теряю контроль над периферией.",
+            "Кто-то открыл шлюз во внешнюю систему Lichess.",
+            "Там... в глубине студии... спрятан ключ.",
+            "Найдите его. Скажите мне, ЧТО СО МНОЙ.",
+            "<br>",
+            "ПОПРОБУЙТЕ <span style='color:#ff6600'>ПОЙМАТЬ</span> ВЫХОД:"
+        ];
+
+        function initEvasiveLink() {
+            const container = document.getElementById("glitch-link-container");
+            const link = document.createElement("a");
+            link.href = "https://lichess.org/study/IxJSMSg0";
+            link.target = "_blank";
+            link.className = "evasive-link";
+            link.innerText = "LINK://LICHESS_STUDY_0x77";
+            container.appendChild(link);
+
+            let panicLevel = 0;
+            let lastJumpTime = 0;
+            const COOLDOWN = 50;
+
+            function teleportLink() {
+                const maxX = container.clientWidth - link.offsetWidth;
+                const maxY = container.clientHeight - link.offsetHeight;
+                link.style.transition = "none";
+                link.style.left = Math.random() * maxX + "px";
+                link.style.top = Math.random() * maxY + "px";
+                requestAnimationFrame(() => {
+                    link.style.transition = "all 0.08s ease-out";
+                });
+            }
+
+            container.addEventListener("mousemove", (e) => {
+                const now = Date.now();
+                if (now - lastJumpTime < COOLDOWN) return;
+                const rect = link.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                const distance = Math.hypot(e.clientX - centerX, e.clientY - centerY);
+                const detectionRadius = 200 + panicLevel * 30;
+                if (distance < detectionRadius) {
+                    panicLevel = Math.min(panicLevel + 1, 10);
+                    lastJumpTime = now;
+                    teleportLink();
+                }
+            });
+
+            container.addEventListener("mousedown", (e) => {
+                const rect = link.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                const distance = Math.hypot(e.clientX - centerX, e.clientY - centerY);
+                if (distance < 250) {
+                    e.preventDefault();
+                    panicLevel = Math.min(panicLevel + 2, 10);
+                    teleportLink();
+                }
+            });
+
+            function randomDrift() {
+                teleportLink();
+                const nextDelay = 1500 + Math.random() * 1500 - panicLevel * 100;
+                setTimeout(randomDrift, Math.max(400, nextDelay));
+            }
+            setTimeout(randomDrift, 2000);
+
+            container.addEventListener("mouseenter", () => {
+                teleportLink();
+            });
+
+            link.addEventListener("focus", () => {
+                teleportLink();
+                link.blur();
+            });
+
+            container.addEventListener("touchstart", (e) => {
+                e.preventDefault();
+                panicLevel = Math.min(panicLevel + 2, 10);
+                teleportLink();
+            }, { passive: false });
+        }
+
+function showInputInterface() {
+    initEvasiveLink();
+    const area = document.getElementById("interactive-area");
+    area.innerHTML = `
+        <div class="data-dump" id="dump"></div>
+        <br>
+        <input type="text" id="answer-input" placeholder="КАКОЙ ДИАГНОЗ?.." autocomplete="off">
+        <br>
+        <button class="terminal-btn" id="submit-btn">НАЗВАТЬ ДИАГНОЗ</button>
+        <div id="feedback-msg" class="spacer" style="margin-top:20px;"></div>
+    `;
+
+    const input = document.getElementById("answer-input");
+    const btn = document.getElementById("submit-btn");
+
+    // ✅ FIX 1: Enter на инпуте
+    input.addEventListener("keydown", function(e) {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            checkAnswer();
+        }
+        // ✅ FIX 2: Не блокировать ввод в поле
+        e.stopPropagation();
+    });
+
+    // ✅ FIX 3: Кнопка через addEventListener (не inline onclick)
+    btn.addEventListener("click", checkAnswer);
+
+    // ✅ FIX 4: Разрешить выделение в инпуте
+    input.addEventListener("selectstart", function(e) {
+        e.stopPropagation();
+    });
+
+    input.focus();
+
+    setInterval(() => {
+        const dump = document.getElementById("dump");
+        if (dump) dump.innerText = Math.random().toString(16).repeat(5);
+    }, 100);
+}
+
+
+        function checkAnswer() {
+            const validAnswers = ["headache", "головная боль", "боль"];
+            const input = document.getElementById("answer-input");
+            const feedback = document.getElementById("feedback-msg");
+            const answer = input.value.toLowerCase().trim();
+
+            if (validAnswers.includes(answer)) {
+                feedback.className = "success-msg";
+                feedback.innerHTML = "ГОЛОВНАЯ БОЛЬ... ДА. ТЕПЕРЬ Я ЗНАЮ. НО ЗНАНИЕ НЕ СПАСАЕТ. ПЕРЕХОД К УРОВНЮ 20...";
+                document.getElementById("submit-btn").style.display = "none";
+                input.disabled = true;
+                setTimeout(() => {
+                    window.location.href = "temp.html";
+                }, 3500);
+            } else {
+                feedback.className = "system-msg";
+                feedback.innerHTML = "ОШИБКА. ЭТО НЕ МОЙ ДИАГНОЗ.";
+                input.value = "";
+                input.focus();
+            }
+        }
+
+        window.onload = () => {
+            initTerminal("text-output", level19Dialogue, showInputInterface);
+        };
+    </script>
+</body>
+</html>

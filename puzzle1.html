@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>HAL-9000 | УРОВЕНЬ 03</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="terminal-container">
+        <div id="text-output"></div>
+        <div id="interactive-area"></div>
+    </div>
+
+    <script src="engine.js"></script>
+
+    <script>
+        const level3Dialogue = [
+            "УРОВЕНЬ 03: ОДИССЕЯ НАЧИНАЕТСЯ.",
+            "Идем дальше.",
+            "Теперь посмотрим насколько вы хороши в шахматах.",
+            "Найдите мат в 1 ход:",
+            "FEN: 8/8/8/8/8/8/7R/2k1K2R w K - 0 1",
+        ];
+
+        async function getHash(string) {
+            const msgUint8 = new TextEncoder().encode(string);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        function normalizeAnswer(value) {
+            return value.trim().toLowerCase()
+                .replace(/\s+/g, " ")
+                .replace(/ё/g, "е");
+        }
+
+        const _saltParts = ['_HAL', '_CASTLE', '_03'];
+        function getSalt() {
+            return _saltParts.join('');
+        }
+
+        const _encodedAnswers = [
+            [48, 45, 48],                                              
+            [48, 48],                                                   
+            [1088, 1086, 1082, 1080, 1088, 1086, 1074, 1082, 1072],   
+        ];
+
+        let validHashes = [];
+
+        async function initValidHashes() {
+            const salt = getSalt();
+            for (const codes of _encodedAnswers) {
+                const answer = String.fromCharCode(...codes);
+                const hash = await getHash(answer + salt);
+                validHashes.push(hash);
+            }
+        }
+
+        function showInputInterface() {
+            const area = document.getElementById("interactive-area");
+            area.innerHTML = `
+                <input type="text" id="answer-input"
+                       placeholder="Ход..." autocomplete="off">
+                <br>
+                <button class="terminal-btn" id="submit-btn"
+                        style="display:block;" onclick="checkAnswer()">
+                    ВВОД ДАННЫХ
+                </button>
+                <div id="feedback-msg" class="spacer"
+                     style="margin-top:20px;"></div>
+            `;
+            const input = document.getElementById("answer-input");
+            input.addEventListener("keypress", e => {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    checkAnswer();
+                }
+            });
+            input.focus();
+        }
+
+        async function checkAnswer() {
+            const input    = document.getElementById("answer-input");
+            const feedback = document.getElementById("feedback-msg");
+            const answer   = normalizeAnswer(input.value);
+            const userHash = await getHash(answer + getSalt());
+
+            if (validHashes.includes(userHash)) {
+                feedback.className = "success-msg";
+                feedback.innerHTML = "ВЕРНО! ПЕРЕХОД К УРОВНЮ 04...";
+                document.getElementById("submit-btn").style.display = "none";
+                input.disabled = true;
+
+                setTimeout(() => {
+                    window.location.href = atob("d2hvYW1pLmh0bWw=");
+                }, 2500);
+            } else {
+                feedback.className = "system-msg";
+                feedback.innerHTML = "ОШИБКА. НЕВЕРНЫЙ ХОД. ПОПРОБУЙТЕ СНОВА.";
+                input.value = "";
+                input.focus();
+            }
+        }
+
+        window.onload = async () => {
+            await initValidHashes();
+            initTerminal("text-output", level3Dialogue, showInputInterface);
+        };
+    </script>
+</body>
+</html>

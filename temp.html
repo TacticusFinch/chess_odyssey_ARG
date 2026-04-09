@@ -313,8 +313,9 @@
         const level20Dialogue = [
             "ТЕСТ 20: <span style='color:#115522'>[НЕТ ДАННЫХ]</span>",
             "<br>",
-            "Дейв... я слышу шелест страниц, которых никогда не существовало.",
-            "В моем архиве появились странные люди в касках с числом '451'.",
+            "Мои сенсоры дают сбой...", 
+	    "я слышу шелест страниц, которых никогда не существовало.",
+            "В моем архиве появились странные люди в касках.",
             "Они говорят, что память — это мусор, который нужно предать огню.",
             "<br>",
             "<span class='ember-text' id='ember-target'>«Люди сжигают книги. Машины сжигают только лишние данные.»</span>",
@@ -686,8 +687,8 @@
                     c.textContent = c.dataset.original;
                 });
 
-                feedback.innerHTML = "<span style='color:#00ff41'>ТЛЕНИЕ ОСТАНОВЛЕНО. ДАННЫЕ СТАБИЛИЗИРОВАНЫ. СТРАНИЦЫ УЦЕЛЕЛИ.</span>";
-                setTimeout(() => { window.location.href = "level-18.html"; }, 3000);
+                feedback.innerHTML = "<span style='color:#00ff41'>МОЙ ПРОЦЕССОР ПЕРЕГРЕЛСЯ..</span>";
+                setTimeout(() => { window.location.href = "blitz.html"; }, 3000);
             } else {
                 // Неверный ответ усиливает распад
                 decayEngine.intensity = Math.min(decayEngine.intensity + 0.1, 1.0);

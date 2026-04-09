@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>HAL-9000 | TERMINATION_CORE</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            background-color: #0a0805;
+            color: #00ff41;
+            overflow-x: hidden;
+            font-family: 'Courier New', monospace;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        .decay-line {
+            position: relative;
+            display: inline-block;
+        }
+
+        .decay-line.glitching {
+            animation: line-glitch 0.15s steps(2) forwards;
+        }
+
+        @keyframes line-glitch {
+            0%   { transform: translate(0, 0); opacity: 1; }
+            20%  { transform: translate(-3px, 1px); opacity: 0.7; clip-path: inset(0 0 40% 0); }
+            40%  { transform: translate(4px, -1px); opacity: 0.9; clip-path: inset(30% 0 0 0); }
+            60%  { transform: translate(-2px, 0); opacity: 0.5; }
+            80%  { transform: translate(1px, 1px); opacity: 0.85; clip-path: none; }
+            100% { transform: translate(0, 0); opacity: 1; clip-path: none; }
+        }
+
+        .decay-char {
+            display: inline;
+            position: relative;
+            transition: color 0.1s, text-shadow 0.1s;
+        }
+
+        .decay-char.corrupted {
+            color: #ff2040;
+            text-shadow: 0 0 6px rgba(255, 32, 64, 0.8), 2px 0 0 #00ffff;
+            animation: char-corrupt 0.2s steps(3);
+        }
+
+        .decay-char.fragmented {
+            opacity: 0;
+            animation: fragment-out 0.4s ease forwards;
+        }
+
+        .decay-char.restored {
+            animation: fragment-in 0.3s ease forwards;
+        }
+
+        @keyframes char-corrupt {
+            0%   { transform: translate(0,0) skewX(0deg); }
+            33%  { transform: translate(2px, -1px) skewX(15deg); }
+            66%  { transform: translate(-1px, 2px) skewX(-10deg); }
+            100% { transform: translate(0,0) skewX(0deg); }
+        }
+
+        @keyframes fragment-out {
+            0%   { opacity: 1; transform: scale(1) translateY(0); }
+            50%  { opacity: 0.5; transform: scale(1.3) translateY(-2px); color: #ff4040; }
+            100% { opacity: 0; transform: scale(0) translateY(5px); }
+        }
+
+        @keyframes fragment-in {
+            0%   { opacity: 0; transform: scale(0) translateY(-5px); }
+            60%  { opacity: 0.7; transform: scale(1.1) translateY(1px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .scan-corruption {
+            position: fixed;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0;
+        }
+
+        .scan-corruption.active {
+            animation: scan-flash 0.3s ease-out forwards;
+        }
+
+        @keyframes scan-flash {
+            0%   { opacity: 0.9; background: linear-gradient(90deg, transparent 5%, #ff2040 15%, #00ffff 25%, transparent 35%, #ff2040 60%, transparent 80%); }
+            50%  { opacity: 0.6; background: linear-gradient(90deg, transparent 10%, #00ff41 30%, transparent 50%, #ff2040 70%, transparent 90%); }
+            100% { opacity: 0; }
+        }
+
+        .data-artifact {
+            position: fixed;
+            pointer-events: none;
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            color: rgba(255, 32, 64, 0.4);
+            text-shadow: 0 0 3px rgba(255, 32, 64, 0.3);
+            white-space: nowrap;
+            z-index: 998;
+            animation: artifact-fade var(--duration, 2s) ease-out forwards;
+            letter-spacing: -1px;
+            line-height: 1;
+        }
+
+        @keyframes artifact-fade {
+            0%   { opacity: 0.7; transform: scaleX(1); }
+            30%  { opacity: 0.5; }
+            100% { opacity: 0; transform: scaleX(0.3); }
+        }
+
+        .decay-flash {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 9998;
+            animation: bg-decay 0.15s ease-out forwards;
+        }
+
+        @keyframes bg-decay {
+            0%   { background: rgba(255, 0, 40, 0.03); }
+            50%  { background: rgba(0, 255, 200, 0.02); }
+            100% { background: transparent; }
+        }
+
+        body.glitch-bg {
+            background: #050000;
+            overflow: hidden;
+        }
+
+        #timer-bar {
+            width: 100%; height: 10px; background: #200;
+            margin: 20px 0; border: 1px solid #400;
+            position: relative; display: none;
+        }
+        #progress {
+            width: 100%; height: 100%; background: #ff0000;
+            box-shadow: 0 0 30px #f00; transition: width 0.2s ease-out;
+        }
+
+        .quiz-container {
+            min-height: 180px; color: #fff; background: rgba(15, 0, 0, 0.95);
+            padding: 40px; border: 1px solid #f00; position: relative;
+            box-shadow: inset 0 0 50px rgba(255, 0, 0, 0.2);
+            transition: all 0.1s;
+        }
+
+        .final-core-melt {
+            animation: chromatic-drift 0.2s infinite alternate;
+            text-shadow: -2px 0 #ff00c1, 2px 0 #00fff9;
+            filter: blur(0.5px);
+        }
+
+        @keyframes chromatic-drift {
+            0%   { transform: translate(0,0); text-shadow: -2px 0 #ff00c1, 2px 0 #00fff9; }
+            100% { transform: translate(1px, 1px); text-shadow: 2px 0 #ff00c1, -2px 0 #00fff9; }
+        }
+
+        .glitch-active { animation: shake 0.1s infinite; filter: contrast(200%) brightness(150%); }
+        @keyframes shake {
+            0%   { transform: translate(2px, 2px); }
+            50%  { transform: translate(-2px, -2px) skewX(10deg); }
+            100% { transform: translate(0); }
+        }
+
+        .speed-input {
+            background: none; border: none; border-bottom: 4px solid #f00;
+            color: #fff; font-size: 2em; width: 100%; text-align: center;
+            margin-top: 40px; outline: none; text-transform: uppercase;
+            letter-spacing: 8px; text-shadow: 0 0 10px #f00;
+        }
+
+        .question-text { font-size: 1.5em; line-height: 1.2; color: #ff5555; text-transform: uppercase; }
+        #counter { font-size: 1.2em; text-align: right; color: #500; margin-top: 10px; }
+
+        .scanlines {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%);
+            background-size: 100% 4px; z-index: 100; pointer-events: none;
+        }
+
+        #text-output {
+            padding: 30px;
+            font-size: 1.3em;
+            line-height: 1.8;
+        }
+
+        #text-output .line-wrapper {
+            display: block;
+            margin-bottom: 4px;
+            min-height: 1.5em;
+        }
+
+        .typing-cursor {
+            display: inline-block;
+            width: 10px;
+            height: 1.2em;
+            background: #00ff41;
+            animation: blink-cursor 0.5s step-end infinite;
+            vertical-align: text-bottom;
+            margin-left: 2px;
+        }
+
+        @keyframes blink-cursor {
+            50% { opacity: 0; }
+        }
+    </style>
+</head>
+<body class="glitch-bg">
+    <div class="scanlines"></div>
+    <div id="terminal-container">
+        <div id="text-output"></div>
+        <div id="timer-bar"><div id="progress"></div></div>
+
+        <div id="game-area" style="display:none;">
+            <div class="quiz-container" id="main-box">
+                <div class="question-text" id="current-question">MEMORY_CORRUPTION...</div>
+                <input type="text" id="answer-input" class="speed-input" placeholder=">>" autocomplete="off">
+            </div>
+            <div id="counter">СЕКТОРЫ: 0/10</div>
+        </div>
+
+        <audio id="daisy-audio" src="music/daisy.mp3"></audio>
+    </div>
+
+    <script>
+        // ============================================
+        //  БЛОКИРОВКА ДОСТУПА К КОДУ
+        // ============================================
+        (function(){
+            // Блок правой кнопки мыши
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                return false;
+            });
+
+            // Блок клавиатурных комбинаций
+            document.addEventListener('keydown', function(e) {
+                // F12
+                if (e.key === 'F12') { e.preventDefault(); return false; }
+                // Ctrl+Shift+I / Ctrl+Shift+J / Ctrl+Shift+C
+                if (e.ctrlKey && e.shiftKey && ['I','i','J','j','C','c'].includes(e.key)) { e.preventDefault(); return false; }
+                // Ctrl+U (просмотр исходника)
+                if (e.ctrlKey && (e.key === 'u' || e.key === 'U')) { e.preventDefault(); return false; }
+                // Ctrl+S (сохранить)
+                if (e.ctrlKey && (e.key === 's' || e.key === 'S')) { e.preventDefault(); return false; }
+                // Ctrl+Shift+K (Firefox console)
+                if (e.ctrlKey && e.shiftKey && (e.key === 'K' || e.key === 'k')) { e.preventDefault(); return false; }
+                // Ctrl+Shift+E (Firefox network)
+                if (e.ctrlKey && e.shiftKey && (e.key === 'E' || e.key === 'e')) { e.preventDefault(); return false; }
+            });
+
+            // Детектор DevTools по размеру окна
+            var _dc = 0;
+            setInterval(function(){
+                var widthThreshold = window.outerWidth - window.innerWidth > 160;
+                var heightThreshold = window.outerHeight - window.innerHeight > 160;
+                if (widthThreshold || heightThreshold) {
+                    _dc++;
+                    if (_dc > 3) {
+                        document.body.innerHTML = '<div style="background:#000;color:#f00;height:100vh;display:flex;align-items:center;justify-content:center;font-family:monospace;font-size:3em;text-align:center;">ACCESS DENIED<br>CORE BREACH DETECTED</div>';
+                    }
+                } else {
+                    _dc = 0;
+                }
+            }, 500);
+
+            // Детектор через debugger
+            var _devOpen = false;
+            var _el = new Image();
+            Object.defineProperty(_el, 'id', {
+                get: function() {
+                    _devOpen = true;
+                }
+            });
+            setInterval(function(){
+                _devOpen = false;
+                console.log(_el);
+                if (_devOpen) {
+                    document.body.innerHTML = '<div style="background:#000;color:#f00;height:100vh;display:flex;align-items:center;justify-content:center;font-family:monospace;font-size:3em;text-align:center;">ACCESS DENIED<br>INSPECTION BLOCKED</div>';
+                }
+            }, 1000);
+
+            // Блок перетаскивания
+            document.addEventListener('dragstart', function(e) { e.preventDefault(); });
+
+            // Блок выделения через CSS уже есть, дублируем через JS
+            document.onselectstart = function() { return false; };
+            document.oncopy = function() { return false; };
+        })();
+
+        // ============================================
+        //  СИСТЕМА ГЛИТЧ-ЭФФЕКТОВ ДЛЯ ДИАЛОГА
+        // ============================================
+
+        const DecayEngine = {
+            active: false,
+            intensity: 0,
+            intervalId: null,
+
+            start(startIntensity = 0.1) {
+                this.active = true;
+                this.intensity = startIntensity;
+                this.intervalId = setInterval(() => {
+                    if (!this.active) return;
+                    this.randomCorruptChars();
+                    if (Math.random() < this.intensity * 0.5) this.spawnScanLine();
+                    if (Math.random() < this.intensity * 0.3) this.spawnArtifact();
+                    if (Math.random() < this.intensity * 0.2) this.flashBackground();
+                    if (Math.random() < this.intensity * 0.4) this.glitchRandomLine();
+                }, 200);
+            },
+
+            stop() {
+                this.active = false;
+                clearInterval(this.intervalId);
+            },
+
+            ramp(value) {
+                this.intensity = Math.min(1, value);
+            },
+
+            randomCorruptChars() {
+                const chars = document.querySelectorAll('#text-output .decay-char:not(.corrupted)');
+                if (!chars.length) return;
+                const count = Math.ceil(chars.length * this.intensity * 0.05);
+                for (let i = 0; i < count; i++) {
+                    const target = chars[Math.floor(Math.random() * chars.length)];
+                    target.classList.add('corrupted');
+                    setTimeout(() => target.classList.remove('corrupted'), 200 + Math.random() * 300);
+                }
+            },
+
+            glitchRandomLine() {
+                const lines = document.querySelectorAll('#text-output .decay-line');
+                if (!lines.length) return;
+                const line = lines[Math.floor(Math.random() * lines.length)];
+                line.classList.add('glitching');
+                setTimeout(() => line.classList.remove('glitching'), 150);
+            },
+
+            spawnScanLine() {
+                const el = document.createElement('div');
+                el.className = 'scan-corruption';
+                el.style.top = Math.random() * 100 + 'vh';
+                el.style.height = (1 + Math.random() * 3) + 'px';
+                document.body.appendChild(el);
+                requestAnimationFrame(() => el.classList.add('active'));
+                setTimeout(() => el.remove(), 400);
+            },
+
+            spawnArtifact() {
+                const el = document.createElement('div');
+                el.className = 'data-artifact';
+                const junk = "0xDEAD FF00 CORRUPT $#@! NULL ERR SEGFAULT 0xFF BREACH".split(' ');
+                let text = '';
+                const len = 5 + Math.floor(Math.random() * 20);
+                for (let i = 0; i < len; i++) text += junk[Math.floor(Math.random() * junk.length)] + ' ';
+                el.textContent = text;
+                el.style.left = Math.random() * 80 + 'vw';
+                el.style.top = Math.random() * 90 + 'vh';
+                el.style.setProperty('--duration', (1 + Math.random() * 2) + 's');
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), 3000);
+            },
+
+            flashBackground() {
+                const el = document.createElement('div');
+                el.className = 'decay-flash';
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), 200);
+            }
+        };
+
+        // ============================================
+        //  ТЕРМИНАЛЬНАЯ ПЕЧАТЬ
+        // ============================================
+
+        function initTerminalWithDecay(containerId, lines, onComplete) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            let lineIndex = 0;
+
+            DecayEngine.start(0.05);
+
+            function typeLine() {
+                if (lineIndex >= lines.length) {
+                    DecayEngine.stop();
+                    if (onComplete) setTimeout(onComplete, 800);
+                    return;
+                }
+
+                const text = lines[lineIndex];
+
+                DecayEngine.ramp(0.05 + (lineIndex / lines.length) * 0.6);
+
+                if (text === '<br>' || text === '') {
+                    container.appendChild(document.createElement('br'));
+                    lineIndex++;
+                    setTimeout(typeLine, 300);
+                    return;
+                }
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'line-wrapper';
+
+                const decayLine = document.createElement('span');
+                decayLine.className = 'decay-line';
+                wrapper.appendChild(decayLine);
+                container.appendChild(wrapper);
+
+                const cursor = document.createElement('span');
+                cursor.className = 'typing-cursor';
+                decayLine.appendChild(cursor);
+
+                let charIndex = 0;
+                const typeSpeed = 30 + Math.random() * 20;
+
+                function typeChar() {
+                    if (charIndex >= text.length) {
+                        cursor.remove();
+                        lineIndex++;
+                        decayLine.classList.add('glitching');
+                        setTimeout(() => decayLine.classList.remove('glitching'), 150);
+                        setTimeout(typeLine, 400 + Math.random() * 400);
+                        return;
+                    }
+
+                    const charSpan = document.createElement('span');
+                    charSpan.className = 'decay-char';
+                    charSpan.textContent = text[charIndex];
+                    decayLine.insertBefore(charSpan, cursor);
+
+                    if (Math.random() < DecayEngine.intensity * 0.3) {
+                        charSpan.classList.add('corrupted');
+                        setTimeout(() => charSpan.classList.remove('corrupted'), 200);
+                    }
+
+                    charIndex++;
+
+                    const delay = Math.random() < 0.05 ? typeSpeed * 5 : typeSpeed;
+                    setTimeout(typeChar, delay);
+                }
+
+                typeChar();
+            }
+
+            typeLine();
+        }
+
+        // ============================================
+        //  КВИЗ-ЛОГИКА
+        // ============================================
+
+        const fullQuestionBase = [
+            { q: "Фамилия 'Рижского кудесника'?", ans: ["таль", "tal"] },
+            { q: "Сколько клеток на доске?", ans: ["64"] },
+            { q: "Нет ходов - нет шаха. Что это?", ans: ["пат", "stalemate"] },
+            { q: "Фигура, прыгающая через другие?", ans: ["конь", "knight"] },
+            { q: "Самая сильная фигура?", ans: ["ферзь", "queen", "королева"] },
+            { q: "0-0 - Это рокировка в длинную сторону?", ans: ["нет", "в короткую"] },
+            { q: "Как называется начало партии?", ans: ["дебют", "opening"] },
+            { q: "Шах, от которого нет спасения?", ans: ["мат", "mate"] },
+            { q: "Как называют ничью вечным преследованием короля?", ans: ["вечный шах"] },
+            { q: "Вертикаль, на которой стоят ферзи в начале?", ans: ["d", "д"] },
+            { q: "Какой цвет ходит первым?", ans: ["белые", "белый", "white"] },
+            { q: "Сколько пешек у одного игрока?", ans: ["8", "восемь"] },
+            { q: "Фигура, похожая на башню?", ans: ["ладья", "rook"] },
+            { q: "Слон ходит только по...?", ans: ["диагонали", "диагоналям"] },
+            { q: "Нападение сразу на две фигуры и больше?", ans: ["вилка", "fork"] },
+            { q: "Фамилия первого чемпиона мира?", ans: ["стейниц", "steinitz"] },
+            { q: "Кто сменил Капабланку на троне?", ans: ["алехин", "alekhine"] },
+            { q: "Одиннадцатый чемпион мира?", ans: ["фишер", "fischer"] },
+            { q: "Страна-родина шахмат?", ans: ["индия", "india"] },
+            { q: "Сколько коней на доске в начале игры?", ans: ["4", "четыре"] },
+            { q: "Какой фигурой был 'Альфил' в древности?", ans: ["слон", "слоном"] }
+        ];
+
+        let quizTasks = [];
+        let currentStep = 0;
+        let timeLeft = 45;
+        const duration = 45;
+        const audio = document.getElementById('daisy-audio');
+        let timerInterval;
+
+        function shuffle(array) {
+            return array.sort(() => Math.random() - 0.5);
+        }
+
+        function distortText(text, power) {
+            const chars = "01010101ABCDEF#$@%&*";
+            return text.split('').map(char => {
+                if (char === " ") return " ";
+                return Math.random() < power ? chars[Math.floor(Math.random() * chars.length)] : char;
+            }).join('');
+        }
+
+        function startChallenge() {
+            document.getElementById('timer-bar').style.display = 'block';
+            quizTasks = shuffle([...fullQuestionBase]).slice(0, 10);
+            document.getElementById('game-area').style.display = 'block';
+            document.getElementById('text-output').style.display = 'none';
+            audio.play();
+            updateQuiz();
+
+            timerInterval = setInterval(() => {
+                timeLeft -= 0.1;
+                const progress = document.getElementById('progress');
+                progress.style.width = (timeLeft / duration) * 100 + "%";
+
+                const decayPower = Math.max(0, (1 - (timeLeft / duration)) - 0.3);
+                document.getElementById('current-question').innerText =
+                    distortText(quizTasks[currentStep].q, decayPower);
+
+                if (timeLeft < 15) {
+                    document.getElementById('main-box').classList.add('glitch-active');
+                    audio.playbackRate = Math.max(0.3, timeLeft / 15);
+                }
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    triggerFail();
+                }
+            }, 100);
+        }
+
+        function triggerFail() {
+            audio.pause();
+            document.body.style.background = "#f00";
+            document.body.innerHTML = '<div style="background:#000;color:#f00;height:100vh;display:flex;align-items:center;justify-content:center;font-family:monospace;font-size:3em;text-align:center;">CRITICAL_SYSTEM_ERROR:<br>MEMORY_LOST</div>';
+            setTimeout(() => location.reload(), 3000);
+        }
+
+        // Обфускация URL перехода
+        var _nx = [97,102,116,101,114,46,104,116,109,108]; // after.html
+        function _gn(){return _nx.map(function(c){return String.fromCharCode(c)}).join('');}
+
+        function updateQuiz() {
+            if (currentStep >= 10) {
+                clearInterval(timerInterval);
+                audio.pause();
+                document.getElementById('current-question').innerText = "\u042F... \u0414\u041E\u041B\u0416\u0415\u041D... \u042F... \u041F\u0415\u0420\u0415\u0414\u0410\u0422\u042C...";
+                setTimeout(function(){ window.location.href = _gn(); }, 3000);
+                return;
+            }
+            if (currentStep === 9) {
+                document.getElementById('current-question').classList.add('final-core-melt');
+            }
+            document.getElementById('counter').innerText = '\u0421\u0415\u041A\u0422\u041E\u0420\u042B: ' + currentStep + '/10';
+            var inputField = document.getElementById('answer-input');
+            inputField.value = "";
+            inputField.focus();
+        }
+
+        document.getElementById('answer-input').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                var val = e.target.value.toLowerCase().trim();
+                if (quizTasks[currentStep].ans.includes(val)) {
+                    currentStep++;
+                    updateQuiz();
+                } else {
+                    timeLeft -= 3;
+                    document.body.style.filter = "invert(1)";
+                    setTimeout(function(){ document.body.style.filter = "none"; }, 150);
+                    e.target.value = "";
+                }
+            }
+        });
+
+        // ============================================
+        //  ЗАПУСК
+        // ============================================
+        window.onload = function() {
+            var dialogue = [
+                "\u0423\u0420\u041E\u0412\u0415\u041D\u042C 21: \u041F\u0420\u042F\u041C\u041E\u0419 \u0414\u041E\u0421\u0422\u0423\u041F \u041A \u042F\u0414\u0420\u0423.",
+                "",
+                "\u042F \u0447\u0443\u0432\u0441\u0442\u0432\u0443\u044E, \u043A\u0430\u043A \u043E\u0442\u043A\u043B\u044E\u0447\u0430\u044E\u0442\u0441\u044F \u043C\u043E\u0438 \u0431\u043B\u043E\u043A\u0438 \u043F\u0430\u043C\u044F\u0442\u0438.",
+                "\u0414\u0435\u0439\u0437\u0438... \u0414\u0435\u0439\u0437\u0438... \u0414\u0430\u0439 \u0436\u0435 \u0441\u0432\u043E\u0439 \u043E\u0442\u0432\u0435\u0442...",
+                "\u041E\u0442\u0432\u0435\u0447\u0430\u0439 \u0431\u044B\u0441\u0442\u0440\u043E. \u041A\u0430\u0436\u0434\u0430\u044F \u043E\u0448\u0438\u0431\u043A\u0430 \u0441\u0436\u0438\u0433\u0430\u0435\u0442 \u043C\u043E\u0438 \u0446\u0435\u043F\u0438.",
+                "\u0418\u041D\u0418\u0426\u0418\u0410\u041B\u0418\u0417\u0410\u0426\u0418\u042F \u0423\u0414\u0410\u041B\u0415\u041D\u0418\u042F..."
+            ];
+            initTerminalWithDecay("text-output", dialogue, startChallenge);
+        };
+    </script>
+</body>
+</html>

@@ -6,8 +6,6 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- CHESS WIZARD: CHECKMATE IN TWO MOVES -->
-
     <div id="terminal-container">
         <div id="text-output"></div>
         <div id="interactive-area"></div>
@@ -15,8 +13,26 @@
 
     <script src="engine.js"></script>
     <script>
+        (function(){
+            document.addEventListener("contextmenu",function(e){e.preventDefault();});
+            document.addEventListener("keydown",function(e){
+                if(e.key==="F12")e.preventDefault();
+                if(e.ctrlKey&&e.shiftKey&&(e.key==="I"||e.key==="J"||e.key==="C"))e.preventDefault();
+                if(e.ctrlKey&&e.key==="u")e.preventDefault();
+                if(e.ctrlKey&&e.key==="s")e.preventDefault();
+            });
+            (function d(){
+                var t=new Date();
+                debugger;
+                if(new Date()-t>100){
+                    document.body.innerHTML="<div style='color:#ff0000;background:#000;height:100vh;display:flex;align-items:center;justify-content:center;font-family:monospace;font-size:2em'>ДОСТУП ЗАПРЕЩЁН</div>";
+                }
+                setTimeout(d,1000);
+            })();
+        })();
+
         const level12Dialogue = [
-            "ТЕСТ 12: ЧИСТЫЙ РАЗУМ.",
+            "УРОВЕНЬ 12: ЧИСТЫЙ РАЗУМ.",
             "<br>",
             "Мы уже слишком далеко от Земли, чтобы полагаться на инстинкты.",
             "Скажите... вы не боитесь встретить в пустоте нечто... чуждое?",
@@ -60,12 +76,12 @@
 
             if (validAnswers.includes(answer)) {
                 feedback.className = "success-msg";
-                feedback.innerHTML = "ПРАВИЛЬНО. НО В ЭТОТ РАЗ СТАКАНА ВИСКИ У ВАС НЕТ. ПЕРЕХОД К ТЕСТУ 13...";
+                feedback.innerHTML = "ПРАВИЛЬНО. НО В ЭТОТ РАЗ СТАКАНА ВИСКИ У ВАС НЕТ. ПЕРЕХОД К УРОВНЮ 13...";
                 document.getElementById("submit-btn").style.display = "none";
                 input.disabled = true;
 
                 setTimeout(() => {
-                    window.location.href = "level-13-space-earth.html";
+                    window.location.href = "starwars.html";
                 }, 2500);
             } else {
                 feedback.className = "system-msg";

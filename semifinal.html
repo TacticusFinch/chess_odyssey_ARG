@@ -172,19 +172,31 @@
             background: rgba(100, 200, 150, .3);
         }
 
+        /* === КНОПКА ПРОДОЛЖИТЬ — более заметная === */
         .click-hint {
-            font-size: .65em;
+            font-size: .7em;
             letter-spacing: 5px;
-            color: rgba(150, 155, 170, .2);
+            color: rgba(180, 190, 220, .45);
             margin-top: 30px;
             animation: hint-pulse 3s ease-in-out infinite;
             cursor: pointer;
             text-transform: uppercase;
+            padding: 8px 18px;
+            border: 1px solid rgba(150, 160, 200, .15);
+            border-radius: 2px;
+            transition: color .4s, border-color .4s, text-shadow .4s;
+            display: inline-block;
+        }
+
+        .click-hint:hover {
+            color: rgba(220, 225, 240, .8);
+            border-color: rgba(150, 160, 200, .4);
+            text-shadow: 0 0 12px rgba(100, 120, 255, .25);
         }
 
         @keyframes hint-pulse {
-            0%, 100% { opacity: .2; }
-            50% { opacity: .5; }
+            0%, 100% { opacity: .55; }
+            50% { opacity: 1; }
         }
 
         /* === HOME BUTTON (not a link) === */
@@ -495,7 +507,7 @@
     </div>
 
     <audio id="soundtrack" loop preload="auto">
-        <source src="space-song.mp3" type="audio/mpeg">
+        <source src="music/space-song.mp3" type="audio/mpeg">
         <source src="space-song.ogg" type="audio/ogg">
     </audio>
 
@@ -729,7 +741,7 @@
         }
 
         // ============================================
-        // QUOTES SEQUENCE
+        // QUOTES SEQUENCE  (+ новая цитата)
         // ============================================
         const passages = [
             {
@@ -743,6 +755,10 @@
             {
                 text: "Монолит ждал. Он ждал терпеливо, потому что время для него не имело значения. Четыре миллиона лет — одно мгновение.",
                 note: "Часовой вечности"
+            },
+            {
+                text: "Сотня неудач не имеет значения, если один-единственный успех может изменить судьбу мира.",
+                note: "АРТУР КЛАРК, КОСМИЧЕСКАЯ ОДИССЕЯ-2001"
             },
             {
                 text: "Комната, белая комната. Знакомая и невозможная одновременно. Он понял: это не конец путешествия. Это его начало.",
@@ -816,7 +832,8 @@
 
         function showPassage() {
             if (currentPassage >= passages.length) {
-                showFinalReveal();
+                // Сразу переходим к listen-hint, минуя повторный показ
+                showListenHint();
                 return;
             }
 
@@ -849,7 +866,7 @@
             starSpeed = 0.06;
             setTimeout(() => { starSpeed = 0.015; }, 1200);
 
-            if (currentPassage >= 3) {
+            if (currentPassage >= 4) {
                 document.getElementById('starchild-glow').classList.add('visible');
             }
 
@@ -892,9 +909,9 @@
         });
 
         // ============================================
-        // FINAL REVEAL
+        // LISTEN HINT  (без предварительного повтора)
         // ============================================
-        function showFinalReveal() {
+        function showListenHint() {
             floatActive = false;
             document.querySelectorAll('.float-word').forEach(w => {
                 w.classList.add('fading');
@@ -903,25 +920,6 @@
 
             glowIntensity = 1;
 
-            const content = document.getElementById('main-content');
-
-            content.classList.remove('fade-out');
-            requestAnimationFrame(() => {
-                requestAnimationFrame(() => {
-                    content.classList.add('visible');
-                });
-            });
-
-            setTimeout(() => {
-                content.classList.add('fade-out');
-                setTimeout(() => {
-                    content.classList.remove('visible', 'fade-out');
-                    showListenHint();
-                }, 2500);
-            }, 8000);
-        }
-
-        function showListenHint() {
             const content = document.getElementById('main-content');
 
             content.innerHTML = `
@@ -962,7 +960,7 @@
 
             content.innerHTML = `
                 <button class="final-btn" id="home-btn">
-		.
+                    .
                 </button>
                 <div class="sub-text" style="margin-top:20px; font-size:.65em; color:rgba(150,160,200,.18); letter-spacing:5px">
                     УРОВЕНЬ 25
@@ -999,11 +997,9 @@
             content.style.transition = 'opacity 1.5s';
             content.style.opacity = '0';
 
-            // Hide volume control
             document.getElementById('vol-ctrl').style.transition = 'opacity 1s';
             document.getElementById('vol-ctrl').style.opacity = '0';
 
-            // White flash
             const flash = document.getElementById('flash');
             flash.classList.add('flash');
             setTimeout(() => {
@@ -1011,7 +1007,6 @@
                 flash.classList.add('fade');
             }, 150);
 
-            // Engage warp drive
             warpMode = true;
             let ws = 0;
             const warpUp = setInterval(() => {
@@ -1022,7 +1017,6 @@
                 }
             }, 30);
 
-            // Accelerate stars dramatically
             let sp = starSpeed;
             const speedUp = setInterval(() => {
                 sp += 0.003;
@@ -1030,7 +1024,6 @@
                 if (sp >= 0.3) clearInterval(speedUp);
             }, 30);
 
-            // Increase glow during warp
             let gl = glowIntensity;
             const glowUp = setInterval(() => {
                 gl += 0.01;
@@ -1038,7 +1031,6 @@
                 if (gl >= 1.5) clearInterval(glowUp);
             }, 30);
 
-            // Fade audio out slowly
             const fadeOutAudio = setInterval(() => {
                 if (audio.volume > 0.01) {
                     audio.volume = Math.max(0, audio.volume - 0.005);
@@ -1048,9 +1040,7 @@
                 }
             }, 50);
 
-            // After warp builds up, darken everything
             setTimeout(() => {
-                // Stop warp gradually
                 const warpDown = setInterval(() => {
                     warpSpeed = Math.max(0, warpSpeed - 0.3);
                     if (warpSpeed <= 0) {
@@ -1059,22 +1049,18 @@
                     }
                 }, 30);
 
-                // Fade canvas to black
                 canvas.style.transition = 'opacity 2.5s ease';
                 canvas.style.opacity = '0';
 
-                // Fade nebulas
                 document.querySelectorAll('.nebula').forEach(n => {
                     n.style.transition = 'opacity 2s ease';
                     n.style.opacity = '0';
                 });
 
-                // Fade starchild glow
                 const sg = document.getElementById('starchild-glow');
                 sg.style.transition = 'opacity 2s ease';
                 sg.style.opacity = '0';
 
-                // Show dark overlay with final message
                 setTimeout(() => {
                     const darkOverlay = document.getElementById('dark-overlay');
                     darkOverlay.classList.add('visible');
