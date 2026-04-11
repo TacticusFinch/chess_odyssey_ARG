@@ -2,10 +2,30 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HAL-9000 | УРОВЕНЬ 02</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        #terminal-container { width: 95%; max-width: 800px; margin: auto; }
+        input { font-size: 16px !important; } 
+    </style>
 </head>
 <body>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript">
+    (function(m,e,t,r,i,k,a){
+        m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+        m[i].l=1*new Date();
+        for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+    })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=108490054', 'ym');
+
+    ym(108490054, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/108490054" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<!-- /Yandex.Metrika counter -->
+
     <div id="terminal-container">
         <div id="text-output"></div>
         <div id="interactive-area"></div>
@@ -24,83 +44,35 @@
             "<br>",
         ];
 
-        async function getHash(string) {
-            const buf = new TextEncoder().encode(string);
-            const hash = await crypto.subtle.digest('SHA-256', buf);
-            return Array.from(new Uint8Array(hash))
-                .map(b => b.toString(16).padStart(2, '0')).join('');
-        }
-
         function normalizeAnswer(value) {
-            return value
-                .trim()
-                .toLowerCase()
-                .replace(/\s+/g, ' ')
-                .replace(/ё/g, 'е');
+            return value.trim().toLowerCase().replace(/ё/g, 'е');
         }
-
-        const _s = ['_HAL', '_CHESS', '_VULN'];
-        function getSalt() {
-            return _s.join('');
-        }
-
-        const _encodedAnswers = [
-            [102, 55], // f7
-            [102, 50]  // f2
-        ];
-
-        let validHashes = [];
-
-        async function initValidHashes() {
-            const salt = getSalt();
-            for (const codes of _encodedAnswers) {
-                const answer = String.fromCharCode(...codes);
-                const hash = await getHash(answer + salt);
-                validHashes.push(hash);
-            }
-        }
-
-        const _r = [
-    112,117,122,122,108,101,49,46,
-    104,116,109,108
-];
-
 
         function showInputInterface() {
             const area = document.getElementById('interactive-area');
             area.innerHTML = `
-                <input type="text" id="answer-input"
-                       placeholder="координата..." autocomplete="off">
+                <input type="text" id="answer-input" placeholder="координата..." autocomplete="off">
                 <br>
-                <button class="terminal-btn" id="submit-btn"
-                        style="display:block;" onclick="checkAnswer()">
-                    ВВОД ДАННЫХ
-                </button>
-                <div id="feedback-msg" class="spacer"
-                     style="margin-top:20px;"></div>
+                <button class="terminal-btn" id="submit-btn" style="display:block;" onclick="checkAnswer()">ВВОД ДАННЫХ</button>
+                <div id="feedback-msg" class="spacer" style="margin-top:20px;"></div>
             `;
             const inp = document.getElementById('answer-input');
-            inp.addEventListener('keypress', e => {
-                if (e.key === 'Enter') { e.preventDefault(); checkAnswer(); }
-            });
+            inp.addEventListener('keypress', e => { if (e.key === 'Enter') checkAnswer(); });
             inp.focus();
         }
 
-        async function checkAnswer() {
+        function checkAnswer() {
             const inp = document.getElementById('answer-input');
             const fb  = document.getElementById('feedback-msg');
+            const answer = normalizeAnswer(inp.value);
 
-            const answer   = normalizeAnswer(inp.value);
-            const userHash = await getHash(answer + getSalt());
-
-            if (validHashes.includes(userHash)) {
+            // Проверка оригинальных ответов f7 и f2 (включая русскую раскладку)
+            if (["f7", "ф7", "f2", "ф2"].includes(answer)) {
                 fb.className = 'success-msg';
                 fb.innerHTML = 'УЯЗВИМОСТЬ НАЙДЕНА. ПЕРЕХОД К УРОВНЮ 03...';
                 document.getElementById('submit-btn').style.display = 'none';
                 inp.disabled = true;
-
-                const dest = String.fromCharCode(..._r);
-                setTimeout(() => { window.location.href = dest; }, 2000);
+                setTimeout(() => { window.location.href = "puzzle1.html"; }, 2000);
             } else {
                 fb.className = 'system-msg';
                 fb.innerHTML = 'НЕТ. КАКИЕ ПОПУЛЯРНЫЕ ЛОВУШКИ ТЫ ЗНАЕШЬ?';
@@ -109,9 +81,12 @@
             }
         }
 
-        window.onload = async () => {
-            await initValidHashes();
-            initTerminal('text-output', level2Dialogue, showInputInterface);
+        window.onload = () => {
+            if (typeof initTerminal === 'function') {
+                initTerminal('text-output', level2Dialogue, showInputInterface);
+            } else {
+                showInputInterface();
+            }
         };
     </script>
 </body>

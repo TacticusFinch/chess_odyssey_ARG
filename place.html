@@ -7,6 +7,20 @@
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
 </head>
 <body>
+     <!-- Yandex.Metrika counter -->
+<script type="text/javascript">
+    (function(m,e,t,r,i,k,a){
+        m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+        m[i].l=1*new Date();
+        for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+    })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=108490054', 'ym');
+
+    ym(108490054, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/108490054" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<!-- /Yandex.Metrika counter -->
+
     <div id="terminal-container">
         <div id="text-output"></div>
         <div id="interactive-area"></div>
@@ -23,6 +37,7 @@
 
     <script src="engine.js"></script>
     <script>
+  	document.addEventListener('contextmenu', event => event.preventDefault());
         const level0Dialogue = [
             "Добро пожаловать.",
             "Прежде чем мы приступим, я должен убедиться, что вы на своём месте.",
@@ -31,9 +46,6 @@
             "Что вы видите на картинке?",
         ];
 
-        /* ========================================= */
-        /* === ГЕНЕРАТОР ЖИВОЙ КАПЧИ =============== */
-        /* ========================================= */
         function generateLiveCaptcha() {
             const canvas = document.getElementById("captcha-canvas");
             if (!canvas) return;
@@ -71,7 +83,6 @@
             }
             ctx.shadowBlur = 0;
 
-            // --- Буквы ЧЕЛОВЕК в случайном порядке ---
             const letters = "ЧЕЛОВЕК".split("");
             // Перемешиваем (Fisher-Yates)
             for (let i = letters.length - 1; i > 0; i--) {

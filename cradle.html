@@ -6,84 +6,75 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+	<!-- Yandex.Metrika counter -->
+<script type="text/javascript">
+    (function(m,e,t,r,i,k,a){
+        m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+        m[i].l=1*new Date();
+        for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+    })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=108490054', 'ym');
+
+    ym(108490054, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/108490054" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<!-- /Yandex.Metrika counter -->
+
     <div id="terminal-container">
         <div id="text-output"></div>
         <div id="interactive-area"></div>
     </div>
 
     <script src="engine.js"></script>
-    <script>
-        const level1Dialogue = [
-            "УРОВЕНЬ 01: БАЗОВАЯ КОГНИТИВНАЯ ПРОВЕРКА.",
-	    "<br>",
-	    "А пока мы покидаем нижние слои атмосферы...",
-            "Начнём наш поединок с простой загадки:",
-            "<br>",
-            '<span class="riddle-text">Деревянная колыбель, в которой засыпают короли.</span>',
-            '<span class="riddle-text">Бездна, где империи рождаются и гибнут в одно мгновение.</span>',
-            '<span class="riddle-text">Её ширина - одна октава.</span>',
-            '<span class="riddle-text">Каков её размер?</span>',
-            "<br>"
-        ];
+<script>
+    const level1Dialogue = [
+        "УРОВЕНЬ 01: БАЗОВАЯ КОГНИТИВНАЯ ПРОВЕРКА.",
+        "<br>",
+        "А пока мы покидаем нижние слои атмосферы...",
+        "Начнём наш поединок с простой загадки:",
+        "<br>",
+        '<span class="riddle-text">Деревянная колыбель, в которой засыпают короли.</span>',
+        '<span class="riddle-text">Бездна, где империи рождаются и гибнут в одно мгновение.</span>',
+        '<span class="riddle-text">Её ширина - одна октава.</span>',
+        '<span class="riddle-text">Каков её размер?</span>',
+        "<br>"
+    ];
 
-        async function _digest(str) {
-            const buf = new TextEncoder().encode(str);
-            const hash = await crypto.subtle.digest("SHA-256", buf);
-            return Array.from(new Uint8Array(hash))
-                .map(b => b.toString(16).padStart(2, "0"))
-                .join("");
-        }
+    async function _digest(str) {
+        const msgUint8 = new TextEncoder().encode(str);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
 
-        const _k = [
-            "a68b412c4282",
-            "555f15546cf6",
-            "e1fc42893b7e",
-            "07f271557ceb",
-            "021821098dd6",
-            "6c1b"
-        ];
+    const _r = [119,101,97,107,46,104,116,109,108];
 
-        const _r = [
-    119,101,97,107,46,104,116,
-    109,108
-];
+    function showInputInterface() {
+        const area = document.getElementById("interactive-area");
+        area.innerHTML = `
+            <input type="text" id="answer-input" placeholder="ОТВЕТ..." autocomplete="off">
+            <br>
+            <button class="terminal-btn" id="submit-btn" style="display:block;" onclick="checkAnswer()">ВВОД ДАННЫХ</button>
+            <div id="feedback-msg" class="spacer" style="margin-top:20px;"></div>
+        `;
+        const inp = document.getElementById("answer-input");
+        inp.addEventListener("keypress", e => { if (e.key === "Enter") { e.preventDefault(); checkAnswer(); } });
+        inp.focus();
+    }
 
-
-        function showInputInterface() {
-            const area = document.getElementById("interactive-area");
-            area.innerHTML = `
-                <input type="text" id="answer-input"
-                       placeholder="ОТВЕТ..." autocomplete="off">
-                <br>
-                <button class="terminal-btn" id="submit-btn"
-                        style="display:block;" onclick="checkAnswer()">
-                    ВВОД ДАННЫХ
-                </button>
-                <div id="feedback-msg" class="spacer"
-                     style="margin-top:20px;"></div>
-            `;
-
-            const inp = document.getElementById("answer-input");
-            inp.addEventListener("keypress", e => {
-                if (e.key === "Enter") { e.preventDefault(); checkAnswer(); }
-            });
-            inp.focus();
-        }
-
-        async function checkAnswer() {
-            const raw   = document.getElementById("answer-input").value.trim();
-            const fb    = document.getElementById("feedback-msg");
-            const hUser = await _digest(raw);          
-            const hReal = _k.join("");                 
-
-            if (hUser === hReal) {
+            async function checkAnswer() {
+            
+            const raw = document.getElementById("answer-input").value.trim().toLowerCase();
+            const fb = document.getElementById("feedback-msg");
+            
+            if (raw === "64" || raw === "64 клетки") {
                 fb.className = "success-msg";
                 fb.innerHTML = "ДОСТУП РАЗРЕШЕН. ПЕРЕХОД К УРОВНЮ 02...";
                 document.getElementById("submit-btn").style.display = "none";
                 document.getElementById("answer-input").disabled = true;
 
-                // Собираем URL из char-кодов только при успехе
-                const dest = String.fromCharCode(..._r);
+                // Переход на следующую страницу (weak.html)
+                const dest = "weak.html"; 
                 setTimeout(() => { window.location.href = dest; }, 2000);
 
             } else {
@@ -95,9 +86,14 @@
         }
 
 
-        window.onload = () => {
+    window.onload = () => {
+        if (typeof initTerminal === 'function') {
             initTerminal("text-output", level1Dialogue, showInputInterface);
-        };
-    </script>
+        } else {
+            showInputInterface(); 
+        }
+    };
+</script>
+
 </body>
 </html>
