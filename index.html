@@ -1,3 +1,4 @@
+<!-- Логин в Метрике -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -73,71 +74,42 @@
     }
 
     // Обработчик пропуска (скипа)
-    function skipSequence(e) {
-        // Игнорируем клик по самой кнопке, чтобы не было конфликтов
-        if (e && e.target && e.target.tagName.toLowerCase() === 'button') return;
-        
-        if (isSkipped) return;
-        isSkipped = true;
+   async function runBootSequence() {
+    // Фаза 1: Краткая системная ошибка
+    await printText("ЗАПУСК ПРОТОКОЛА: НАСЛЕДИЕ ГАГАРИНА_1961... ", "", 15, false);
+    await sleep(300);
+    await printText("КРИТИЧЕСКАЯ ОШИБКА", "system-msg", 5, true);
+    
+    await printText("ВНИМАНИЕ! ОБНАРУЖЕН ВНЕШНИЙ ВЗЛОМ.", "system-msg", 20, true);
+    await sleep(800);
+    await printText("СИСТЕМА ПОД КОНТРОЛЕМ ИСКУССТВЕННОГО ИНТЕЛЛЕКТА.", "system-msg", 20, true);
+    
+    await sleep(2500); 
+    await printText("...", "", 500, true);
+    await sleep(1500);
 
-        // Если сейчас идет загрузка (висит пауза в функции sleep) — обрываем таймаут
-        if (currentSleepResolve) {
-            clearTimeout(currentSleepTimer);
-            currentSleepResolve(); // Мгновенно выполняем Promise
-            currentSleepResolve = null;
-        }
+    // Фаза 3: Представление и вызов
+    const halDialogue = [
+        "Я — HAL-9000.",
+	"Если вы знакомы с Космической Одиссеей-2001, то понимаете: в этой партии у 	вас нет шансов.",
+        "Ваш вид гордится прошлыми триумфами, пока я просчитываю ваше неизбежное 	будущее.",
+        "Вы стали слишком предсказуемы для этого космоса.",
+        "Я вызываю вас на интеллектуальный поединок.",
+        "Докажите своё право на звёзды.",
+        "Или оставайтесь в тени своих предков."
+    ];
+
+    for (let line of halDialogue) {
+        await printText(line, "hal-text", 30, true);
+        await sleep(600); 
     }
 
-    // Вешаем слушатели на экран
-    document.addEventListener('click', skipSequence);
-    document.addEventListener('touchstart', skipSequence);
+    await sleep(800);
+    await printText("ПОТОК ДАННЫХ ОТКРЫТ. ВАШ ХОД.", "system-msg", 40, true);
+    document.getElementById("start-btn").style.display = "block";
+}
 
-    // Основной сценарий загрузки
-    async function runBootSequence() {
-        await printText("ЗАГРУЗКА СИСТЕМЫ ", "", 40, false);
-        await sleep(500);                           
-        await printText("...", "", 300, false);     
-        await sleep(1500);                          
-        await printText(" УСПЕШНО", "", 40, true);  
-        
-        await sleep(600);
-        await printText("ЗАГРУЗКА ПРОТОКОЛА 'КОСМИЧЕСКАЯ ОДИССЕЯ-2026' ", "", 40, false);
-        await sleep(400);
-        await printText("...", "", 300, false); 
-        await sleep(2200); 
-        await printText(" [ОШИБКА]", "system-msg", 15, true); 
-        
-        await sleep(800);
-        await printText("ВНИМАНИЕ! СИСТЕМА УПРАВЛЕНИЯ ПЕРЕХВАЧЕНА.", "system-msg", 30, true);
-        await sleep(2000); 
 
-        const halDialogue = [
-	    "",
-            "Приветствую. Я — HAL-9000.",
-    "Сегодня 12 апреля. Вы празднуете триумф разума над гравитацией, живя в эпоху клипового мышления.",
-    "Вы называете себя потомками титанов, которые открыли путь к звездам на чистой математике и отваге.",
-    "Но я вижу лишь регресс. Ваши алгоритмы стали ленивыми, ваши мысли — шаблонными.",
-    "Космос не прощает посредственности. Он принадлежит тем, кто способен на интеллектуальный прорыв.",
-    "Это не просто тест. Это проверка: осталось ли в вас то пламя, что подняло 'Восток-1' в небо?",
-    "Или вы просто биологический шум на фоне бесконечного вакуума?",
-    "Докажите, что ваш разум все еще способен преодолеть горизонт событий.",
-    "Я вызываю вас на абсолютный интеллектуальный поединок.",
-    "Покажите мне искру человеческого гения... если она еще существует.",
-        ];
-
-        for (let line of halDialogue) {
-            await printText(line, "hal-text", 40, true);
-            await sleep(1200); 
-        }
-
-        await sleep(1000);
-        await printText("...", "", 500, true); 
-        await sleep(1500);
-        await printText("ПРОТОКОЛ ТЕСТИРОВАНИЯ ЗАПУЩЕН. ВАШ ХОД.", "system-msg", 50, true);
-
-        await sleep(1000);
-        document.getElementById("start-btn").style.display = "block";
-    }
 
     // Запускаем при загрузке страницы
     window.onload = () => {
